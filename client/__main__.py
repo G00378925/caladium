@@ -10,13 +10,28 @@
 import json, os, sys, tkinter
 import tkinter.filedialog, tkinter.messagebox, urllib.request
 
+import quarantine
+
+def get_caladium_appdata_location():
+    if sys.platform == "win32":
+        return os.environ["USERPROFILE"] + "{0}AppData{0}Local{0}Caladium".format(os.path.sep)
+    else:
+        return None
+
 def load_config(argv):
     config_json_location = ''.join(argv[0].split(os.path.sep)[:-1]) + os.path.sep + "config.json"
+
+    if sys.platform == "win32":
+        config_json_location = config_json_location.lstrip(os.path.sep)
+
     with open(config_json_location) as config_json_handle:
-        return json.loads(config_json_handle.read())
+        return json.load(config_json_handle)
 
 def main(argv):
     config = load_config(argv)
+    caladium_appdata_location = get_caladium_appdata_location()
+
+    quarantine_obj = quarantine.Quarantine(caladium_appdata_location + os.path.sep + "Quarantine")
 
     main_window = tkinter.Tk()
     main_window.minsize(640, 480)
