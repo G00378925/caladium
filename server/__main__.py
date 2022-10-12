@@ -12,6 +12,15 @@ import flask
 
 app = flask.Flask(__name__)
 
+@app.route("/")
+def root_page():
+    with open("static/index.html") as index_html_handle:
+        return index_html_handle.read()
+
+@app.route("/js/<path:js_file_path>")
+def serve_js_file(js_file_path):
+    return flask.send_from_directory("static/js/", js_file_path)
+
 @app.route("/api/upload_file", methods=["POST"])
 def upload_file():
     request_data = flask.request.get_data()
