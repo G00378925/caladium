@@ -7,10 +7,10 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import json, os, sys, tkinter
-import tkinter.filedialog, tkinter.messagebox, urllib.request
+import json, os, sys, tkinter, tkinter.filedialog
+import tkinter.messagebox, tkinter.ttk, urllib.request
 
-import quarantine
+import quarantine, quarantineframe
 
 def get_caladium_appdata_location():
     if sys.platform == "win32":
@@ -37,6 +37,14 @@ def main(argv):
     main_window.minsize(640, 480)
     main_window.title("Caladium")
 
+    main_window_notebook = tkinter.ttk.Notebook(main_window)
+    main_window_notebook.pack(fill=tkinter.BOTH)
+
+    main_frame = tkinter.ttk.Frame()
+    main_window_notebook.add(main_frame, text="Caladium")
+    quarantine_frame = quarantineframe.QuarantineFrame(main_window, quarantine_obj)
+    main_window_notebook.add(quarantine_frame, text="Quarantine")
+
     def upload_file():
         try:
             file_handle = tkinter.filedialog.askopenfile("rb")
@@ -53,7 +61,7 @@ def main(argv):
         except (urllib.error.URLError):
             tkinter.messagebox.showerror("Error", "Error establishing connection to server")
 
-    upload_file_button = tkinter.Button(main_window, command=upload_file)
+    upload_file_button = tkinter.Button(main_frame, command=upload_file)
     upload_file_button["text"] = "Upload file"
     upload_file_button.pack()
 
