@@ -13,7 +13,8 @@ import flask
 app = flask.Flask(__name__)
 
 @app.route("/")
-def root_page():
+@app.route("/<path:index_path>")
+def root_page(index_path=None):
     with open("static/index.html") as index_html_handle:
         return index_html_handle.read()
 
