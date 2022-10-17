@@ -16,7 +16,7 @@ class Quarantine:
 
         for i in range(1, len(self.index_json_location.split(os.path.sep))):
             dir_path = os.path.sep.join(self.index_json_location.split(os.path.sep)[:i])
-            if not os.path.isdir(dir_path): os.mkdir(dir_path)
+            if len(dir_path) != 0 and not os.path.isdir(dir_path): os.mkdir(dir_path)
 
         if os.path.exists(self.index_json_location):
             with open(self.index_json_location) as index_json_handle:

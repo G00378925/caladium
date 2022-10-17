@@ -10,11 +10,13 @@
 import json, os, sys, tkinter, tkinter.filedialog
 import tkinter.messagebox, tkinter.ttk, urllib.request
 
-import quarantine, quarantineframe
+import dirchangelistener, quarantine, quarantineframe
 
 def get_caladium_appdata_location():
     if sys.platform == "win32":
         return os.environ["USERPROFILE"] + "{0}AppData{0}Local{0}Caladium".format(os.path.sep)
+    elif sys.platform == "darwin":
+        return "/tmp"
     else:
         return None
 
@@ -32,6 +34,12 @@ def main(argv):
     caladium_appdata_location = get_caladium_appdata_location()
 
     quarantine_obj = quarantine.Quarantine(caladium_appdata_location + os.path.sep + "Quarantine")
+
+    def dirchangelistener_callback(file_path):
+        print("Change detected:", file_path)
+
+    dirchangelistener_obj = dirchangelistener.DirChangeListener([], dirchangelistener_callback)
+    dirchangelistener_obj.start()
 
     main_window = tkinter.Tk()
     main_window.minsize(640, 480)
