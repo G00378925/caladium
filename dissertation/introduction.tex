@@ -1,3 +1,35 @@
-\chapter{Introduction}
+% Fri 7 Oct 18:57
 
-This chapter should provide a clear context for your project and set out its objectives. You can cite references from the bibliography using IEEE format, such as Claude Shannon \cite{shannon1948mathematical} and John Von Neumann \textit{et al} \cite{von2007theory}. Use Google Scholar's BibTex export function to get a \LaTeX formatted citation to copy and paste into the \textit{references.bib} document.
+It is common knowledge that malicious software is a problem in computing.
+Malicious actors are often motivated by financial and political gains.
+
+Malware can be described as a piece of software that is malicious,
+malicious meaning it does things that are bad,
+this can include exfiltration of data from a device,
+creating damage such as encrypting data and holding the key as ransom.
+
+Malware authors work hard to avoid their work being attributed back to themselves,
+adopting strategies such as polymorphic code (code that can change itself during execution),
+anti-debugging (changing behaviour or not running at all),
+code obfuscation (making code hard to reverse engineer or decrypting the real code on execution).
+
+Malware is commonly packed with a tool called UPX, which allows code to unpack itself on start,
+making it difficult to analysis the code, until it is executing and you can dump the real code from memory.
+
+What can be classified as malware is hard to define, false positives is something that plagues modern anti-malware solutions,
+sometimes applications used by millions of people can exhibit behaviours comparable to malware,
+such as retrieving your contacts list on your smart phone or retrieving a list of your installed applications.
+
+A common technique modern anti-malware solution employ is heuristic analysis,
+this is scanning executable file formats for certain known arifacts that other known malware have.
+This is not enough as I have explained above, modern malware try to hide their true nature from scanners,
+now dynamic heuristic analysis is needed, we can observe what the application is doing while it is running, what resources it is requesting,
+a ransomware for example would be opening many files on the computer, and replacing them with encrypted modified versions.
+
+In Ireland in 2021 the Health Service Executive was compromised with the use of a excel spreadsheet document,
+this served as the entry point for the Conti ransomeware, this could have been avoided if the excel document was opened in a sandboxed environment mimicking the target computer,
+as soon as the ransomware started showing malware signature behaviour it could have been classed as malicious and then be quaratined.
+
+The goal of my project is to create a platform that can facilitate malware detection using dynamic heuristic analysis.
+I will be developing an application that will run on the computer natively, it will be a GUI application
+
