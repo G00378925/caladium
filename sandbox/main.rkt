@@ -17,25 +17,23 @@
 (define procmon-csv-file-location
     (path->string (make-temporary-file "caladium_~a.csv")))
 
-(define-values (procmon-subprocess procmon-out procmon-in procmon-err)
-    (subprocess #f #f #f procmon-location "/Minimized" "/BackingFile" procmon-pml-file-location))
-(define-values (sandboxed-subprocess sandboxed-out sandboxed-in sandboxed-err)
-    (subprocess #f #f #f sandboxie-start-location "/wait" "cmd.exe"))
+(define (subprocess-and-close-ports executable-location subprocess-parameters)
+    (begin (define-values (subprocess-obj out in err)
+        (apply subprocess #f #f #f executable-location subprocess-parameters))
+        (close-input-port out)
+        (close-output-port in)
+        (close-input-port err)
+        subprocess-obj))
+
+(define procmon-subprocess (subprocess-and-close-ports procmon-location (list "/Minimized" "/BackingFile" procmon-pml-file-location)))
+(define sandboxed-subprocess (subprocess-and-close-ports sandboxie-start-location (list "/wait" "cmd.exe")))
 
 (define sandboxed-subprocess-pid
     (subprocess-pid sandboxed-subprocess))
 (subprocess-wait sandboxed-subprocess)
 
-(close-input-port sandboxed-out)
-(close-output-port sandboxed-in)
-(close-input-port sandboxed-err)
-
 (system (string-join (list procmon-location "/Terminate") " "))
 (subprocess-wait procmon-subprocess)
-
-(close-input-port procmon-out)
-(close-output-port procmon-in)
-(close-input-port procmon-err)
 
 (system (string-join (list procmon-location "/OpenLog" procmon-pml-file-location
     "/SaveAs" procmon-csv-file-location) " "))
