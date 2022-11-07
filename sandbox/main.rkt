@@ -15,13 +15,19 @@
 (define (subprocess-and-close-ports executable-location subprocess-parameters)
     (begin (define-values (subprocess-obj out in err)
         (apply subprocess #f #f #f executable-location subprocess-parameters))
-        (close-input-port out)
-        (close-output-port in)
-        (close-input-port err)
+        (close-input-port out) (close-output-port in) (close-input-port err)
         subprocess-obj))
 
+(define (listpids-in-sandbox)
+    (begin (define-values (subprocess-obj out in err)
+        (subprocess #f #f #f sandboxie-start-location "/listpids"))
+        (define listpids-list (string-split (port->string out) "\r\n"))
+        (subprocess-wait subprocess-obj)
+        (close-input-port out) (close-output-port in) (close-input-port err)
+        listpids-list))
+
 (define (run-in-sandbox executable-location)
-    (begin 
+    (begin
         (define procmon-pml-file-location
             (path->string (make-temporary-file "caladium_~a.pml")))
         (define procmon-csv-file-location
@@ -29,8 +35,11 @@
 
         (define procmon-subprocess (subprocess-and-close-ports procmon-location
             (list "/Minimized" "/BackingFile" procmon-pml-file-location)))
-        (define sandboxed-subprocess (subprocess-and-close-ports sandboxie-start-location (list "/wait" executable-location)))
+        (define sandboxed-subprocess (subprocess-and-close-ports sandboxie-start-location
+            (list "/wait" executable-location)))
 
+        (sleep 1)
+        (define listpids-list (listpids-in-sandbox))
         (subprocess-wait sandboxed-subprocess)
 
         (system (string-join (list procmon-location "/Terminate") " "))
@@ -38,6 +47,8 @@
 
         (system (string-join (list procmon-location "/OpenLog" procmon-pml-file-location
             "/SaveAs" procmon-csv-file-location) " "))
+        (system (string-join (append (list "python.exe" "procmon_csv_filter.py" procmon-csv-file-location)
+            listpids-list) " "))
 
         (define procmon-csv-port
             (open-input-file (string->path procmon-csv-file-location)))
