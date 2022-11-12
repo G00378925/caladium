@@ -60,6 +60,20 @@
         (delete-file (string->path procmon-csv-file-location))
         procmon-csv-data))
 
+(define semaphore-obj (make-semaphore))
+(define tcp-obj (tcp-listen 8080))
+
+(define (handle-request)
+    (begin (define-values (in out) (tcp-accept tcp-obj))
+        (print in out)))
+
+(define (poll-for-request)
+    (begin
+        (thread handle-request)
+        (poll-for-request)))
+
+(poll-for-request)
+
 (print (string-append "procmon-csv-data size:" (number->string
     (string-length (run-in-sandbox "cmd.exe"))) "\n"))
 
