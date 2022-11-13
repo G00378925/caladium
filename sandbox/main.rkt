@@ -7,6 +7,8 @@
 ;  Copyright © 2022 Declan Kelly. All rights reserved.
 ;
 
+(require json)
+
 (define sandboxie-start-location
     (string-append (getenv "ProgramFiles") "\\Sandboxie\\Start.exe"))
 (define procmon-location
@@ -63,17 +65,18 @@
 (define semaphore-obj (make-semaphore))
 (define tcp-obj (tcp-listen 8080))
 
-(define (handle-request)
-    (begin (define-values (in out) (tcp-accept tcp-obj))
-        (print in out)))
+(define (exec-file json-obj out)
+    (begin
+        (write (string-append "procmon-csv-data size:" (number->string
+            (string-length (run-in-sandbox "cmd.exe"))) "\n") out)))
 
 (define (poll-for-request)
-    (begin
-        (thread handle-request)
-        (poll-for-request)))
+    (begin (define-values (in out) (tcp-accept tcp-obj))
+        (thread poll-for-request)
+        (define json-obj (string->jsexpr (read-json in)))
+        (case (hash-ref json-obj 'command)
+            [("run") (exec-file json-obj out)])
+        (close-input-port in) (close-output-port out)))
 
 (poll-for-request)
-
-(print (string-append "procmon-csv-data size:" (number->string
-    (string-length (run-in-sandbox "cmd.exe"))) "\n"))
 
