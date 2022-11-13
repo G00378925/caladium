@@ -62,21 +62,29 @@
         (delete-file (string->path procmon-csv-file-location))
         procmon-csv-data))
 
-(define semaphore-obj (make-semaphore))
+(define semaphore-obj (make-semaphore 1))
 (define tcp-obj (tcp-listen 8080))
 
-(define (exec-file json-obj out)
+(define (run-file json-obj out)
     (begin
+        (semaphore-wait semaphore-obj)
+        (define file-location
+            (string-append (path->string (make-temporary-directory)) "\\" (hash-ref json-obj 'file-name)))
+        (display-to-file (hash-ref json-obj 'file-data) (string->path file-location))
         (write (string-append "procmon-csv-data size:" (number->string
-            (string-length (run-in-sandbox "cmd.exe"))) "\n") out)))
+            (string-length (run-in-sandbox file-location))) "\n") out)
+        (semaphore-post semaphore-obj)))
 
 (define (poll-for-request)
     (begin (define-values (in out) (tcp-accept tcp-obj))
         (thread poll-for-request)
-        (define json-obj (string->jsexpr (read-json in)))
+        (define json-obj (read-json in))
         (case (hash-ref json-obj 'command)
-            [("run") (exec-file json-obj out)])
+            [("run") (run-file json-obj out)])
         (close-input-port in) (close-output-port out)))
 
 (poll-for-request)
+(define (wait-for-threads)
+    (begin (sleep) (wait-for-threads)))
+(wait-for-threads)
 
