@@ -28,7 +28,14 @@ def upload_file():
     print(f"Received {len(request_data)} byte(s)")
     return str()
 
+def after_request(response_obj):
+    response_obj.headers.add("Access-Control-Allow-Headers", '*')
+    response_obj.headers.add("Access-Control-Allow-Methods", '*')
+    response_obj.headers.add("Access-Control-Allow-Origin", '*')
+    return response_obj
+
 def main(argv):
+    app.after_request(after_request)
     app.run(host="127.0.0.1", port=8080)
 
 if __name__ == "__main__":
