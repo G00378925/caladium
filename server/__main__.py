@@ -8,7 +8,7 @@
 
 import sys
 
-import flask
+import flask, requests
 
 app = flask.Flask(__name__)
 
@@ -17,6 +17,20 @@ app = flask.Flask(__name__)
 def root_page(index_path=None):
     with open("static/index.html") as index_html_handle:
         return index_html_handle.read()
+
+@app.route("/css/<path:css_file_path>")
+def serve_css_file(css_file_path):
+    milligram_dist_location = "https://raw.githubusercontent.com/milligram/milligram/master/dist/"
+    css_file_dict = {
+        "milligram.min.css": {"content_type": "text/css"},
+        "milligram.min.css.map": {"content_type": "application/json"}
+    }
+
+    if css_file_path in css_file_dict:
+        milligram_dist_resp = requests.get(milligram_dist_location + css_file_path).text
+        return flask.Response(milligram_dist_resp, headers={"Content-Type": css_file_dict[css_file_path]["content_type"]})
+    else:
+        return str()
 
 @app.route("/js/<path:js_file_path>")
 def serve_js_file(js_file_path):
@@ -35,8 +49,9 @@ def after_request(response_obj):
     return response_obj
 
 def main(argv):
+    port_number = int(argv[1]) if len(argv) > 1 else 8080
     app.after_request(after_request)
-    app.run(host="127.0.0.1", port=8080)
+    app.run(host="127.0.0.1", port=port_number)
 
 if __name__ == "__main__":
     main(sys.argv)
