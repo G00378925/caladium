@@ -8,11 +8,14 @@
 
 const routes = {
     "/": {
-        "body": "<h1>Dashboard</h1><a href=\"/login\">Login</a>",
+        "body": ` (div (hash "children"
+                      (list
+                          (h1 (hash "innerHTML" "Dashboard"))
+                          (a (hash "href" "/login" "innerHTML" "Login")))))`,
         "title": "Dashboard"
     },
     "/login": {
-        "body": "<h1>Login</h1>",
+        "body": `(h1 (hash "innerHTML" "Login"))`,
         "title": "Login"
     }
 };
@@ -25,10 +28,10 @@ function loadPage(path) {
         document.body.childNodes[0].remove();
     }
 
-    document.write(page["body"]);
-    const aTagArray = document.getElementsByTagName('a');
-    for (let i = 0; i < aTagArray.length; i++) {
-        aTagArray[i]["href"] = "javascript:loadPage('" + (new URL(aTagArray[i]["href"])).pathname + "')";
+    document.body.append(generateDOM(page["body"], {}));
+    const anchorTagArray = document.getElementsByTagName('a');
+    for (let i = 0; i < anchorTagArray.length; i++) {
+        anchorTagArray[i]["href"] = "javascript:loadPage('" + (new URL(anchorTagArray[i]["href"])).pathname + "')";
     }
 
     document.title = page["title"];
