@@ -9,13 +9,18 @@
 const routes = {
     "/": {
         "body": ` (div (hash "children"
-                      (list
-                          (h1 (hash "innerHTML" "Dashboard"))
-                          (a (hash "href" "/login" "innerHTML" "Login")))))`,
+                    (list
+                      (h1 (hash "innerHTML" "Dashboard"))
+                      (a (hash "href" "/login" "innerHTML" "Login")))))`,
         "title": "Dashboard"
     },
     "/login": {
-        "body": `(h1 (hash "innerHTML" "Login"))`,
+        "body": ` (center (hash "children"
+                    (list
+                      (h1 (hash "innerHTML" "Login")) (br)
+                      (input (hash "type" "text" "id" "username" "placeholder" "Username")) (br)
+                      (input (hash "type" "password" "id" "password" "placeholder" "Password")) (br)
+                      (button (hash "innerHTML" "Login")))))`,
         "title": "Login"
     }
 };

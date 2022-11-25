@@ -51,7 +51,7 @@ def after_request(response_obj):
 def main(argv):
     port_number = int(argv[1]) if len(argv) > 1 else 8080
     app.after_request(after_request)
-    app.run(host="127.0.0.1", port=port_number)
+    app.run(host="0.0.0.0", port=port_number)
 
 if __name__ == "__main__":
     main(sys.argv)

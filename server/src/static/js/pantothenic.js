@@ -1,5 +1,5 @@
 //
-//  pantothenic.mjs
+//  pantothenic.js
 //  pantothenic
 //
 //  Created by Declan Kelly on 16-11-2022.
@@ -69,8 +69,8 @@ function generateDOM(expressionStr, parameters) {
             return expressionList.splice(1);
         }
         default: {
-            if (expressionList.length < 2) return null;
             let newElement = document.createElement(expressionList[0]);
+            if (expressionList.length < 2) return newElement;
             if (Object.keys(expressionList[1]).includes("children")) {
                 expressionList[1]["children"].forEach(i => {
                     newElement.append(i);
