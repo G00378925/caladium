@@ -6,21 +6,49 @@
 //  Copyright © 2022 Declan Kelly. All rights reserved.
 //
 
+class Page {
+    constructor() {
+        globalThis.currentPage = this;
+    }
+
+    generateDOM() {
+        return generateDOM(globalThis.currentPage.body, globalThis.currentPage);
+    }
+}
+
+class IndexPage extends Page {
+    constructor() {
+        super();
+        this.body = ` (div (hash "children"
+                        (list
+                          (h1 (hash "innerHTML" "Dashboard"))
+                          (a (hash "href" "/login" "innerHTML" "Login")))))`;
+    }
+}
+
+class LoginPage extends Page {
+    constructor() {
+        super();
+        this.body = ` (center (hash "children"
+                        (list
+                          (h1 (hash "innerHTML" "Login")) (br)
+                          (input (hash "type" "text" "id" "username" "placeholder" "Username")) (br)
+                          (input (hash "type" "password" "id" "password" "placeholder" "Password")) (br)
+                          (button (hash "onclick" loginButtonOnClick "innerHTML" "Login")))))`;
+    }
+
+    loginButtonOnClick() {
+        alert("loginButtonOnClick");
+    }
+}
+
 const routes = {
     "/": {
-        "body": ` (div (hash "children"
-                    (list
-                      (h1 (hash "innerHTML" "Dashboard"))
-                      (a (hash "href" "/login" "innerHTML" "Login")))))`,
+        "body": IndexPage,
         "title": "Dashboard"
     },
     "/login": {
-        "body": ` (center (hash "children"
-                    (list
-                      (h1 (hash "innerHTML" "Login")) (br)
-                      (input (hash "type" "text" "id" "username" "placeholder" "Username")) (br)
-                      (input (hash "type" "password" "id" "password" "placeholder" "Password")) (br)
-                      (button (hash "innerHTML" "Login")))))`,
+        "body": LoginPage,
         "title": "Login"
     }
 };
@@ -33,7 +61,7 @@ function loadPage(path) {
         document.body.childNodes[0].remove();
     }
 
-    document.body.append(generateDOM(page["body"], {}));
+    document.body.append((new page["body"]()).generateDOM());
     const anchorTagArray = document.getElementsByTagName('a');
     for (let i = 0; i < anchorTagArray.length; i++) {
         anchorTagArray[i]["href"] = "javascript:loadPage('" + (new URL(anchorTagArray[i]["href"])).pathname + "')";
