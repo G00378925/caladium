@@ -12,7 +12,7 @@ class Page {
     }
 
     generateDOM() {
-        return generateDOM(globalThis.currentPage.body, globalThis.currentPage);
+        return generateDOM(this.body, this);
     }
 }
 
@@ -38,7 +38,19 @@ class LoginPage extends Page {
     }
 
     loginButtonOnClick() {
-        alert("loginButtonOnClick");
+        const [username, password] = ["username", "password"].map(id => document.getElementById(id).value);
+
+        if (!username.length || !password.length) {
+            alert("Either the username or password field is empty");
+            return;
+        }
+
+        const requestBody = JSON.stringify({"username": username, "password": password});
+        fetch("/api/login", {method: "POST", body: requestBody})
+        .then(resp => resp.json())
+        .then(resp => {
+            loadPage("/");
+        });
     }
 }
 
