@@ -34,7 +34,8 @@ class IndexPage extends Page {
         this.body = ` (div (hash "children"
                         (list
                           (h1 (hash "innerHTML" "Dashboard"))
-                          (a (hash "href" "/login" "innerHTML" "Login")))))`;
+                          (a (hash "href" "/login" "innerHTML" "Login")) (br)
+                          (a (hash "href" "/workers" "innerHTML" "Workers")))))`;
     }
 }
 
@@ -67,11 +68,70 @@ class LoginPage extends Page {
         fetch("/api/login", {method: "POST", body: requestBody})
         .then(resp => resp.json())
         .then(resp => {
+            localStorage["Authorisation"] = resp["Authorisation"];
             loadPage("/");
         })
         .catch(err => {
             currentPage.errMessage = err;
             currentPage.errMessageHidden = false;
+            currentPage.loadPage(true);
+        });
+    }
+}
+
+class WorkersPage extends Page {
+    constructor() {
+        super();
+        this.body = ` (div (hash "children"
+                        (list
+                          (input (hash "type" "text" "id" "workerAddress" "placeholder" "0.0.0.0:8080"))
+                          (button (hash "onclick" addWorkerOnClick "innerHTML" "Add Worker"))
+                          (table (hash "children" workersTableRows))))`;
+
+        this.tableHeader = `(tr (hash "children"
+                              (list
+                                (th (hash "innerHTML" "Worker Address"))
+                                (th (hash "innerHTML" "Delete Worker")))))`;
+
+        this.tableData = `(tr (hash "children"
+                            (list
+                              (td (hash "innerHTML" workerAddress))
+                              (td (hash "children"
+                                (list (button (hash "onclick" workerDeleteFunc "innerHTML" "Delete")))))`;
+    }
+
+    loadPage(updatePage=false) {
+        this.workersTableRows = [generateDOM(this.tableHeader, {})];
+
+        fetch("/api/workers")
+        .then(resp => resp.json())
+        .then(resp => {
+            Object.keys(resp).forEach(workerID => {
+                const rowParameters = {
+                    workerAddress: resp[workerID]["workerAddress"],
+                    workerDeleteFunc: () => currentPage.deleteWorker(workerID)
+                };
+                this.workersTableRows.push(generateDOM(this.tableData, rowParameters));
+            });
+            super.loadPage("/");
+        });
+    }
+
+    addWorkerOnClick() {
+        const workerAddress = document.getElementById("workerAddress").value;
+        if (workerAddress) {
+            fetch("/api/workers", {method: "POST", body: JSON.stringify({workerAddress: workerAddress})})
+            .then(resp => resp.json())
+            .then(resp => {
+                currentPage.loadPage(true);
+            });
+        }
+    }
+
+    deleteWorker(workerID) {
+        fetch("/api/workers/" + workerID, {method: "DELETE"})
+        .then(resp => resp.json())
+        .then(resp => {
             currentPage.loadPage(true);
         });
     }
@@ -85,6 +145,10 @@ const routes = {
     "/login": {
         "body": LoginPage,
         "title": "Login"
+    },
+    "/workers": {
+        "body": WorkersPage,
+        "title": "Workers"
     }
 };
 

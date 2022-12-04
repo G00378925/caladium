@@ -10,7 +10,10 @@ import sys
 
 import flask, requests
 
+import workers
+
 app = flask.Flask(__name__)
+app.register_blueprint(workers.workers)
 
 @app.route("/")
 @app.route("/<path:index_path>")
@@ -36,8 +39,12 @@ def serve_css_file(css_file_path):
 def serve_js_file(js_file_path):
     return flask.send_from_directory("static/js/", js_file_path)
 
-@app.route("/api/upload_file", methods=["POST"])
-def upload_file():
+@app.post("/api/login")
+def login_route():
+    return {"Authorisation": "token"}
+
+@app.post("/api/upload_file")
+def upload_file_route():
     request_data = flask.request.get_data()
     print(f"Received {len(request_data)} byte(s)")
     return str()
