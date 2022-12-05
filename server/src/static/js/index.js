@@ -86,7 +86,7 @@ class WorkersPage extends Page {
                         (list
                           (input (hash "type" "text" "id" "workerAddress" "placeholder" "0.0.0.0:8080"))
                           (button (hash "onclick" addWorkerOnClick "innerHTML" "Add Worker"))
-                          (table (hash "children" workersTableRows))))`;
+                          (table (hash "children" workersTable))))`;
 
         this.tableHeader = `(tr (hash "children"
                               (list
@@ -101,7 +101,7 @@ class WorkersPage extends Page {
     }
 
     loadPage(updatePage=false) {
-        this.workersTableRows = [generateDOM(this.tableHeader, {})];
+        this.workersTable = [generateDOM(this.tableHeader, {})];
 
         fetch("/api/workers")
         .then(resp => resp.json())
@@ -111,7 +111,7 @@ class WorkersPage extends Page {
                     workerAddress: resp[workerID]["workerAddress"],
                     workerDeleteFunc: () => currentPage.deleteWorker(workerID)
                 };
-                this.workersTableRows.push(generateDOM(this.tableData, rowParameters));
+                this.workersTable.push(generateDOM(this.tableData, rowParameters));
             });
             super.loadPage("/");
         });
@@ -139,21 +139,18 @@ class WorkersPage extends Page {
 
 const routes = {
     "/": {
-        "body": IndexPage,
-        "title": "Dashboard"
+        "body": IndexPage, "title": "Dashboard"
     },
     "/login": {
-        "body": LoginPage,
-        "title": "Login"
+        "body": LoginPage, "title": "Login"
     },
     "/workers": {
-        "body": WorkersPage,
-        "title": "Workers"
+        "body": WorkersPage, "title": "Workers"
     }
 };
 
 function loadPage(path) {
-    const page = routes[path];
+    const page = routes[(new URL(window.location.origin + path)).pathname];
     window.history.replaceState(undefined, "", path);
 
     (new page["body"]()).loadPage();
@@ -161,12 +158,10 @@ function loadPage(path) {
 }
 
 function initialLoadPage() {
-    const path = window.location.pathname;
-
-    if (!routes[path]) {
+    if (!routes[window.location.pathname]) {
         loadPage("/");
     } else {
-        loadPage(path);
+        loadPage(window.location.href.substring(window.location.origin.length));
     }
 }
 
