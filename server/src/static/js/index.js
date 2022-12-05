@@ -11,6 +11,20 @@ class Page {
         globalThis.currentPage = this;
     }
 
+    async caladiumFetch(method, path, body=undefined) {
+        try {
+            const caladiumFetchParameters = {
+                method: method, body: body ? JSON.stringify(body) : undefined
+            };
+            const resp = await fetch(path, caladiumFetchParameters);
+            return await resp.json();
+        } catch (exception) {
+            localStorage["Authorisation"] = undefined;
+            loadPage("/login");
+            return {};
+        }
+    }
+
     generateDOM() {
         return generateDOM(this.body, this);
     }
@@ -103,8 +117,7 @@ class WorkersPage extends Page {
     loadPage(updatePage=false) {
         this.workersTable = [generateDOM(this.tableHeader, {})];
 
-        fetch("/api/workers")
-        .then(resp => resp.json())
+        currentPage.caladiumFetch("GET", "/api/workers")
         .then(resp => {
             Object.keys(resp).forEach(workerID => {
                 const rowParameters = {
@@ -120,8 +133,7 @@ class WorkersPage extends Page {
     addWorkerOnClick() {
         const workerAddress = document.getElementById("workerAddress").value;
         if (workerAddress) {
-            fetch("/api/workers", {method: "POST", body: JSON.stringify({workerAddress: workerAddress})})
-            .then(resp => resp.json())
+            currentPage.caladiumFetch("POST", "/api/workers", {workerAddress: workerAddress})
             .then(resp => {
                 currentPage.loadPage(true);
             });
@@ -129,8 +141,7 @@ class WorkersPage extends Page {
     }
 
     deleteWorker(workerID) {
-        fetch("/api/workers/" + workerID, {method: "DELETE"})
-        .then(resp => resp.json())
+        currentPage.caladiumFetch("DELETE", "/api/workers/" + workerID, {})
         .then(resp => {
             currentPage.loadPage(true);
         });
