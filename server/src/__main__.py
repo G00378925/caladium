@@ -10,9 +10,10 @@ import sys
 
 import flask, requests
 
-import workers
+import tasks, workers
 
 app = flask.Flask(__name__)
+app.register_blueprint(tasks.tasks)
 app.register_blueprint(workers.workers)
 
 @app.route("/")

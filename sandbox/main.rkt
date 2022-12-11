@@ -63,7 +63,7 @@
         procmon-csv-data))
 
 (define semaphore-obj (make-semaphore 1))
-(define tcp-obj (tcp-listen 8080))
+(define tcp-obj (tcp-listen 8080 8 #f "0.0.0.0"))
 
 (define (run-file json-obj out)
     (begin

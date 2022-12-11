@@ -56,12 +56,13 @@ def main(argv):
     def upload_file():
         try:
             file_handle = tkinter.filedialog.askopenfile("rb")
-            file_data = file_handle.read()
+            file_name = file_handle.name.split(os.path.sep)[-1]
+            data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_handle.read().decode("utf-8")}).encode()
             file_handle.close()
 
-            req_url = f"http://{config['server_address']}/api/upload_file"
+            req_url = f"http://{config['server_address']}/api/tasks"
             req_headers = {"Authorisation": config["authorisation_token"]}
-            req_obj = urllib.request.Request(req_url, data=file_data, headers=req_headers, method="POST")
+            req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="POST")
 
             resp_obj = urllib.request.urlopen(req_obj)
         except (IsADirectoryError):
