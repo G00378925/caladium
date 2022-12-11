@@ -77,7 +77,8 @@ function generateDOM(expressionStr, parameters) {
                 });
             }
             Object.keys(expressionList[1]).filter(i => i != "children").forEach(i => {
-                newElement[i] = expressionList[1][i];
+                if (i != "class") newElement[i] = expressionList[1][i];
+                else newElement.setAttribute(i, expressionList[1][i]);
             });
             return newElement;
         }

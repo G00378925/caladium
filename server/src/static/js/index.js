@@ -9,6 +9,13 @@
 class Page {
     constructor() {
         globalThis.currentPage = this;
+
+        this.navigationBar = generateDOM(`(div (hash "class" "clearfix" "children"
+                                            (list
+                                              (a (hash "class" "float-left" "href" "/"
+                                                "children" (list (h1 (hash "innerHTML" "Caladium Dashboard")))))
+                                              (button (hash "class" "float-right"
+                                                "innerHTML" "Logout" "onclick" logout)))))`, this);
     }
 
     async caladiumFetch(method, path, body=undefined) {
@@ -19,8 +26,7 @@ class Page {
             const resp = await fetch(path, caladiumFetchParameters);
             return await resp.json();
         } catch (exception) {
-            localStorage["Authorisation"] = undefined;
-            loadPage("/login");
+            currentPage.logout();
             return {};
         }
     }
@@ -37,8 +43,14 @@ class Page {
         document.body.append(this.generateDOM());
         const anchorTagArray = document.getElementsByTagName('a');
         for (let i = 0; i < anchorTagArray.length; i++) {
-            anchorTagArray[i]["href"] = "javascript:loadPage('" + (new URL(anchorTagArray[i]["href"])).pathname + "')";
+            if (!anchorTagArray[i]["href"].startsWith("javascript:"))
+                anchorTagArray[i]["href"] = "javascript:loadPage('" + (new URL(anchorTagArray[i]["href"])).pathname + "')";
         }
+    }
+
+    logout() {
+        localStorage["Authorisation"] = undefined;
+        window.location = "/login";
     }
 }
 
@@ -47,7 +59,7 @@ class IndexPage extends Page {
         super();
         this.body = ` (div (hash "children"
                         (list
-                          (h1 (hash "innerHTML" "Dashboard"))
+                          navigationBar
                           (a (hash "href" "/login" "innerHTML" "Login")) (br)
                           (a (hash "href" "/workers" "innerHTML" "Workers")))))`;
     }
@@ -93,58 +105,81 @@ class LoginPage extends Page {
     }
 }
 
-class WorkersPage extends Page {
+class ListPage extends Page {
     constructor() {
         super();
+    }
+
+    loadPage(updatePage=false) {
+        this.elementsTable = [generateDOM(this.tableHeader, {})];
+
+        currentPage.caladiumFetch("GET", this.endpoint)
+        .then(resp => {
+            Object.keys(resp).forEach(elementID => {
+                this.elementsTable.push(generateDOM(this.tableData, currentPage.generateRowParameters(resp, elementID)));
+            });
+            super.loadPage("/");
+        });
+    }
+
+    deleteElement(elementID) {
+        currentPage.caladiumFetch("DELETE", currentPage.endpoint + "/" + elementID, {})
+        .then(resp => {
+            currentPage.loadPage(true);
+        });
+    }
+}
+
+class WorkersPage extends ListPage {
+    constructor() {
+        super();
+        this.endpoint = "/api/workers";
+
         this.body = ` (div (hash "children"
                         (list
+                          navigationBar
                           (input (hash "type" "text" "id" "workerAddress" "placeholder" "0.0.0.0:8080"))
                           (button (hash "onclick" addWorkerOnClick "innerHTML" "Add Worker"))
-                          (table (hash "children" workersTable))))`;
+                          (table (hash "children" elementsTable))))`;
 
         this.tableHeader = `(tr (hash "children"
                               (list
                                 (th (hash "innerHTML" "Worker Address"))
+                                (th (hash "innerHTML" "Ping Worker"))
                                 (th (hash "innerHTML" "Delete Worker")))))`;
 
         this.tableData = `(tr (hash "children"
                             (list
                               (td (hash "innerHTML" workerAddress))
                               (td (hash "children"
-                                (list (button (hash "onclick" workerDeleteFunc "innerHTML" "Delete")))))`;
-    }
-
-    loadPage(updatePage=false) {
-        this.workersTable = [generateDOM(this.tableHeader, {})];
-
-        currentPage.caladiumFetch("GET", "/api/workers")
-        .then(resp => {
-            Object.keys(resp).forEach(workerID => {
-                const rowParameters = {
-                    workerAddress: resp[workerID]["workerAddress"],
-                    workerDeleteFunc: () => currentPage.deleteWorker(workerID)
-                };
-                this.workersTable.push(generateDOM(this.tableData, rowParameters));
-            });
-            super.loadPage("/");
-        });
+                                (list (button (hash "style" "background-color: blue; border-color: blue"
+                                  "onclick" workerPingFunc "innerHTML" "Ping")))))
+                              (td (hash "children"
+                                (list (button (hash "style" "background-color: red; border-color: red"
+                                  "onclick" workerDeleteFunc "innerHTML" "Delete"))))))))`;
     }
 
     addWorkerOnClick() {
         const workerAddress = document.getElementById("workerAddress").value;
         if (workerAddress) {
-            currentPage.caladiumFetch("POST", "/api/workers", {workerAddress: workerAddress})
+            currentPage.caladiumFetch("POST", currentPage.endpoint, {workerAddress: workerAddress})
             .then(resp => {
                 currentPage.loadPage(true);
             });
         }
     }
 
-    deleteWorker(workerID) {
-        currentPage.caladiumFetch("DELETE", "/api/workers/" + workerID, {})
-        .then(resp => {
-            currentPage.loadPage(true);
-        });
+    generateRowParameters(resp, elementID) {
+        const rowParameters = {
+            workerAddress: resp[elementID]["workerAddress"],
+            workerPingFunc: () => currentPage.pingWorker(elementID),
+            workerDeleteFunc: () => currentPage.deleteElement(elementID)
+        };
+        return rowParameters;
+    }
+
+    pingWorker(workerID) {
+        alert(workerID);
     }
 }
 
