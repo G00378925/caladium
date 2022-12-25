@@ -15,7 +15,9 @@ class Page {
                                               (a (hash "class" "float-left" "href" "/"
                                                 "children" (list (h1 (hash "innerHTML" "Caladium Dashboard")))))
                                               (button (hash "class" "float-right"
-                                                "innerHTML" "Logout" "onclick" logout)))))`, this);
+                                                "innerHTML" "Logout" "onclick" logout))
+                                              (button (hash "class" "float-right" "style" "background-color: grey; border-color: grey"
+                                                "innerHTML" "Preferences" "onclick" openPreferences)))))`, this);
     }
 
     async caladiumFetch(method, path, body=undefined) {
@@ -51,6 +53,10 @@ class Page {
     logout() {
         localStorage["Authorisation"] = undefined;
         window.location = "/login";
+    }
+
+    openPreferences() {
+        loadPage("/preferences");
     }
 }
 
@@ -130,6 +136,24 @@ class ListPage extends Page {
     }
 }
 
+class PatternsPage extends ListPage {
+}
+
+class TasksPage extends ListPage {
+    constructor() {
+        super();
+        this.endpoint = "/api/tasks";
+
+        this.body = ` (div (hash "children"
+                        (list
+                          navigationBar
+                          (input (hash "type" "text" "id" "workerAddress" "placeholder" "0.0.0.0:8080"))
+                          (button (hash "onclick" addWorkerOnClick "innerHTML" "Add Worker"))
+                          (table (hash "children" elementsTable))))`;
+    }
+}
+
+
 class WorkersPage extends ListPage {
     constructor() {
         super();
@@ -189,6 +213,12 @@ const routes = {
     },
     "/login": {
         "body": LoginPage, "title": "Login"
+    },
+    "/patterns": {
+        "body": PatternsPage, "title": "Patterns"
+    },
+    "/tasks": {
+        "body": TasksPage, "title": "Tasks"
     },
     "/workers": {
         "body": WorkersPage, "title": "Workers"
