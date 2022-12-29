@@ -7,6 +7,7 @@
 ;  Copyright © 2022 Declan Kelly. All rights reserved.
 ;
 
+(require net/base64)
 (require json)
 
 (define sandboxie-start-location
@@ -70,7 +71,7 @@
         (semaphore-wait semaphore-obj)
         (define file-location
             (string-append (path->string (make-temporary-directory)) "\\" (hash-ref json-obj 'file-name)))
-        (display-to-file (hash-ref json-obj 'file-data) (string->path file-location))
+        (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
         (write (string-append "procmon-csv-data size:" (number->string
             (string-length (run-in-sandbox file-location))) "\n") out)
         (semaphore-post semaphore-obj)))

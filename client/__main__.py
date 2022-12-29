@@ -7,7 +7,7 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import json, os, sys, tkinter, tkinter.filedialog
+import base64, json, os, sys, tkinter, tkinter.filedialog
 import tkinter.messagebox, tkinter.ttk, urllib.request
 
 import dirchangelistener, quarantine, quarantineframe
@@ -56,8 +56,9 @@ def main(argv):
     def upload_file():
         try:
             file_handle = tkinter.filedialog.askopenfile("rb")
-            file_name = file_handle.name.split(os.path.sep)[-1]
-            data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_handle.read().decode("utf-8")}).encode()
+            file_name = file_handle.name.split('/')[-1]
+            file_data = base64.b64encode(file_handle.read()).decode("utf-8")
+            data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
             file_handle.close()
 
             req_url = f"http://{config['server_address']}/api/tasks"
