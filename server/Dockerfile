@@ -5,7 +5,7 @@ FROM debian:bullseye
 RUN apt-get update -y
 RUN apt-get install python3 python3-pip -y
 
-RUN python3 -m pip install flask requests
+RUN python3 -m pip install flask pycouchdb requests
 
 WORKDIR /caladium
 

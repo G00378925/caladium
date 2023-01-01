@@ -10,25 +10,21 @@ import json, uuid
 
 import flask
 
-workers = flask.Blueprint(__name__, "workers")
+import database
 
-workers_database = {}
+workers = flask.Blueprint(__name__, "workers")
 
 @workers.get("/api/workers")
 def get_workers_route():
-    global workers_database
-    return workers_database
+    return database.get_caladium_collection("workers")
 
 @workers.post("/api/workers")
 def create_workers_route():
-    global workers_database
-    new_worker_id = str(uuid.uuid1())
-    workers_database[new_worker_id] = json.loads(flask.request.data.decode("utf-8"))
-    return {"workerID": new_worker_id}
+    new_document = json.loads(flask.request.data.decode("utf-8"))
+    return database.get_database("workers").save(new_document)
 
 @workers.delete("/api/workers/<worker_id>")
 def delete_workers_route(worker_id):
-    global workers_database
-    del workers_database[worker_id]
+    database.get_database("workers").delete(worker_id)
     return {}
 

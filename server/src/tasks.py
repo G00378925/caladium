@@ -10,15 +10,13 @@ import json, socket, threading, uuid
 
 import flask
 
-import workers
+import database, workers
 
 tasks = flask.Blueprint(__name__, "tasks")
 
-tasks_database = {}
-
 def scan_file(task_id, scan_file_obj):
-    global tasks_database
-    tasks_database[task_id] = {"state": "Scanning"}
+    tasks_database = database.get_database("tasks")
+    tasks_database[task_id] = {"state": "Running"}
 
     workers_dict = workers.get_workers_route()
     if len(list(workers_dict)) == 0:
@@ -36,17 +34,14 @@ def scan_file(task_id, scan_file_obj):
 
 @tasks.get("/api/tasks")
 def get_tasks_route():
-    global tasks_database
-    return tasks_database
+    return database.get_database("tasks").add(as_list=True)
 
 @tasks.get("/api/tasks/<task_id>")
 def get_task_progress_route(task_id):
-    global tasks_database
     return tasks_database[task_id]
 
 @tasks.post("/api/tasks")
 def create_task_route():
-    global tasks_database
     task_id = str(uuid.uuid1())
 
     thread_obj = threading.Thread(args=(task_id, flask.request.get_data()), target=scan_file)
