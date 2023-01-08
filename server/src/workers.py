@@ -14,6 +14,9 @@ import database
 
 workers = flask.Blueprint(__name__, "workers")
 
+class WorkerRecord(database.DatabaseRecord):
+    database_name = "workers"
+
 @workers.get("/api/workers")
 def get_workers_route():
     return database.get_caladium_collection("workers")
@@ -25,6 +28,7 @@ def create_workers_route():
 
 @workers.delete("/api/workers/<worker_id>")
 def delete_workers_route(worker_id):
-    database.get_database("workers").delete(worker_id)
+    if worker := database.get(WorkerRecord, worker_id):
+        del worker
     return {}
 

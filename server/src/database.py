@@ -10,15 +10,32 @@ import os
 
 import pycouchdb
 
-couchdb_server = None
-if not couchdb_server:
-    couchdb_server = pycouchdb.Server(os.environ["COUCHDB_CONNECTION_STR"])
+couchdb_server = pycouchdb.Server(os.environ["COUCHDB_CONNECTION_STR"])
 
 def get_database(database_name):
     try: return couchdb_server.database(database_name)
     except: return couchdb_server.create(database_name)
 
-def get_caladium_collection(collection_name):
-    all_elements = get_database(collection_name).all(as_list=True)
+def get_caladium_collection(database_name):
+    all_elements = get_database(database_name).all(as_list=True)
     return {document["id"]: document["doc"] for document in all_elements}
+
+class DatabaseRecord:
+    def __init__(self, items):
+        self.fields = {}
+        for field_name, field_value in items:
+            self.fields[field_name] = field_value
+
+    def get(self, field_name):
+        return fields[field_name]
+
+    def set(self, field_name, new_value):
+        fields[field_name] = new_value
+
+    def __del__(self):
+        get_database(self.database_name).delete(self.fields["_id"])
+
+def get(record_class, record_id):
+    if items := get_database(record_class.database_name).get(record_id).items(): return record_class(items)
+    else: return None
 

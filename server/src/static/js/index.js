@@ -66,8 +66,22 @@ class IndexPage extends Page {
         this.body = ` (div (hash "children"
                         (list
                           navigationBar
-                          (a (hash "href" "/login" "innerHTML" "Login")) (br)
-                          (a (hash "href" "/workers" "innerHTML" "Workers")))))`;
+                          (div (hash "children" cardList)))))`;
+
+        const card = ` (div (hash "class" "row" "onclick" cardOnClickFunc "children"
+                         (list
+                           (div (hash "class" "column column-75" "children"
+                             (list (h1 (hash "innerHTML" pageName)))))
+                           (div (hash "class" "column column-25" "children"
+                             (list (canvas (hash "id" canvasID))))))))`;
+
+        const pageList = [
+            {canvasID: "clients-canvas", cardOnClickFunc: () => loadPage("/clients"), pageName: "Clients"},
+            {canvasID: "tasks-canvas", cardOnClickFunc: () => loadPage("/tasks"), pageName: "Tasks"},
+            {canvasID: "workers-canvas", cardOnClickFunc: () => loadPage("/workers"), pageName: "Workers"}
+        ];
+
+        this.cardList = pageList.map(page => generateDOM(card, page));
     }
 }
 
@@ -111,6 +125,9 @@ class LoginPage extends Page {
     }
 }
 
+class PreferencesPage extends Page {
+}
+
 class ListPage extends Page {
     constructor() {
         super();
@@ -136,6 +153,9 @@ class ListPage extends Page {
     }
 }
 
+class ClientsPage extends ListPage {
+}
+
 class PatternsPage extends ListPage {
 }
 
@@ -152,7 +172,6 @@ class TasksPage extends ListPage {
                           (table (hash "children" elementsTable))))`;
     }
 }
-
 
 class WorkersPage extends ListPage {
     constructor() {
@@ -211,11 +230,17 @@ const routes = {
     "/": {
         "body": IndexPage, "title": "Dashboard"
     },
+    "/clients": {
+        "body": ClientsPage, "title": "Clients"
+    },
     "/login": {
         "body": LoginPage, "title": "Login"
     },
     "/patterns": {
         "body": PatternsPage, "title": "Patterns"
+    },
+    "/preferences": {
+        "body": PreferencesPage, "title": "Preferences"
     },
     "/tasks": {
         "body": TasksPage, "title": "Tasks"
