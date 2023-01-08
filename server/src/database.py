@@ -6,7 +6,7 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import os
+import json, os
 
 import pycouchdb
 
@@ -23,19 +23,28 @@ def get_caladium_collection(database_name):
 class DatabaseRecord:
     def __init__(self, items):
         self.fields = {}
+        if type(items) == dict: items = items.items()
+
         for field_name, field_value in items:
             self.fields[field_name] = field_value
 
     def get(self, field_name):
-        return fields[field_name]
+        return self.fields[field_name]
 
     def set(self, field_name, new_value):
-        fields[field_name] = new_value
+        self.fields[field_name] = new_value
+        get_database(self.database_name).save(self.fields)
 
-    def __del__(self):
+    def delete(self):
         get_database(self.database_name).delete(self.fields["_id"])
+
+    def __str__(self):
+        return json.dumps(self.fields)
 
 def get(record_class, record_id):
     if items := get_database(record_class.database_name).get(record_id).items(): return record_class(items)
     else: return None
+
+def create(record_class, record_dict):
+    return record_class(get_database(record_class.database_name).save(record_dict).items())
 

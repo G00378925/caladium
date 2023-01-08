@@ -222,7 +222,10 @@ class WorkersPage extends ListPage {
     }
 
     pingWorker(workerID) {
-        alert(workerID);
+        currentPage.caladiumFetch("GET", currentPage.endpoint + "/ping/" + workerID)
+        .then(resp => {
+            alert(workerID);
+        });
     }
 }
 

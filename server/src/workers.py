@@ -12,10 +12,14 @@ import flask
 
 import database
 
-workers = flask.Blueprint(__name__, "workers")
-
 class WorkerRecord(database.DatabaseRecord):
     database_name = "workers"
+
+    def ping(self):
+        worker_address = self.get("workerAddress")
+        return {"_id": self.get("_id")}
+
+workers = flask.Blueprint(__name__, "workers")
 
 @workers.get("/api/workers")
 def get_workers_route():
@@ -24,11 +28,16 @@ def get_workers_route():
 @workers.post("/api/workers")
 def create_workers_route():
     new_document = json.loads(flask.request.data.decode("utf-8"))
-    return database.get_database("workers").save(new_document)
+    return str(database.create(WorkerRecord, new_document))
 
 @workers.delete("/api/workers/<worker_id>")
 def delete_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):
-        del worker
+        worker.delete()
     return {}
+
+@workers.get("/api/workers/ping/<worker_id>")
+def ping_workers_route(worker_id):
+    if worker := database.get(WorkerRecord, worker_id):
+        return worker.ping()
 
