@@ -6,9 +6,13 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import json, os
+import json, os, sys
 
 import pycouchdb
+
+if not os.environ.get("COUCHDB_CONNECTION_STR", None):
+    sys.stderr.write("COUCHDB_CONNECTION_STR environmental variable must be set\n")
+    sys.exit(0)
 
 couchdb_server = pycouchdb.Server(os.environ["COUCHDB_CONNECTION_STR"])
 
