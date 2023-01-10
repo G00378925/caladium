@@ -154,6 +154,41 @@ class ListPage extends Page {
 }
 
 class ClientsPage extends ListPage {
+    constructor() {
+        super();
+        this.endpoint = "/api/clients";
+
+        this.body = ` (div (hash "children"
+                        (list
+                          navigationBar
+                          (button (hash "onclick" addWorkerOnClick "innerHTML" "Provision New Client"))
+                          (table (hash "children" elementsTable))))`;
+
+        this.tableHeader = `(tr (hash "children"
+                              (list
+                                (th (hash "innerHTML" "Client ID"))
+                                (th (hash "innerHTML" "Get Provision Token"))
+                                (th (hash "innerHTML" "Delete Client")))))`;
+
+        this.tableData = `(tr (hash "children"
+                            (list
+                              (td (hash "innerHTML" taskID))
+                              (td (hash "children"
+                                (list (button (hash "style" "background-color: blue; border-color: blue"
+                                  "onclick" getProvisionTokenFunc "innerHTML" "Copy Token"))))
+                              (td (hash "children"
+                                (list (button (hash "style" "background-color: red; border-color: red"
+                                  "onclick" taskDeleteFunc "innerHTML" "Delete"))))))))`;
+    }
+
+    generateRowParameters(resp, elementID) {
+        const rowParameters = {
+            clientID: resp[elementID]["_id"],
+            getProvisionTokenFunc: () => currentPage.deleteElement(elementID),
+            taskDeleteFunc: () => currentPage.deleteElement(elementID)
+        };
+        return rowParameters;
+    }
 }
 
 class PatternsPage extends ListPage {
@@ -167,9 +202,30 @@ class TasksPage extends ListPage {
         this.body = ` (div (hash "children"
                         (list
                           navigationBar
-                          (input (hash "type" "text" "id" "workerAddress" "placeholder" "0.0.0.0:8080"))
-                          (button (hash "onclick" addWorkerOnClick "innerHTML" "Add Worker"))
                           (table (hash "children" elementsTable))))`;
+
+        this.tableHeader = `(tr (hash "children"
+                              (list
+                                (th (hash "innerHTML" "Task ID"))
+                                (th (hash "innerHTML" "Current State"))
+                                (th (hash "innerHTML" "Delete Task")))))`;
+
+        this.tableData = `(tr (hash "children"
+                            (list
+                              (td (hash "innerHTML" taskID))
+                              (td (hash "innerHTML" taskStatus))
+                              (td (hash "children"
+                                (list (button (hash "style" "background-color: red; border-color: red"
+                                  "onclick" taskDeleteFunc "innerHTML" "Delete"))))))))`;
+    }
+
+    generateRowParameters(resp, elementID) {
+        const rowParameters = {
+            taskID: resp[elementID]["_id"],
+            taskStatus: resp[elementID]["_id"],
+            taskDeleteFunc: () => currentPage.deleteElement(elementID)
+        };
+        return rowParameters;
     }
 }
 

@@ -8,9 +8,9 @@
 #
 
 import base64, json, os, sys, tkinter, tkinter.filedialog
-import tkinter.messagebox, tkinter.ttk, urllib.request
+import tkinter.messagebox, tkinter.ttk, threading, urllib
 
-import dirchangelistener, quarantine, quarantineframe
+import dirchangelistener, scanwindow, quarantine, quarantineframe
 
 def get_caladium_appdata_location():
     if sys.platform == "win32":
@@ -61,11 +61,7 @@ def main(argv):
             data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
             file_handle.close()
 
-            req_url = f"http://{config['server_address']}/api/tasks"
-            req_headers = {"Authorisation": config["authorisation_token"]}
-            req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="POST")
-
-            resp_obj = urllib.request.urlopen(req_obj)
+            threading.Thread(target=lambda: scanwindow.ScanWindow().mainloop(data, config)).start()
         except (IsADirectoryError):
             tkinter.messagebox.showerror("Error", "Error opening file")
         except (urllib.error.URLError):

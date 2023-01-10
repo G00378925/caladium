@@ -12,40 +12,63 @@ import flask
 
 import database, workers
 
+class TaskRecord(database.DatabaseRecord):
+    database_name = "tasks"
+
 tasks = flask.Blueprint(__name__, "tasks")
 
-def scan_file(task_id, scan_file_obj):
-    tasks_database = database.get_database("tasks")
-    tasks_database[task_id] = {"state": "Running"}
+def scan_file(scan_file_obj):
+    task = database.create(TaskRecord, {"state": "Running"})
 
-    workers_dict = workers.get_workers_route()
-    if len(list(workers_dict)) == 0:
-        tasks_database[task_id] = {"state": "Failure"}
-        return
+    def scan_file_thread():
+        workers_dict = workers.get_workers_route()
+        if len(list(workers_dict)) == 0:
+            task.set("state", {"state": "Failure"})
+            return
 
-    worker_address = workers_dict[list(workers_dict)[0]]["workerAddress"]
-    host, port = worker_address.strip().split(':')
+        worker_address = workers_dict[list(workers_dict)[0]]["workerAddress"]
+        host, port = worker_address.strip().split(':')
 
-    sandbox_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sandbox_socket.connect((host, int(port)))
-    sandbox_socket.send(scan_file_obj)
-    tasks_database[task_id] = json.loads(sandbox_socket.recv(1024).decode("utf-8"))
-    sandbox_socket.close()
+        sandbox_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sandbox_socket.connect((host, int(port)))
+        sandbox_socket.send(scan_file_obj)
+
+        while True:
+            total_recv_bytes = bytes()
+
+            while recv_bytes := sandbox_socket.recv(1024):
+                total_recv_bytes += recv_bytes
+
+            tasks.set("state", json.loads(total_recv_bytes.decode("utf-8")))
+
+        sandbox_socket.close()
+
+    thread_obj = threading.Thread(target=scan_file_thread)
+    thread_obj.start()
+
+    return str(task)
 
 @tasks.get("/api/tasks")
 def get_tasks_route():
-    return database.get_database("tasks").add(as_list=True)
+    return database.get_caladium_collection("tasks")
 
 @tasks.get("/api/tasks/<task_id>")
 def get_task_progress_route(task_id):
-    return tasks_database[task_id]
+    return str(database.get(TaskRecord, task_id))
+
+@tasks.delete("/api/tasks")
+def delete_all_task_route():
+    for task in database.get_caladium_collection("task"):
+        database.get_database("tasks").get(task["_id"]).delete()
+    return str()
+
+@tasks.delete("/api/tasks/<task_id>")
+def delete_tasks_route(task_id):
+    if task := database.get(TaskRecord, task_id):
+        task.delete()
+    return {}
 
 @tasks.post("/api/tasks")
 def create_task_route():
-    task_id = str(uuid.uuid1())
-
-    thread_obj = threading.Thread(args=(task_id, flask.request.get_data()), target=scan_file)
-    thread_obj.start()
-
-    return task_id
+    return scan_file(flask.request.get_data())
 
