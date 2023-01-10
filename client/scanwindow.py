@@ -10,8 +10,8 @@ import json, threading, time, tkinter
 import tkinter.scrolledtext, tkinter.ttk, urllib.request
 
 class ScanWindow:
-    def __init__(self):
-        self.window_handle = tkinter.Tk()
+    def __init__(self, main_window):
+        self.window_handle = tkinter.Toplevel(main_window)
 
         self.scrolled_text = tkinter.scrolledtext.ScrolledText(self.window_handle)
         self.scrolled_text.grid(row=0, column=0, columnspan=2)
@@ -35,7 +35,7 @@ class ScanWindow:
             self.scrolled_text.insert(tkinter.CURRENT, f"{resp_obj}\n")
             time.sleep(1)
 
-    def mainloop(self, data, config):
+    def start(self, data, config):
         globals()["data"], globals()["config"] = data, config
 
         threading.Thread(target=self.scan_file).start()

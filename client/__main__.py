@@ -61,7 +61,7 @@ def main(argv):
             data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
             file_handle.close()
 
-            threading.Thread(target=lambda: scanwindow.ScanWindow().mainloop(data, config)).start()
+            scanwindow.ScanWindow(main_window).start(data, config)
         except (IsADirectoryError):
             tkinter.messagebox.showerror("Error", "Error opening file")
         except (urllib.error.URLError):
