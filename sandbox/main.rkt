@@ -7,8 +7,8 @@
 ;  Copyright © 2022 Declan Kelly. All rights reserved.
 ;
 
-(require net/base64)
 (require json)
+(require net/base64)
 
 (define sandboxie-start-location
     (string-append (getenv "ProgramFiles") "\\Sandboxie\\Start.exe"))
@@ -28,6 +28,16 @@
         (subprocess-wait subprocess-obj)
         (close-input-port out) (close-output-port in) (close-input-port err)
         listpids-list))
+
+(define (output-json json-out-string out)
+    (begin
+        (display (integer->integer-bytes (string-length json-out-string) 4 #f #t) out)
+        (display json-out-string out)
+        (flush-output out)))
+
+(define (send-message status message out)
+    (output-json (with-output-to-string (lambda ()
+        (write-json (hash 'status status 'message message)))) out))
 
 (define (run-in-sandbox executable-location)
     (begin
@@ -66,19 +76,14 @@
 (define semaphore-obj (make-semaphore 1))
 (define tcp-obj (tcp-listen 8080 8 #f "0.0.0.0"))
 
-(define (output-json json-obj out)
-    (begin
-        (define json-out-string (jsexpr->string json-obj))
-        (write (integer->integer-bytes (string-length json-out-string) 4 #f #t) out)
-        (write json-out-string out)))
-
 (define (run-file json-obj out)
     (begin
         (semaphore-wait semaphore-obj)
+        (send-message "scanning" "Scan beginning" out)
         (define file-location
             (string-append (path->string (make-temporary-directory)) "\\" (hash-ref json-obj 'file-name)))
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
-        (write (string-append "procmon-csv-data size:" (number->string
+        (send-message "complete" (string-append "procmon-csv-data size:" (number->string
             (string-length (run-in-sandbox file-location))) "\n") out)
         (semaphore-post semaphore-obj)))
 

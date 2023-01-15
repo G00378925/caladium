@@ -40,7 +40,7 @@ def scan_file(scan_file_obj):
 
         while True:
             sandbox_json_obj = read_json_from_socket(sandbox_socket)
-            tasks.set("state", sandbox_json_obj)
+            task.set("state", sandbox_json_obj)
 
         sandbox_socket.close()
 
