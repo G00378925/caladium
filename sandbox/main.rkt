@@ -66,6 +66,12 @@
 (define semaphore-obj (make-semaphore 1))
 (define tcp-obj (tcp-listen 8080 8 #f "0.0.0.0"))
 
+(define (output-json json-obj out)
+    (begin
+        (define json-out-string (jsexpr->string json-obj))
+        (write (integer->integer-bytes (string-length json-out-string) 4 #f #t) out)
+        (write json-out-string out)))
+
 (define (run-file json-obj out)
     (begin
         (semaphore-wait semaphore-obj)

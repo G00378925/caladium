@@ -6,7 +6,7 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import json, socket, threading, uuid
+import json, socket, struct, threading, uuid
 
 import flask
 
@@ -16,6 +16,11 @@ class TaskRecord(database.DatabaseRecord):
     database_name = "tasks"
 
 tasks = flask.Blueprint(__name__, "tasks")
+
+def read_json_from_socket(sandbox_socket):
+    json_size = struct.unpack(">I", sandbox_socket.recv(4))
+    json_data = sandbox_socket.recv(json_size).decode("utf-8")
+    return json.loads(json_data)
 
 def scan_file(scan_file_obj):
     task = database.create(TaskRecord, {"state": "Running"})
@@ -34,12 +39,8 @@ def scan_file(scan_file_obj):
         sandbox_socket.send(scan_file_obj)
 
         while True:
-            total_recv_bytes = bytes()
-
-            while recv_bytes := sandbox_socket.recv(1024):
-                total_recv_bytes += recv_bytes
-
-            tasks.set("state", json.loads(total_recv_bytes.decode("utf-8")))
+            sandbox_json_obj = read_json_from_socket(sandbox_socket)
+            tasks.set("state", sandbox_json_obj)
 
         sandbox_socket.close()
 
