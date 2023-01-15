@@ -68,12 +68,12 @@ class IndexPage extends Page {
                           navigationBar
                           (div (hash "children" cardList)))))`;
 
-        const card = ` (div (hash "class" "row" "onclick" cardOnClickFunc "children"
-                         (list
-                           (div (hash "class" "column column-75" "children"
-                             (list (h1 (hash "innerHTML" pageName)))))
-                           (div (hash "class" "column column-25" "children"
-                             (list (canvas (hash "id" canvasID))))))))`;
+        const card = `(div (hash "class" "row" "onclick" cardOnClickFunc "children"
+                        (list
+                          (div (hash "class" "column column-75" "children"
+                            (list (h1 (hash "innerHTML" pageName)))))
+                          (div (hash "class" "column column-25" "children"
+                            (list (canvas (hash "id" canvasID))))))))`;
 
         const pageList = [
             {canvasID: "clients-canvas", cardOnClickFunc: () => loadPage("/clients"), pageName: "Clients"},
@@ -192,6 +192,47 @@ class ClientsPage extends ListPage {
 }
 
 class PatternsPage extends ListPage {
+    constructor() {
+        super();
+        this.endpoint = "/api/patterns";
+
+        this.body = ` (div (hash "children"
+                        (list
+                          navigationBar
+                          (input (hash "type" "text" "id" "patternString" "placeholder" "Malicious Pattern"))
+                          (button (hash "onclick" addPatternOnClick "innerHTML" "Add Pattern"))
+                          (table (hash "children" elementsTable))))`;
+
+        this.tableHeader = `(tr (hash "children"
+                              (list
+                                (th (hash "innerHTML" "Pattern String"))
+                                (th (hash "innerHTML" "Delete Pattern")))))`;
+
+        this.tableData = `(tr (hash "children"
+                            (list
+                              (td (hash "innerHTML" patternString))
+                              (td (hash "children"
+                                (list (button (hash "style" "background-color: red; border-color: red"
+                                  "onclick" patternDeleteFunc "innerHTML" "Delete"))))))))`;
+    }
+
+    addPatternOnClick() {
+        const patternString = document.getElementById("patternString").value;
+        if (patternString) {
+            currentPage.caladiumFetch("POST", currentPage.endpoint, {patternString: patternString})
+            .then(resp => {
+                currentPage.loadPage(true);
+            });
+        }
+    }
+
+    generateRowParameters(resp, elementID) {
+        const rowParameters = {
+            patternString: resp[elementID]["patternString"],
+            patternDeleteFunc: () => currentPage.deleteElement(elementID)
+        };
+        return rowParameters;
+    }
 }
 
 class TasksPage extends ListPage {

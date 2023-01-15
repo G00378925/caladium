@@ -10,9 +10,10 @@ import sys
 
 import flask, requests
 
-import tasks, workers
+import patterns, tasks, workers
 
 app = flask.Flask(__name__)
+app.register_blueprint(patterns.patterns)
 app.register_blueprint(tasks.tasks)
 app.register_blueprint(workers.workers)
 
