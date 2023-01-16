@@ -19,6 +19,9 @@ class ScanWindow:
         self.progress_bar = tkinter.ttk.Progressbar(self.window_handle)
         self.progress_bar.grid(row=1, column=0, columnspan=2)
 
+    def display_update(self, update_obj):
+        self.scrolled_text.insert(tkinter.CURRENT, f"{update_obj}\n")
+
     def scan_file(self):
         data, config = globals()["data"], globals()["config"]
 
@@ -32,7 +35,9 @@ class ScanWindow:
             req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="GET")
             resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
 
-            self.scrolled_text.insert(tkinter.CURRENT, f"{resp_obj}\n")
+            if len(resp_obj["updates"] != 0:
+                [self.display_update(update) for update in resp_obj["updates"]]
+
             time.sleep(1)
 
     def start(self, data, config):

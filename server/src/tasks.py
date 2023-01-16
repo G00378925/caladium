@@ -18,12 +18,12 @@ class TaskRecord(database.DatabaseRecord):
 tasks = flask.Blueprint(__name__, "tasks")
 
 def read_json_from_socket(sandbox_socket):
-    json_size = struct.unpack(">I", sandbox_socket.recv(4))
+    json_size = struct.unpack(">I", sandbox_socket.recv(4))[0]
     json_data = sandbox_socket.recv(json_size).decode("utf-8")
     return json.loads(json_data)
 
 def scan_file(scan_file_obj):
-    task = database.create(TaskRecord, {"state": "Running"})
+    task = database.create(TaskRecord, {"state": "Running", "updates": []})
 
     def scan_file_thread():
         workers_dict = workers.get_workers_route()
@@ -39,8 +39,12 @@ def scan_file(scan_file_obj):
         sandbox_socket.send(scan_file_obj)
 
         while True:
-            sandbox_json_obj = read_json_from_socket(sandbox_socket)
-            task.set("state", sandbox_json_obj)
+            updates_list = task.get("updates")
+            updates_list += [read_json_from_socket(sandbox_socket)]
+            task.set("update", updates_list)
+
+            task.set("state", updates_list[-1]["status"])
+            if updates_list[-1]["status"] == "complete": break
 
         sandbox_socket.close()
 
@@ -55,7 +59,11 @@ def get_tasks_route():
 
 @tasks.get("/api/tasks/<task_id>")
 def get_task_progress_route(task_id):
-    return str(database.get(TaskRecord, task_id))
+    if task := database.get(TaskRecord, task_id):
+        task_str = str(task)
+        task.set("updates", [])
+        return task_str
+    return str()
 
 @tasks.delete("/api/tasks")
 def delete_all_task_route():

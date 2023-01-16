@@ -36,8 +36,8 @@
         (flush-output out)))
 
 (define (send-message status message out)
-    (output-json (with-output-to-string (lambda ()
-        (write-json (hash 'status status 'message message)))) out))
+    (output-json (with-output-to-string
+        (lambda () (write-json (hash 'status status 'message message)))) out))
 
 (define (run-in-sandbox executable-location)
     (begin

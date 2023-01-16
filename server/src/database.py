@@ -37,7 +37,10 @@ class DatabaseRecord:
 
     def set(self, field_name, new_value):
         self.fields[field_name] = new_value
-        get_database(self.database_name).save(self.fields)
+        self.fields["_rev"] = get(self.__class__, self.fields["_id"]).get("_rev")
+
+        try: get_database(self.database_name).save(self.fields)
+        except: pass
 
     def delete(self):
         get_database(self.database_name).delete(self.fields["_id"])
