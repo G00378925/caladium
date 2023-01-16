@@ -39,12 +39,12 @@ def scan_file(scan_file_obj):
         sandbox_socket.send(scan_file_obj)
 
         while True:
-            updates_list = task.get("updates")
+            updates_list = task.get("updates").copy()
             updates_list += [read_json_from_socket(sandbox_socket)]
-            task.set("update", updates_list)
+            task.set("updates", updates_list)
 
-            task.set("state", updates_list[-1]["status"])
-            if updates_list[-1]["status"] == "complete": break
+            task.set("state", updates_list[-1]["state"])
+            if updates_list[-1]["state"] == "complete": break
 
         sandbox_socket.close()
 
@@ -60,9 +60,7 @@ def get_tasks_route():
 @tasks.get("/api/tasks/<task_id>")
 def get_task_progress_route(task_id):
     if task := database.get(TaskRecord, task_id):
-        task_str = str(task)
-        task.set("updates", [])
-        return task_str
+        return str(task)
     return str()
 
 @tasks.delete("/api/tasks")

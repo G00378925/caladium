@@ -36,14 +36,17 @@ class DatabaseRecord:
         return self.fields[field_name]
 
     def set(self, field_name, new_value):
+        self.__init__(get(self.__class__, self.fields["_id"]).get_obj())
         self.fields[field_name] = new_value
-        self.fields["_rev"] = get(self.__class__, self.fields["_id"]).get("_rev")
 
         try: get_database(self.database_name).save(self.fields)
         except: pass
 
     def delete(self):
         get_database(self.database_name).delete(self.fields["_id"])
+
+    def get_obj(self):
+        return self.fields
 
     def __str__(self):
         return json.dumps(self.fields)

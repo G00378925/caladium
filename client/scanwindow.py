@@ -21,6 +21,7 @@ class ScanWindow:
 
     def display_update(self, update_obj):
         self.scrolled_text.insert(tkinter.CURRENT, f"{update_obj}\n")
+        self.progress_bar["value"] = update_obj["progress"]
 
     def scan_file(self):
         data, config = globals()["data"], globals()["config"]
@@ -30,15 +31,18 @@ class ScanWindow:
         req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="POST")
         resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
 
+        message_count = 0
+
         while True:
             req_url = f"http://{config['server_address']}/api/tasks/{resp_obj['_id']}"
             req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="GET")
             resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
 
-            if len(resp_obj["updates"] != 0:
-                [self.display_update(update) for update in resp_obj["updates"]]
+            if len(resp_obj["updates"]) > message_count:
+                [self.display_update(update) for update in resp_obj["updates"][message_count:]]
+                message_count = len(resp_obj["updates"])
 
-            time.sleep(1)
+            time.sleep(2)
 
     def start(self, data, config):
         globals()["data"], globals()["config"] = data, config
