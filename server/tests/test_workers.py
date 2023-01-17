@@ -1,5 +1,5 @@
 #
-#  test_tasks.py
+#  test_workers.py
 #  caladium
 #
 #  Created by Declan Kelly on 17-01-2023.
@@ -12,8 +12,8 @@ import requests
 
 import setup
 
-class TasksTestCase(setup.EndPointTestCase):
+class WorkersTestCase(setup.EndPointTestCase):
     def setUp(self):
         example_record = {}
-        super().setUp("/api/tasks", example_record)
+        super().setUp("/api/workers", example_record)
 

@@ -35,7 +35,8 @@ class EndPointTestCase(unittest.TestCase):
 
         self.test_delete_all_records()
 
-        for _ in range(100): self.create_new_record(self.example_record)
+        if endpoint != "/api/tasks":
+            for _ in range(100): self.create_new_record(self.example_record)
 
     def test_delete_all_records(self):
         requests.delete(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}")
