@@ -6,18 +6,33 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import json, uuid
+import json, socket, struct, uuid
 
 import flask
 
 import database
 
+def read_json_from_socket(sandbox_socket):
+    json_size = struct.unpack(">I", sandbox_socket.recv(4))[0]
+    json_data = sandbox_socket.recv(json_size).decode("utf-8")
+    return json.loads(json_data)
+
+def establish_connection(server_address):
+    host, port = server_address.strip().split(':')
+
+    sandbox_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sandbox_socket.connect((host, int(port)))
+    return sandbox_socket
+
 class WorkerRecord(database.DatabaseRecord):
     database_name = "workers"
 
     def ping(self):
-        worker_address = self.get("workerAddress")
-        return {"_id": self.get("_id")}
+        sandbox_socket = establish_connection(self.get("workerAddress"))
+        sandbox_socket.send(json.dumps({"command": "ping"}).encode())
+        ping_resp = read_json_from_socket(sandbox_socket)
+        sandbox_socket.close()
+        return ping_resp
 
 workers = flask.Blueprint(__name__, "workers")
 

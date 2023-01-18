@@ -6,7 +6,7 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import json, socket, struct, threading, uuid
+import json, threading, uuid
 
 import flask
 
@@ -17,11 +17,6 @@ class TaskRecord(database.DatabaseRecord):
 
 tasks = flask.Blueprint(__name__, "tasks")
 
-def read_json_from_socket(sandbox_socket):
-    json_size = struct.unpack(">I", sandbox_socket.recv(4))[0]
-    json_data = sandbox_socket.recv(json_size).decode("utf-8")
-    return json.loads(json_data)
-
 def scan_file(scan_file_obj):
     task = database.create(TaskRecord, {"state": "Running", "updates": []})
 
@@ -31,16 +26,12 @@ def scan_file(scan_file_obj):
             task.set("state", {"state": "Failure"})
             return
 
-        worker_address = workers_dict[list(workers_dict)[0]]["workerAddress"]
-        host, port = worker_address.strip().split(':')
-
-        sandbox_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sandbox_socket.connect((host, int(port)))
+        sandbox_socket = workers.establish_connection(workers_dict[list(workers_dict)[0]]["workerAddress"])
         sandbox_socket.send(scan_file_obj)
 
         while True:
             updates_list = task.get("updates").copy()
-            updates_list += [read_json_from_socket(sandbox_socket)]
+            updates_list += [workers.read_json_from_socket(sandbox_socket)]
             task.set("updates", updates_list)
 
             task.set("state", updates_list[-1]["state"])

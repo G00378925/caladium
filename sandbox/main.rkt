@@ -29,15 +29,17 @@
         (close-input-port out) (close-output-port in) (close-input-port err)
         listpids-list))
 
-(define (output-json json-out-string out)
+(define (output-json hash-obj out)
     (begin
+        (define json-out-string
+            (with-output-to-string
+                (lambda () (write-json hash-obj))))
         (display (integer->integer-bytes (string-length json-out-string) 4 #f #t) out)
         (display json-out-string out)
         (flush-output out)))
 
 (define (send-message state progress message out)
-    (output-json (with-output-to-string
-        (lambda () (write-json (hash 'state state 'progress progress 'message message)))) out))
+    (output-json (hash 'state state 'progress progress 'message message) out))
 
 (define (run-in-sandbox executable-location out)
     (begin
@@ -89,11 +91,15 @@
             (string-length (run-in-sandbox file-location out))) "\n") out)
         (semaphore-post semaphore-obj)))
 
+(define (ping out)
+    (output-json (hash 'message "Sandbox is alive") out))
+
 (define (poll-for-request)
     (begin (define-values (in out) (tcp-accept tcp-obj))
         (thread poll-for-request)
         (define json-obj (read-json in))
         (case (hash-ref json-obj 'command)
+            [("ping") (ping out)]
             [("run") (run-file json-obj out)])
         (close-input-port in) (close-output-port out)))
 
