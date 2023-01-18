@@ -68,7 +68,7 @@ def main(argv):
             tkinter.messagebox.showerror("Error", "Error establishing connection to server")
 
     upload_file_button = tkinter.Button(main_frame, command=upload_file)
-    upload_file_button["text"] = "Upload file"
+    upload_file_button["text"] = "Scan file"
     upload_file_button.pack()
 
     main_window.mainloop()

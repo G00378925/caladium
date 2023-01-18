@@ -38,8 +38,14 @@
         (display json-out-string out)
         (flush-output out)))
 
-(define (send-message state progress message out)
-    (output-json (hash 'state state 'progress progress 'message message) out))
+(define (send-message text out)
+    (output-json (hash 'type "message" 'text text) out))
+
+(define (send-progress value out)
+    (output-json (hash 'type "progress" 'value value) out))
+
+(define (send-state state out)
+    (output-json (hash 'type "state" 'state state) out))
 
 (define (run-in-sandbox executable-location out)
     (begin
@@ -48,12 +54,15 @@
         (define procmon-csv-file-location
             (path->string (make-temporary-file "caladium_~a.csv")))
 
-        (send-message "scanning" 10 "Starting process monitor" out)
+        (send-message "Starting process monitor" out)
+        (send-progress 10 out)
         (define procmon-subprocess (subprocess-and-close-ports procmon-location
             (list "/Minimized" "/BackingFile" procmon-pml-file-location)))
-        (send-message "scanning" 20 "Executing file in sandboxie" out)
+
+        (send-message "Executing file in sandboxie" out)
+        (send-progress 20 out)
         (define sandboxed-subprocess (subprocess-and-close-ports sandboxie-start-location
-            (list "/wait" executable-location)))
+            (list "/wait" "start" executable-location)))
 
         (sleep 1)
         (define listpids-list (listpids-in-sandbox))
@@ -83,12 +92,18 @@
 (define (run-file json-obj out)
     (begin
         (semaphore-wait semaphore-obj)
-        (send-message "scanning" 0 "Scan beginning" out)
+        (send-message "Scan beginning" out)
+        (send-progress 0 out)
+
         (define file-location
             (string-append (path->string (make-temporary-directory)) "\\" (hash-ref json-obj 'file-name)))
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
-        (send-message "complete" 100 (string-append "procmon-csv-data size:" (number->string
+
+        (send-message (string-append "procmon-csv-data size:" (number->string
             (string-length (run-in-sandbox file-location out))) "\n") out)
+        (send-progress 100 out)
+        (send-state "complete")
+
         (semaphore-post semaphore-obj)))
 
 (define (ping out)

@@ -34,8 +34,9 @@ def scan_file(scan_file_obj):
             updates_list += [workers.read_json_from_socket(sandbox_socket)]
             task.set("updates", updates_list)
 
-            task.set("state", updates_list[-1]["state"])
-            if updates_list[-1]["state"] == "complete": break
+            if updates_list[-1]["type"] == "state":
+                task.set("state", updates_list[-1]["state"])
+                if updates_list[-1]["state"] == "complete": break
 
         sandbox_socket.close()
 

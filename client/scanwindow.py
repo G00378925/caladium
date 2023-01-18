@@ -15,13 +15,19 @@ class ScanWindow:
 
         self.scrolled_text = tkinter.scrolledtext.ScrolledText(self.window_handle)
         self.scrolled_text.grid(row=0, column=0, columnspan=2)
+        self.scrolled_text["state"] = "disabled"
 
         self.progress_bar = tkinter.ttk.Progressbar(self.window_handle)
         self.progress_bar.grid(row=1, column=0, columnspan=2)
 
     def display_update(self, update_obj):
-        self.scrolled_text.insert(tkinter.CURRENT, f"{update_obj}\n")
-        self.progress_bar["value"] = update_obj["progress"]
+        match update_obj["type"]:
+            case "message":
+                self.scrolled_text["state"] = "normal"
+                self.scrolled_text.insert(tkinter.CURRENT, update_obj["text"] + '\n')
+                self.scrolled_text["state"] = "disabled"
+            case "progress":
+                self.progress_bar["value"] = update_obj["value"]
 
     def scan_file(self):
         data, config = globals()["data"], globals()["config"]
