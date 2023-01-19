@@ -23,7 +23,7 @@ class Page {
     async caladiumFetch(method, path, body=undefined) {
         try {
             const caladiumFetchParameters = {
-                method: method, body: body ? JSON.stringify(body) : undefined
+                method: method, headers: {"Authorisation": localStorage["Authorisation"]}, body: body ? JSON.stringify(body) : undefined
             };
             const resp = await fetch(path, caladiumFetchParameters);
             return await resp.json();

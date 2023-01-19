@@ -8,9 +8,11 @@
 
 import sys
 
-import flask, requests
+import flask, requests, uuid
 
 import patterns, tasks, workers
+
+authorisation_tokens = []
 
 app = flask.Flask(__name__)
 app.register_blueprint(patterns.patterns)
@@ -43,13 +45,23 @@ def serve_js_file(js_file_path):
 
 @app.post("/api/login")
 def login_route():
-    return {"Authorisation": "token"}
+    global authorisation_tokens
+    token = str(uuid.uuid1())
+    authorisation_tokens += [token]
+    return {"Authorisation": token}
 
-@app.post("/api/upload_file")
-def upload_file_route():
-    request_data = flask.request.get_data()
-    print(f"Received {len(request_data)} byte(s)")
-    return str()
+def get_authorisation_tokens():
+    global authorisation_tokens
+    return authorisation_tokens
+
+def before_request():
+    path = flask.request.path
+    if path.startswith("/api") and not path.startswith("/api/login"):
+        if flask.request.headers["Authorisation"] not in get_authorisation_tokens():
+            resp_obj = flask.Response()
+            resp_obj.status_code = 403
+            resp_obj.set_data("Invalid authorisation token")
+            return resp_obj
 
 def after_request(response_obj):
     response_obj.headers.add("Access-Control-Allow-Headers", '*')
@@ -59,6 +71,7 @@ def after_request(response_obj):
 
 def main(argv):
     port_number = int(argv[1]) if len(argv) > 1 else 8080
+    app.before_request(before_request)
     app.after_request(after_request)
     app.run(host="0.0.0.0", port=port_number)
 

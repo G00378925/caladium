@@ -102,7 +102,7 @@
         (send-message (string-append "procmon-csv-data size:" (number->string
             (string-length (run-in-sandbox file-location out))) "\n") out)
         (send-progress 100 out)
-        (send-state "complete")
+        (send-state "complete" out)
 
         (semaphore-post semaphore-obj)))
 
