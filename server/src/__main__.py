@@ -6,13 +6,13 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import sys
+import hashlib, json, sys
 
 import flask, requests, uuid
 
 import patterns, tasks, workers
 
-authorisation_tokens = []
+authorisation_tokens, administrator_password = [], hashlib.sha256("root".encode()).hexdigest()
 
 app = flask.Flask(__name__)
 app.register_blueprint(patterns.patterns)
@@ -46,9 +46,17 @@ def serve_js_file(js_file_path):
 @app.post("/api/login")
 def login_route():
     global authorisation_tokens
-    token = str(uuid.uuid1())
-    authorisation_tokens += [token]
-    return {"Authorisation": token}
+
+    req_body_obj = json.loads(flask.request.get_data())
+    username = req_body_obj["username"]
+    password = req_body_obj["username"]
+
+    if username == "root" and administrator_password == hashlib.sha256(password.encode()).hexdigest():
+        token = str(uuid.uuid1())
+        authorisation_tokens += [token]
+        return {"Authorisation": token}
+    else:
+        return {"message": "Incorrect username or password"}
 
 def get_authorisation_tokens():
     global authorisation_tokens

@@ -254,7 +254,7 @@ class TasksPage extends ListPage {
         this.tableData = `(tr (hash "children"
                             (list
                               (td (hash "innerHTML" taskID))
-                              (td (hash "innerHTML" taskStatus))
+                              (td (hash "innerHTML" taskState))
                               (td (hash "children"
                                 (list (button (hash "style" "background-color: red; border-color: red"
                                   "onclick" taskDeleteFunc "innerHTML" "Delete"))))))))`;
@@ -263,7 +263,7 @@ class TasksPage extends ListPage {
     generateRowParameters(resp, elementID) {
         const rowParameters = {
             taskID: resp[elementID]["_id"],
-            taskStatus: resp[elementID]["_id"],
+            taskState: resp[elementID]["state"],
             taskDeleteFunc: () => currentPage.deleteElement(elementID)
         };
         return rowParameters;
