@@ -77,6 +77,7 @@ class IndexPage extends Page {
 
         const pageList = [
             {canvasID: "clients-canvas", cardOnClickFunc: () => loadPage("/clients"), pageName: "Clients"},
+            {canvasID: "patterns-canvas", cardOnClickFunc: () => loadPage("/patterns"), pageName: "Patterns"},
             {canvasID: "tasks-canvas", cardOnClickFunc: () => loadPage("/tasks"), pageName: "Tasks"},
             {canvasID: "workers-canvas", cardOnClickFunc: () => loadPage("/workers"), pageName: "Workers"}
         ];
@@ -161,7 +162,7 @@ class ClientsPage extends ListPage {
         this.body = ` (div (hash "children"
                         (list
                           navigationBar
-                          (button (hash "onclick" addWorkerOnClick "innerHTML" "Provision New Client"))
+                          (button (hash "onclick" addClientOnClick "innerHTML" "Provision New Client"))
                           (table (hash "children" elementsTable))))`;
 
         this.tableHeader = `(tr (hash "children"
@@ -172,20 +173,30 @@ class ClientsPage extends ListPage {
 
         this.tableData = `(tr (hash "children"
                             (list
-                              (td (hash "innerHTML" taskID))
+                              (td (hash "innerHTML" clientID))
                               (td (hash "children"
                                 (list (button (hash "style" "background-color: blue; border-color: blue"
-                                  "onclick" getProvisionTokenFunc "innerHTML" "Copy Token"))))
+                                  "onclick" getProvisionTokenFunc "innerHTML" "Copy Token")))))
                               (td (hash "children"
                                 (list (button (hash "style" "background-color: red; border-color: red"
-                                  "onclick" taskDeleteFunc "innerHTML" "Delete"))))))))`;
+                                  "onclick" clientDeleteFunc "innerHTML" "Delete"))))))))`;
+    }
+
+    addClientOnClick() {
+        currentPage.caladiumFetch("POST", currentPage.endpoint, {})
+        .then(resp => {
+            currentPage.loadPage(true);
+        });
+    }
+
+    getProvisionTokenFunc(clientID) {
     }
 
     generateRowParameters(resp, elementID) {
         const rowParameters = {
             clientID: resp[elementID]["_id"],
-            getProvisionTokenFunc: () => currentPage.deleteElement(elementID),
-            taskDeleteFunc: () => currentPage.deleteElement(elementID)
+            getProvisionTokenFunc: () => currentPage.getProvisionTokenFunc(elementID),
+            clientDeleteFunc: () => currentPage.deleteElement(elementID)
         };
         return rowParameters;
     }

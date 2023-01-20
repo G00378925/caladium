@@ -10,11 +10,12 @@ import hashlib, json, sys
 
 import flask, requests, uuid
 
-import patterns, tasks, workers
+import clients, patterns, tasks, workers
 
 authorisation_tokens, administrator_password = [], hashlib.sha256("root".encode()).hexdigest()
 
 app = flask.Flask(__name__)
+app.register_blueprint(clients.clients)
 app.register_blueprint(patterns.patterns)
 app.register_blueprint(tasks.tasks)
 app.register_blueprint(workers.workers)
@@ -48,8 +49,7 @@ def login_route():
     global authorisation_tokens
 
     req_body_obj = json.loads(flask.request.get_data())
-    username = req_body_obj["username"]
-    password = req_body_obj["username"]
+    username, password = req_body_obj["username"], req_body_obj["password"]
 
     if username == "root" and administrator_password == hashlib.sha256(password.encode()).hexdigest():
         token = str(uuid.uuid1())
