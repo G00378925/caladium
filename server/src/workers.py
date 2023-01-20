@@ -30,8 +30,12 @@ class WorkerRecord(database.DatabaseRecord):
     def ping(self):
         sandbox_socket = establish_connection(self.get("workerAddress"))
         sandbox_socket.send(json.dumps({"command": "ping"}).encode())
-        ping_resp = read_json_from_socket(sandbox_socket)
+        ping_resp_json = read_json_from_socket(sandbox_socket)
         sandbox_socket.close()
+
+        ping_resp = flask.Response()
+        ping_resp.headers["Content-Type"] = "application/json"
+        ping_resp.set_data(ping_resp_json)
         return ping_resp
 
 workers = flask.Blueprint(__name__, "workers")

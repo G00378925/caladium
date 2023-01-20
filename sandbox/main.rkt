@@ -107,7 +107,7 @@
         (semaphore-post semaphore-obj)))
 
 (define (ping out)
-    (output-json (hash 'message "Sandbox is alive") out))
+    (output-json "pong" out))
 
 (define (poll-for-request)
     (begin (define-values (in out) (tcp-accept tcp-obj))
