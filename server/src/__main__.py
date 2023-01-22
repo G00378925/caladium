@@ -63,7 +63,7 @@ def get_authorisation_tokens():
     return authorisation_tokens
 
 def before_request():
-    path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers["Authorisation"]
+    path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
     if path.startswith("/api/tasks"):
         if token not in get_authorisation_tokens() and token not in clients.get_authorisation_tokens():
             resp_obj.status_code = 403

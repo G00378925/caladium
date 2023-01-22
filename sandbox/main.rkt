@@ -62,7 +62,7 @@
         (send-message "Executing file in sandboxie" out)
         (send-progress 20 out)
         (define sandboxed-subprocess (subprocess-and-close-ports sandboxie-start-location
-            (list "/wait" "start" executable-location)))
+            (list "/wait" executable-location)))
 
         (sleep 1)
         (define listpids-list (listpids-in-sandbox))
@@ -73,13 +73,15 @@
 
         (system (string-join (list procmon-location "/OpenLog" procmon-pml-file-location
             "/SaveAs" procmon-csv-file-location) " "))
+
+        (send-message "Filtering system calls" out)
         (system (string-join (append (list "python.exe" "procmon_csv_filter.py" procmon-csv-file-location)
             listpids-list) " "))
 
         (define procmon-csv-port
             (open-input-file (string->path procmon-csv-file-location)))
         (define procmon-csv-data
-            (port->string procmon-csv-port))
+            (string-split (port->string procmon-csv-port) "\n"))
         (close-input-port procmon-csv-port)
 
         (delete-file (string->path procmon-pml-file-location))
@@ -89,8 +91,33 @@
 (define semaphore-obj (make-semaphore 1))
 (define tcp-obj (tcp-listen 8080 8 #f "0.0.0.0"))
 
+(define (analysis-thread-func patterns receive-channel response-channel)
+    (begin
+        (define syscall (channel-get receive-channel))
+        (channel-put response-channel #f)
+        (analysis-thread-func patterns receive-channel response-channel)))
+
 (define (analyse-syscalls syscall-list patterns out)
-    (display patterns))
+    (begin
+        (define analysis-thread-count 4)
+        (define receive-channel (make-channel))
+        (define analysis-thread-channels
+            (for/list ([x (build-list analysis-thread-count values)])
+                (make-channel)))
+
+        (send-message "Spawning analysis threads" out)
+        (define analysis-threads
+            (for/list ([x (build-list analysis-thread-count values)])
+                (thread (lambda () (analysis-thread-func patterns (list-ref analysis-thread-channels x) receive-channel)))))
+
+        (for/list ([syscall-string syscall-list])
+            (channel-put (list-ref analysis-thread-channels (random 0 (- analysis-thread-count 1))) syscall-string))
+
+        (define (receive-results syscall-number)
+            (begin
+                (channel-get receive-channel)
+                (if (< (+ syscall-number 1) (length syscall-list)) (receive-results (+ syscall-number 1)) #f)))
+        (receive-results 0)))
 
 (define (run-file json-obj out)
     (begin
@@ -103,11 +130,12 @@
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
 
         (define syscall-list (run-in-sandbox file-location out))
-        (send-message (string-append "procmon-csv-data size:" (number->string
-            (string-length syscall-list)) "\n") out)
+        (send-message (string-append "procmon-csv-data size: "
+            (number->string (length syscall-list)) "\n") out)
         (send-progress 90 out)
 
         (analyse-syscalls syscall-list (hash-ref json-obj 'patterns) out)
+        (send-message "Syscall analysis" out)
         (send-progress 100 out)
         (send-state "complete" out)
 

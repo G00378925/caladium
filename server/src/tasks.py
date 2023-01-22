@@ -19,6 +19,7 @@ tasks = flask.Blueprint(__name__, "tasks")
 
 def scan_file(scan_file_obj):
     task = database.create(TaskRecord, {"state": "Running", "updates": []})
+    scan_file_obj = json.loads(scan_file_obj)
 
     def scan_file_thread():
         workers_dict = workers.get_workers_route()
@@ -27,9 +28,8 @@ def scan_file(scan_file_obj):
             return
 
         sandbox_socket = workers.establish_connection(workers_dict[list(workers_dict)[0]]["workerAddress"])
-        scan_file_obj = json.loads(scan_file_obj)
         scan_file_obj["patterns"] = patterns.get_patterns()
-        sandbox_socket.send(json.dumps(scan_file_obj))
+        sandbox_socket.send(json.dumps(scan_file_obj).encode())
 
         while True:
             updates_list = task.get("updates").copy()
