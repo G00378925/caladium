@@ -17,6 +17,9 @@ class PatternRecord(database.DatabaseRecord):
 
 patterns = flask.Blueprint(__name__, "patterns")
 
+def get_patterns():
+    return [database.get(PatternRecord, pattern_id).get("patternString") for pattern_id in database.get_caladium_collection("patterns")]
+
 @patterns.get("/api/patterns")
 def get_patterns_route():
     return database.get_caladium_collection("patterns")

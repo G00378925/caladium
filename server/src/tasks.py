@@ -10,7 +10,7 @@ import json, threading, uuid
 
 import flask
 
-import database, workers
+import database, patterns, workers
 
 class TaskRecord(database.DatabaseRecord):
     database_name = "tasks"
@@ -27,7 +27,9 @@ def scan_file(scan_file_obj):
             return
 
         sandbox_socket = workers.establish_connection(workers_dict[list(workers_dict)[0]]["workerAddress"])
-        sandbox_socket.send(scan_file_obj)
+        scan_file_obj = json.loads(scan_file_obj)
+        scan_file_obj["patterns"] = patterns.get_patterns()
+        sandbox_socket.send(json.dumps(scan_file_obj))
 
         while True:
             updates_list = task.get("updates").copy()

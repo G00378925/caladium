@@ -89,6 +89,9 @@
 (define semaphore-obj (make-semaphore 1))
 (define tcp-obj (tcp-listen 8080 8 #f "0.0.0.0"))
 
+(define (analyse-syscalls syscall-list patterns out)
+    (display patterns))
+
 (define (run-file json-obj out)
     (begin
         (semaphore-wait semaphore-obj)
@@ -99,8 +102,12 @@
             (string-append (path->string (make-temporary-directory)) "\\" (hash-ref json-obj 'file-name)))
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
 
+        (define syscall-list (run-in-sandbox file-location out))
         (send-message (string-append "procmon-csv-data size:" (number->string
-            (string-length (run-in-sandbox file-location out))) "\n") out)
+            (string-length syscall-list)) "\n") out)
+        (send-progress 90 out)
+
+        (analyse-syscalls syscall-list (hash-ref json-obj 'patterns) out)
         (send-progress 100 out)
         (send-state "complete" out)
 
