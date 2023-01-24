@@ -14,6 +14,6 @@ import setup
 
 class ClientsTestCase(setup.EndPointTestCase):
     def setUp(self):
-        example_record = {}
+        example_record = {"token": "token"}
         super().setUp("/api/clients", example_record)
 

@@ -127,6 +127,12 @@ class LoginPage extends Page {
 }
 
 class PreferencesPage extends Page {
+    constructor() {
+        super();
+        this.body = ` (div (hash "children"
+                        (list
+                          navigationBar)))`;
+    }
 }
 
 class ListPage extends Page {

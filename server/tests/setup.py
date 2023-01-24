@@ -39,6 +39,14 @@ class EndPointTestCase(unittest.TestCase):
             for _ in range(100): self.create_new_record(self.example_record)
 
     def test_delete_all_records(self):
-        requests.delete(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}")
+        requests.delete(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}", headers=self.http_headers)
         self.assertEqual(len(self.get_all_records()), 0)
+
+    def test_create_100_records(self):
+        record_count = len(self.get_all_records())
+
+        for _ in range(100):
+            self.create_new_record(self.example_record)
+
+        self.assertEqual(len(self.get_all_records()), record_count + 100)
 
