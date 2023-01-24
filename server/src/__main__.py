@@ -12,7 +12,7 @@ import flask, requests, uuid
 
 import clients, patterns, tasks, workers
 
-authorisation_tokens, administrator_password = [], hashlib.sha256("root".encode()).hexdigest()
+authorisation_tokens, administrator_password = [], None
 
 app = flask.Flask(__name__)
 app.register_blueprint(clients.clients)
@@ -54,12 +54,21 @@ def login_route():
     if username == "root" and administrator_password == hashlib.sha256(password.encode()).hexdigest():
         token = str(uuid.uuid1())
         authorisation_tokens += [token]
-        return {"Authorisation": token}
+        return {"valid": True, "Authorisation": token}
     else:
-        return {"message": "Incorrect username or password"}
+        return {"valid": False, "message": "Incorrect username or password"}
+
+def update_password(new_password):
+    global administrator_password
+    administrator_password = hashlib.sha256(new_password.encode()).hexdigest()
+
+@app.put("/api/update_password")
+def update_password_route():
+    if new_password := flask.request.headers.get("password", None):
+        update_password(new_password)
+    return {}
 
 def get_authorisation_tokens():
-    global authorisation_tokens
     return authorisation_tokens
 
 def before_request():
@@ -83,6 +92,7 @@ def after_request(response_obj):
 
 def main(argv):
     port_number = int(argv[1]) if len(argv) > 1 else 8080
+    update_password("root")
     app.before_request(before_request)
     app.after_request(after_request)
     app.run(host="0.0.0.0", port=port_number)

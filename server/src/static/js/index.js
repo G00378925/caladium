@@ -115,23 +115,38 @@ class LoginPage extends Page {
         fetch("/api/login", {method: "POST", body: requestBody})
         .then(resp => resp.json())
         .then(resp => {
-            localStorage["Authorisation"] = resp["Authorisation"];
-            loadPage("/");
+            if (resp["valid"]) {
+                localStorage["Authorisation"] = resp["Authorisation"];
+                loadPage("/");
+            } else {
+                currentPage.errMessage = resp["message"];
+                currentPage.errMessageHidden = false;
+                currentPage.loadPage(true);
+            }
         })
-        .catch(err => {
-            currentPage.errMessage = err;
-            currentPage.errMessageHidden = false;
-            currentPage.loadPage(true);
-        });
     }
 }
 
 class PreferencesPage extends Page {
     constructor() {
         super();
+        this.endpoint = "/api";
+
         this.body = ` (div (hash "children"
                         (list
-                          navigationBar)))`;
+                          navigationBar
+                          (input (hash "type" "password" "id" "newPassword" "placeholder" "New Password"))
+                          (button (hash "onclick" changePasswordOnClick "innerHTML" "Update Password")))))`;
+    }
+
+    changePasswordOnClick() {
+        const newPassword = document.getElementById("newPassword").value;
+        if (newPassword.length == 0) return;
+
+        currentPage.caladiumFetch("PUT", currentPage.endpoint + '/' + "update_password", {password: newPassword})
+        .then(resp => {
+            currentPage.loadPage(true);
+        });
     }
 }
 
@@ -153,7 +168,7 @@ class ListPage extends Page {
     }
 
     deleteElement(elementID) {
-        currentPage.caladiumFetch("DELETE", currentPage.endpoint + "/" + elementID, {})
+        currentPage.caladiumFetch("DELETE", currentPage.endpoint + '/' + elementID, {})
         .then(resp => {
             currentPage.loadPage(true);
         });

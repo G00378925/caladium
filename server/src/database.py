@@ -33,7 +33,7 @@ class DatabaseRecord:
             self.fields[field_name] = field_value
 
     def get(self, field_name):
-        return self.fields[field_name]
+        return self.fields.get(field_name, None)
 
     def set(self, field_name, new_value):
         self.__init__(get(self.__class__, self.fields["_id"]).get_obj())
