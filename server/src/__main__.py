@@ -64,7 +64,7 @@ def update_password(new_password):
 
 @app.put("/api/update_password")
 def update_password_route():
-    if new_password := flask.request.headers.get("password", None):
+    if new_password := json.loads(flask.request.get_data()).get("password", None):
         update_password(new_password)
     return {}
 
