@@ -49,6 +49,12 @@ def create_workers_route():
     new_document = json.loads(flask.request.data.decode("utf-8"))
     return str(database.create(WorkerRecord, new_document))
 
+@workers.delete("/api/workers")
+def delete_all_workers_route():
+    for worker in database.get_caladium_collection("workers"):
+        database.get_database("workers").get(worker).delete()
+    return str()
+
 @workers.delete("/api/workers/<worker_id>")
 def delete_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):

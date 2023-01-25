@@ -29,6 +29,12 @@ def create_patterns_route():
     new_document = json.loads(flask.request.data.decode("utf-8"))
     return str(database.create(PatternRecord, new_document))
 
+@patterns.delete("/api/patterns")
+def delete_all_patterns_route():
+    for pattern in database.get_caladium_collection("patterns"):
+        database.get_database("patterns").get(pattern).delete()
+    return str()
+
 @patterns.delete("/api/patterns/<pattern_id>")
 def delete_pattern_route(pattern_id):
     if pattern := database.get(PatternRecord, pattern_id):

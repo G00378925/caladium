@@ -40,6 +40,12 @@ def create_clients_route():
     update_authorisation_tokens()
     return resp_str
 
+@clients.delete("/api/clients")
+def delete_all_clients_route():
+    for client in database.get_caladium_collection("clients"):
+        database.get_database("clients").get(client).delete()
+    return str()
+
 @clients.delete("/api/clients/<client_id>")
 def delete_client_route(client_id):
     if client := database.get(ClientRecord, client_id):

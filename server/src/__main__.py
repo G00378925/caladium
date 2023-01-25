@@ -73,6 +73,7 @@ def get_authorisation_tokens():
 
 def before_request():
     path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
+
     if path.startswith("/api/tasks"):
         if token not in get_authorisation_tokens() and token not in clients.get_authorisation_tokens():
             resp_obj.status_code = 403
@@ -93,6 +94,7 @@ def after_request(response_obj):
 def main(argv):
     port_number = int(argv[1]) if len(argv) > 1 else 8080
     update_password("root")
+
     app.before_request(before_request)
     app.after_request(after_request)
     app.run(host="0.0.0.0", port=port_number)
