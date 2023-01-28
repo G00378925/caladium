@@ -37,6 +37,7 @@ function acesulfamePiechart(canvas, data) {
 
     const piePositionX = attributes.height / 2, piePositionY = attributes.height / 2;
     const pieRadius = attributes.height * 0.4;
+    const squareSize = 20, textBeginX = piePositionX + pieRadius;
 
     let currentRadians = 0;
     data.forEach(slice => {
@@ -56,8 +57,22 @@ function acesulfamePiechart(canvas, data) {
         currentRadians += sliceRadians;
     });
 
-    const textBeginX = piePositionX + pieRadius;
     for (let i = 0; i < data.length; i++) {
+        context.beginPath();
+        context.fillStyle = data[i]["colour"];
+        context.rect(textBeginX, squareSize * i, squareSize, squareSize);
+        context.fill();
+
+        context.strokeStyle = "black";
+        context.stroke();
+        context.closePath();
+
+        context.beginPath();
+        context.font = "20px Arial";
+        context.fillStyle = "black";
+        context.fillText(data[i]["title"], textBeginX + squareSize, (squareSize * i) + squareSize);
+        context.fill();
+        context.closePath();
     }
 }
 
