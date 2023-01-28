@@ -6,34 +6,63 @@
 //  Copyright © 2023 Declan Kelly. All rights reserved.
 //
 
-function get2DContext(canvas) {
-    if (typeof(canvas) == "string") return document.getElementById(canvas).getContext("2d");
-    return canvas.getContext("2d");
-}
+function getChartAttributes(canvasID, data) {
+    const canvas = document.getElementById(canvasID);
+    const context = canvas.getContext("2d");
 
-function getChartAttributes(canvas, data) {
+    function max(arr) {
+        if (arr.length == 0) return 0;
+        else if (arr.length == 1) return arr[0];
+
+        let maxValue = 0;
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] > maxValue) maxValue = arr[i];
+        }
+        return maxValue;
+    }
+
     return {
-        "context": get2DContext(canvas),
+        "context": context,
         "elementCount": data.length,
         "height": canvas.height,
-        "maxValue": data.map(i => i.value).reduce((i, j) => i + j),
+        "maxValue": max(data.map(i => i.value)),
+        "totalValue": data.map(i => i.value).reduce((i, j) => i + j),
         "width": canvas.width
     };
 }
 
-function acesulfameBarchart(canvas, data) {
-    const attributes = getChartAttributes(canvas, data);
-    const context = attributes["context"];
+function acesulfameBarchart(canvasID, data) {
+    const attributes = getChartAttributes(canvasID, data);
+    const context = attributes.context;
+
+    const barWidth = attributes.width / (attributes.elementCount * 2);
+    const barHeight = attributes.height * 0.9;
 
     for (let i = 0; i < attributes.elementCount; i++) {
+        const barX = (barWidth / 2) + (barWidth * (i * 2));
+        const barY = barHeight - (barHeight * (data[i].value / attributes.maxValue));
+
+        context.beginPath();
+        context.fillStyle = data[i].colour;
+        context.rect(barX, barY, barWidth, barHeight - barY);
+        context.fill();
+
+        context.strokeStyle = "black";
+        context.stroke();
+        context.closePath();
+
+        context.beginPath();
+        context.font = "20px Arial";
+        context.fillStyle = "black";
+        context.fillText(data[i].title, barX, attributes.height);
+        context.fill();
+        context.closePath();
     }
 }
 
-function acesulfamePiechart(canvas, data) {
-    const attributes = getChartAttributes(canvas, data);
+function acesulfamePiechart(canvasID, data) {
+    const attributes = getChartAttributes(canvasID, data);
     const context = attributes["context"];
-
-    console.log(attributes);
 
     const piePositionX = attributes.height / 2, piePositionY = attributes.height / 2;
     const pieRadius = attributes.height * 0.4;
@@ -41,12 +70,12 @@ function acesulfamePiechart(canvas, data) {
 
     let currentRadians = 0;
     data.forEach(slice => {
-        const sliceRadians = (Math.PI * 2) * (slice.value / attributes.maxValue);
+        const sliceRadians = (Math.PI * 2) * (slice.value / attributes.totalValue);
 
         context.beginPath();
         context.moveTo(piePositionX, piePositionY);
 
-        context.fillStyle = slice["colour"];
+        context.fillStyle = slice.colour;
         context.arc(piePositionX, piePositionY, pieRadius, currentRadians, currentRadians + sliceRadians);
         context.fill();
 
@@ -70,7 +99,7 @@ function acesulfamePiechart(canvas, data) {
         context.beginPath();
         context.font = "20px Arial";
         context.fillStyle = "black";
-        context.fillText(data[i]["title"], textBeginX + squareSize, (squareSize * i) + squareSize);
+        context.fillText(data[i].title, textBeginX + (squareSize * 1.5), (squareSize * i) + squareSize);
         context.fill();
         context.closePath();
     }
