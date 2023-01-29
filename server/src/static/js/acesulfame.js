@@ -6,7 +6,7 @@
 //  Copyright © 2023 Declan Kelly. All rights reserved.
 //
 
-function getChartAttributes(canvasID, data) {
+function _getChartAttributes(canvasID, data) {
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext("2d");
 
@@ -31,8 +31,17 @@ function getChartAttributes(canvasID, data) {
     };
 }
 
-function acesulfameBarchart(canvasID, data) {
-    const attributes = getChartAttributes(canvasID, data);
+function _renderText(context, text, x, y, font) {
+        context.beginPath();
+        context.font = `20px ${font}`;
+        context.fillStyle = "black";
+        context.fillText(text, x, y);
+        context.fill();
+        context.closePath();
+}
+
+function acesulfameBarchart(canvasID, data, font="Arial") {
+    const attributes = _getChartAttributes(canvasID, data);
     const context = attributes.context;
 
     const barWidth = attributes.width / (attributes.elementCount * 2);
@@ -51,17 +60,13 @@ function acesulfameBarchart(canvasID, data) {
         context.stroke();
         context.closePath();
 
-        context.beginPath();
-        context.font = "20px Arial";
-        context.fillStyle = "black";
-        context.fillText(data[i].title, barX, attributes.height);
-        context.fill();
-        context.closePath();
+        const textXDelta = (barWidth / 2) - (data[i].title.length * 5);
+        _renderText(context, data[i].title, barX + textXDelta, (attributes.height * 0.95), font);
     }
 }
 
-function acesulfamePiechart(canvasID, data) {
-    const attributes = getChartAttributes(canvasID, data);
+function acesulfamePiechart(canvasID, data, font="Arial") {
+    const attributes = _getChartAttributes(canvasID, data);
     const context = attributes["context"];
 
     const piePositionX = attributes.height / 2, piePositionY = attributes.height / 2;
@@ -96,12 +101,7 @@ function acesulfamePiechart(canvasID, data) {
         context.stroke();
         context.closePath();
 
-        context.beginPath();
-        context.font = "20px Arial";
-        context.fillStyle = "black";
-        context.fillText(data[i].title, textBeginX + (squareSize * 1.5), (squareSize * i) + squareSize);
-        context.fill();
-        context.closePath();
+        _renderText(context, data[i].title, textBeginX + (squareSize * 1.5), (squareSize * i) + squareSize, font);
     }
 }
 
