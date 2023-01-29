@@ -10,6 +10,8 @@
 (require json)
 (require net/base64)
 
+(define python-location
+    (string-append (getenv "windir") "\\py.exe"))
 (define sandboxie-start-location
     (string-append (getenv "ProgramFiles") "\\Sandboxie\\Start.exe"))
 (define procmon-location
@@ -83,7 +85,7 @@
             "/SaveAs" procmon-csv-file-location) " "))
 
         (send-message "Filtering system calls" out)
-        (system (string-join (append (list "python.exe" "procmon_csv_filter.py" procmon-csv-file-location)
+        (system (string-join (append (list python-location "procmon_csv_filter.py" procmon-csv-file-location)
             listpids-list) " "))
 
         (delete-file (string->path procmon-pml-file-location))
@@ -95,7 +97,7 @@
 (define (analyse-syscalls syscall-list-file-location malicious-patterns-file-location out)
     (begin
         (define-values (subprocess-obj python-out python-in python-err)
-            (apply subprocess #f #f #f "python.exe" (list "syscall_analysis.py" syscall-list-file-location malicious-patterns-file-location)))
+            (subprocess #f #f #f python-location "syscall_analysis.py" syscall-list-file-location malicious-patterns-file-location))
         (subprocess-wait subprocess-obj)
         (display (port->bytes python-out) out)
         (flush-output out)
