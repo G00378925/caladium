@@ -29,6 +29,14 @@
         (close-input-port out) (close-output-port in) (close-input-port err)
         listpids-list))
 
+(define (write-patterns-to-file patterns)
+    (begin
+        (define malicious-patterns-file-location
+            (path->string (make-temporary-file "caladium_patterns_~a.txt")))
+        (delete-file (string->path malicious-patterns-file-location))
+        (display-to-file (string-join patterns "\n") (string->path malicious-patterns-file-location))
+        malicious-patterns-file-location))
+
 (define (output-json hash-obj out)
     (begin
         (define json-out-string
@@ -78,46 +86,20 @@
         (system (string-join (append (list "python.exe" "procmon_csv_filter.py" procmon-csv-file-location)
             listpids-list) " "))
 
-        (define procmon-csv-port
-            (open-input-file (string->path procmon-csv-file-location)))
-        (define procmon-csv-data
-            (string-split (port->string procmon-csv-port) "\n"))
-        (close-input-port procmon-csv-port)
-
         (delete-file (string->path procmon-pml-file-location))
-        (delete-file (string->path procmon-csv-file-location))
-        procmon-csv-data))
+        procmon-csv-file-location))
 
 (define semaphore-obj (make-semaphore 1))
 (define tcp-obj (tcp-listen 8080 8 #f "0.0.0.0"))
 
-(define (analysis-thread-func patterns receive-channel response-channel)
+(define (analyse-syscalls syscall-list-file-location malicious-patterns-file-location out)
     (begin
-        (define syscall (channel-get receive-channel))
-        (channel-put response-channel #f)
-        (analysis-thread-func patterns receive-channel response-channel)))
-
-(define (analyse-syscalls syscall-list patterns out)
-    (begin
-        (define analysis-thread-count 4)
-        (define receive-channel (make-channel))
-        (define analysis-thread-channels
-            (for/list ([x (build-list analysis-thread-count values)])
-                (make-channel)))
-
-        (send-message "Spawning analysis threads" out)
-        (define analysis-threads
-            (for/list ([x (build-list analysis-thread-count values)])
-                (thread (lambda () (analysis-thread-func patterns (list-ref analysis-thread-channels x) receive-channel)))))
-
-        (for/list ([syscall-string syscall-list])
-            (channel-put (list-ref analysis-thread-channels (random 0 (- analysis-thread-count 1))) syscall-string))
-
-        (define (receive-results syscall-number)
-            (begin
-                (channel-get receive-channel)
-                (if (< (+ syscall-number 1) (length syscall-list)) (receive-results (+ syscall-number 1)) #f)))
-        (receive-results 0)))
+        (define-values (subprocess-obj python-out python-in python-err)
+            (apply subprocess #f #f #f "python.exe" (list "syscall_analysis.py" syscall-list-file-location malicious-patterns-file-location)))
+        (subprocess-wait subprocess-obj)
+        (display (port->bytes python-out) out)
+        (flush-output out)
+        (close-input-port python-out) (close-output-port python-in) (close-input-port python-err)))
 
 (define (run-file json-obj out)
     (begin
@@ -128,17 +110,19 @@
         (define file-location
             (string-append (path->string (make-temporary-directory)) "\\" (hash-ref json-obj 'file-name)))
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
+        (define malicious-patterns-file-location (write-patterns-to-file (hash-ref json-obj 'patterns)))
 
-        (define syscall-list (run-in-sandbox file-location out))
-        (send-message (string-append "procmon-csv-data size: "
-            (number->string (length syscall-list)) "\n") out)
-        (send-progress 90 out)
+        (define procmon-csv-file-location (run-in-sandbox file-location out))
 
-        (analyse-syscalls syscall-list (hash-ref json-obj 'patterns) out)
         (send-message "Syscall analysis" out)
+        (send-progress 90 out)
+        (analyse-syscalls procmon-csv-file-location malicious-patterns-file-location out)
+
+        (send-message "Analysis complete" out)
         (send-progress 100 out)
         (send-state "complete" out)
-
+        (delete-file (string->path procmon-csv-file-location))
+        (delete-file (string->path malicious-patterns-file-location))
         (semaphore-post semaphore-obj)))
 
 (define (ping out)
