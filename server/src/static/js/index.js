@@ -75,14 +75,26 @@ class IndexPage extends Page {
                           (div (hash "class" "column column-25" "children"
                             (list (canvas (hash "id" canvasID))))))))`;
 
-        const pageList = [
+        this.pageList = [
             {canvasID: "clients-canvas", cardOnClickFunc: () => loadPage("/clients"), pageName: "Clients"},
             {canvasID: "patterns-canvas", cardOnClickFunc: () => loadPage("/patterns"), pageName: "Patterns"},
             {canvasID: "tasks-canvas", cardOnClickFunc: () => loadPage("/tasks"), pageName: "Tasks"},
             {canvasID: "workers-canvas", cardOnClickFunc: () => loadPage("/workers"), pageName: "Workers"}
         ];
 
-        this.cardList = pageList.map(page => generateDOM(card, page));
+        this.cardList = this.pageList.map(page => generateDOM(card, page));
+    }
+
+    loadPage(updatePage=false) {
+        super.loadPage("/");
+        const piechartData = [
+            {"colour": "red", "title": "Malicious", "value": 75},
+            {"colour": "green", "title": "Clean", "value": 25}
+        ];
+
+        this.pageList.forEach(pageRecord => {
+            acesulfamePiechart(pageRecord["canvasID"], piechartData);
+        });
     }
 }
 

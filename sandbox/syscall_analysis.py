@@ -40,7 +40,7 @@ def analysis_thread_func(malicious_pattern_list):
     while syscall := fetch_next_syscall():
         for pattern in malicious_pattern_list:
             if pattern in syscall:
-                send_message(pattern)
+                send_message(pattern + ", " + syscall)
         inc_analysis_count()
 
 def main(argv):
@@ -55,11 +55,10 @@ def main(argv):
     malicious_pattern_list = get_file_lines(malicious_pattern_file_location)
 
     globals()["count_lock"], globals()["deque_lock"], globals()["stdout_lock"] = [threading.Lock()] * 3
-    globals()["analysis_count"], globals()["syscall_deque"] = 0, syscall_list
+    globals()["analysis_count"], globals()["syscall_deque"] = 0, collections.deque(syscall_list)
 
     for _ in range(10): threading.Thread(target=analysis_thread_func, args=[malicious_pattern_list]).start()
     while globals()["analysis_count"] < len(syscall_list): ...
-    sys.exit(0)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -99,7 +99,7 @@
         (define-values (subprocess-obj python-out python-in python-err)
             (subprocess #f #f #f python-location "syscall_analysis.py" syscall-list-file-location malicious-patterns-file-location))
         (subprocess-wait subprocess-obj)
-        (display (port->bytes python-out) out)
+        (display (port->string python-out) out)
         (flush-output out)
         (close-input-port python-out) (close-output-port python-in) (close-input-port python-err)))
 
