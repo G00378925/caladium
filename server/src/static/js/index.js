@@ -223,12 +223,13 @@ class ClientsPage extends ListPage {
     }
 
     getProvisionTokenFunc(clientID) {
+        navigator.clipboard.writeText(clientID);
     }
 
     generateRowParameters(resp, elementID) {
         const rowParameters = {
             clientID: resp[elementID]["_id"],
-            getProvisionTokenFunc: () => currentPage.getProvisionTokenFunc(elementID),
+            getProvisionTokenFunc: () => currentPage.getProvisionTokenFunc(resp[elementID]["token"]),
             clientDeleteFunc: () => currentPage.deleteElement(elementID)
         };
         return rowParameters;

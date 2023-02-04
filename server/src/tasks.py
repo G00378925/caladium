@@ -55,13 +55,13 @@ def get_tasks_route():
 def get_task_progress_route(task_id):
     if task := database.get(TaskRecord, task_id):
         return str(task)
-    return str()
+    return {}
 
 @tasks.delete("/api/tasks")
 def delete_all_tasks_route():
     for task in database.get_caladium_collection("tasks"):
         database.get_database("tasks").get(task).delete()
-    return str()
+    return {}
 
 @tasks.delete("/api/tasks/<task_id>")
 def delete_tasks_route(task_id):

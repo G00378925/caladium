@@ -53,7 +53,7 @@ def create_workers_route():
 def delete_all_workers_route():
     for worker in database.get_caladium_collection("workers"):
         database.get_database("workers").get(worker).delete()
-    return str()
+    return {}
 
 @workers.delete("/api/workers/<worker_id>")
 def delete_workers_route(worker_id):
