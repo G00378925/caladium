@@ -1,52 +1,141 @@
 % Fri 7 Oct 18:57
+\chapter{Introduction}
+
+\section{Abstract}
+For the Applied Project and Minor Dissertation module, I have been tasked with creating a significant software project.
+For this project, I have decided to create a software platform capable of detecting malicious software based on its behaviour.
+Malicious software meaning software that can be used to harm a system or its users, commonly refered to as malware.
+Its behaviour meaning how the software interacts with the operating system, examples of this include reading and writing files.
+
+Users will have the ability to upload files to the platform, these files will be executed in a sandboxed environment.
+When the program is in a sandbox, it will be unable to cause any harm to distrupt the system.
+The system calls will be logged and analysed to determine if the program is malicious.
+This is known as dynamic heuristic analysis, opposed to static analysis which is scanning for patterns without actually executing the program.
+
+The platform is designed to be used by corporations, it will be installed on all the computers on the network.
+When a user downloads a file they will be prompted to upload it to the platform for analysis.
+The user will see a real-time analysis of the file, if the file is deemed malicious the user will be prompted to quarantine the file.
+
+\section{Project Overview}
+The platform will feature three sub-projects, which will be the client, server, and sandbox.
+
+The client will be a GUI application targeted at Microsoft Windows.
+
+The server will be responsible for bridging communications between the client and the sandbox.
+
+The sandbox will be responsible for running the malware in a sandboxed environment,
+executing the files and logging the system calls.
+
+\section{Context}
+It is common knowledge that malicious software is a problem in computing.
+Anti-virus solutions have been adopted by corporations to protect their systems.
+But these solutions are not perfect and can be bypassed by malware authors.
+
+Malware authors can obfuscate their code to avoid being identified by known malicious signatures,
+and can also use polymorphic code to avoid being detected by anti-virus solutions.
+
+Examples of malware include ransomware, which encrypts files on a system and demands a ransom to decrypt them,
+Trojans, which are used to gain access to a system and exfiltrate data,
+and spyware, which is used to spy on a user.
+
+The detection of malware based on signatures is known as static analysis.
+while the detection of malware based on its behavior is known as "dynamic analysis."
 
 The goal of this project is to develop a software platform capable of detecting malicious software based on its behavior.
 
-Malware is a piece of software that is designed to be malicious.
-Examples include spyware, ransomware, and Trojan horses.
+For a program to do anything meaningful on a system, it must make use of system calls.
+Examples of system calls include reading and writing files,
+These system calls can be logged and analyzed to determine if the program is behaving maliciously.
+
+\section{Objectives}
+The objectives of this project are as follows:
+\begin{itemize}
+    \item Develop a software platform capable of detecting malicious software based on its behavior.
+    \item The platform must be able to detect malware that is designed to run on Microsoft Windows.
+\end{itemize}
 
 The software platform will feature three sub-projects, which will be the client, server, and sandbox.
+
+\subsection{Client}
+The code of the client will be found in the \texttt{client} directory.
 
 The client will be a GUI application targeted at Microsoft Windows.
 It will be written in Python 3, using the Tkinter library for creating the GUI.
 
-The server will be responsible for bridging communications between the client and sandbox.
+The client will be responsible for communicating with the server,
+the user can use it to upload files to be scanned by the server,
+the user will be able to see real-time results from the server.
+
+\subsection{Server}
+The code of the server will be found in the \texttt{server} directory.
+
+The server will be responsible for bridging communications between the client and the sandbox.
 The server will also be written in Python 3, using the Flask micro-framework for handling HTTP requests.
 
 The platform will also feature a dashboard allowing administrators to configure the platform,
 This includes provisioning clients and adding new detection patterns.
 
+\subsubsection{Dashboard}
+
+The code of the dashboard will be found in the \texttt{server/static} directory.
+
+Administrators will be able to login into the dashboard and perform administrative tasks.
+The dashboard will be written in JavaScript, it will be a single-page application.
+
+
+
+\subsection{Sandbox}
+The code of the sandbox will be found in the \texttt{sandbox} directory.
+
+Since this platform is targetting malware that is designed to run on Microsoft Windows,
+the sandbox must run on Microsoft Windows.
+
+It will make use of Sandboxie to isolate the malware from the host system,
+make use of a programme called Process Monitor to log system calls.
+
+It will be written in Racket.
+
+% Set out the objectives of the project clearly.
+% – You will have to address each of these in the evaluation / conclusion.
+% – The metrics by which success or failure is measured.
+
+
+% Briefly list each chapter / section and provide a brief description of what each section contains.
+% – List the resource URL (GitHub address) for the project and provide
+% a brief list and description of the main elements at the URL.
+
+
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-It is common knowledge that malicious software is a problem in computing.
+
 Malicious actors are often motivated by financial and political gains.
 
 Malware can be described as a piece of software that is malicious,
 malicious meaning it does things that are bad,
-this can include exfiltration of data from a device,
+this can include the exfiltration of data from a device,
 creating damage such as encrypting data and holding the key as ransom.
 
 Malware authors work hard to avoid their work being attributed back to themselves,
 adopting strategies such as polymorphic code (code that can change itself during execution),
 anti-debugging (changing behaviour or not running at all),
-code obfuscation (making code hard to reverse engineer or decrypting the real code on execution).
+code obfuscation (making code hard to reverse engineer or decrypt the real code on execution).
 
 Malware is commonly packed with a tool called UPX, which allows code to unpack itself on start,
-making it difficult to analysis the code, until it is executing and you can dump the real code from memory.
+making it difficult to analyse the code, until it is executing and you can dump the real code from memory.
 
-What can be classified as malware is hard to define, false positives is something that plagues modern anti-malware solutions,
+What can be classified as malware is hard to define, false positives are something that plagues modern anti-malware solutions,
 sometimes applications used by millions of people can exhibit behaviours comparable to malware,
-such as retrieving your contacts list on your smart phone or retrieving a list of your installed applications.
+such as retrieving your contacts list on your smartphone or retrieving a list of your installed applications.
 
-A common technique modern anti-malware solution employ is heuristic analysis,
-this is scanning executable file formats for certain known arifacts that other known malware have.
-This is not enough as I have explained above, modern malware try to hide their true nature from scanners,
-now dynamic heuristic analysis is needed, we can observe what the application is doing while it is running, what resources it is requesting,
-a ransomware for example would be opening many files on the computer, and replacing them with encrypted modified versions.
+A common technique modern anti-malware solutions employ is heuristic analysis,
+this is scanning executable file formats for certain known artefacts that other known malware have.
+This is not enough as I have explained above, modern malware tries to hide its true nature from scanners,
+now the dynamic heuristic analysis is needed, we can observe what the application is doing while it is running, what resources it is requesting,
+ransomware for example would be opening many files on the computer, and replacing them with encrypted modified versions.
 
-In Ireland in 2021 the Health Service Executive was compromised with the use of a excel spreadsheet document,
-this served as the entry point for the Conti ransomeware, this could have been avoided if the excel document was opened in a sandboxed environment mimicking the target computer,
-as soon as the ransomware started showing malware signature behaviour it could have been classed as malicious and then be quaratined.
+In Ireland, in 2021 the Health Service Executive was compromised with the use of an excel spreadsheet document,
+this served as the entry point for the Conti ransomware, this could have been avoided if the excel document was opened in a sandboxed environment mimicking the target computer,
+as soon as the ransomware started showing malware signature behaviour it could have been classed as malicious and then be quarantined.
 
 The goal of my project is to create a platform that can facilitate malware detection using dynamic heuristic analysis.
 I will be developing an application that will run on the computer natively, it will be a GUI application
