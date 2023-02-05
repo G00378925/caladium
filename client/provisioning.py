@@ -6,22 +6,21 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import urllib.request
+import json, os, urllib.request
 
-def get_caladium_appdata_location():
-    if sys.platform == "win32":
-        return os.environ["USERPROFILE"] + "{0}AppData{0}Local{0}Caladium".format(os.path.sep)
-    elif sys.platform == "darwin":
-        return "/tmp"
-    else:
-        return None
+def load_config(caladium_appdata_dir):
+    config_json_location = caladium_appdata_dir + os.path.sep + "config.json"
 
-def load_config(argv):
-    config_json_location = ''.join(argv[0].split(os.path.sep)[:-1]) + os.path.sep + "config.json"
-
-    if sys.platform == "win32":
-        config_json_location = config_json_location.lstrip(os.path.sep)
+    if not os.path.exists(config_json_location): return None
 
     with open(config_json_location) as config_json_handle:
         return json.load(config_json_handle)
+
+def save_config(caladium_appdata_dir, config):
+    with open(caladium_appdata_dir + os.path.sep + "config.json", "w") as f:
+        f.write(json.dumps(config))
+
+def test_server_connection(config):
+    try: return True
+    except: return False
 
