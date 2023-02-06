@@ -67,10 +67,6 @@ def statistics_route():
     statistics = []
     return statistics
 
-@app.get("/api/test_connection")
-def test_connection_route():
-    return "OK"
-
 @app.put("/api/update_password")
 def update_password_route():
     if new_password := json.loads(flask.request.get_data()).get("password", None):

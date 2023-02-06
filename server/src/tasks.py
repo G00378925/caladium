@@ -51,6 +51,10 @@ def scan_file(scan_file_obj):
 def get_tasks_route():
     return database.get_caladium_collection("tasks")
 
+@tasks.get("/api/tasks/test_connection")
+def test_connection_route():
+    return "OK"
+
 @tasks.get("/api/tasks/<task_id>")
 def get_task_progress_route(task_id):
     if task := database.get(TaskRecord, task_id):

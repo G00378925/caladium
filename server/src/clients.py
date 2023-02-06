@@ -6,7 +6,7 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import json
+import base64, json
 
 import flask
 
@@ -25,13 +25,20 @@ def get_authorisation_tokens():
 
 def update_authorisation_tokens():
     global authorisation_tokens
-    authorisation_tokens = [database.get(ClientRecord, client_id).get("token") for client_id in database.get_caladium_collection("clients")]
+    authorisation_tokens = [database.get(ClientRecord, client_id).get("_id") for client_id in database.get_caladium_collection("clients")]
 
 update_authorisation_tokens()
 
 @clients.get("/api/clients")
 def get_clients_route():
-    return database.get_caladium_collection("clients")
+    clients = database.get_caladium_collection("clients")
+    for client_id in clients:
+        token_obj = {
+            "authorisation_token": client_id,
+            "server_address": flask.request.headers["Host"]
+        }
+        clients[client_id]["token"] = base64.b64encode(json.dumps(token_obj).encode()).decode("utf-8")
+    return clients
 
 @clients.post("/api/clients")
 def create_clients_route():

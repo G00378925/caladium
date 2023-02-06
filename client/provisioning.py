@@ -23,6 +23,7 @@ def save_config(caladium_appdata_dir, config):
 def test_server_connection(config):
     try:
         req_headers = {"Authorisation": config["authorisation_token"]}
-        return urllib.request.urlopen(f"http://{config['server_address']}/api/test_connection", headers=req_headers).text == "OK"
+        req_obj = urllib.request.Request(f"http://{config['server_address']}/api/tasks/test_connection", headers=req_headers)
+        return urllib.request.urlopen(req_obj).read().decode("utf-8") == "OK"
     except: return False
 

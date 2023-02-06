@@ -6,7 +6,7 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import json, os, sys
+import json, os, sys, time
 
 import pycouchdb
 
@@ -56,5 +56,6 @@ def get(record_class, record_id):
     else: return None
 
 def create(record_class, record_dict):
+    record_dict["creation_time"] = time.time()
     return record_class(get_database(record_class.database_name).save(record_dict).items())
 

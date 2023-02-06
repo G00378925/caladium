@@ -206,7 +206,8 @@ class ClientsPage extends ListPage {
                         (list
                           navigationBar
                           (button (hash "onclick" addClientOnClick "innerHTML" "Provision New Client"))
-                          (button (hash "onclick" deleteAllElements "innerHTML" "Delete All Clients"))
+                          (button (hash "style" "background-color: red; border-color: red"
+                            "onclick" deleteAllElements "innerHTML" "Delete All Clients"))
                           (table (hash "children" elementsTable))))`;
 
         this.tableHeader = `(tr (hash "children"
@@ -257,6 +258,8 @@ class PatternsPage extends ListPage {
                           navigationBar
                           (input (hash "type" "text" "id" "patternString" "placeholder" "Malicious Pattern"))
                           (button (hash "onclick" addPatternOnClick "innerHTML" "Add Pattern"))
+                          (button (hash "style" "background-color: red; border-color: red"
+                            "onclick" deleteAllElements "innerHTML" "Delete All Patterns"))
                           (table (hash "children" elementsTable))))`;
 
         this.tableHeader = `(tr (hash "children"
@@ -299,6 +302,8 @@ class TasksPage extends ListPage {
         this.body = ` (div (hash "children"
                         (list
                           navigationBar
+                          (button (hash "style" "background-color: red; border-color: red"
+                            "onclick" deleteAllElements "innerHTML" "Delete All Tasks"))
                           (table (hash "children" elementsTable))))`;
 
         this.tableHeader = `(tr (hash "children"
@@ -336,6 +341,8 @@ class WorkersPage extends ListPage {
                           navigationBar
                           (input (hash "type" "text" "id" "workerAddress" "placeholder" "0.0.0.0:8080"))
                           (button (hash "onclick" addWorkerOnClick "innerHTML" "Add Worker"))
+                          (button (hash "style" "background-color: red; border-color: red"
+                            "onclick" deleteAllElements "innerHTML" "Delete All Workers"))
                           (table (hash "children" elementsTable))))`;
 
         this.tableHeader = `(tr (hash "children"
