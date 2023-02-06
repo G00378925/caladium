@@ -62,6 +62,11 @@ def update_password(new_password):
     global administrator_password
     administrator_password = hashlib.sha256(new_password.encode()).hexdigest()
 
+@app.get("/api/statistics")
+def statistics_route():
+    statistics = []
+    return statistics
+
 @app.get("/api/test_connection")
 def test_connection_route():
     return "OK"

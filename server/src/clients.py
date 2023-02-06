@@ -42,8 +42,8 @@ def create_clients_route():
 
 @clients.delete("/api/clients")
 def delete_all_clients_route():
-    for client in database.get_caladium_collection("clients"):
-        database.get_database("clients").get(client).delete()
+    for client_id in database.get_caladium_collection("clients"):
+        database.get(ClientRecord, client_id).delete()
     return {}
 
 @clients.delete("/api/clients/<client_id>")

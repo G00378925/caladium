@@ -86,8 +86,8 @@ function acesulfamePiechart(canvasID, data, font="Arial") {
 
         context.strokeStyle = "black";
         context.stroke();
-
         context.closePath();
+
         currentRadians += sliceRadians;
     });
 

@@ -87,13 +87,16 @@ class IndexPage extends Page {
 
     loadPage(updatePage=false) {
         super.loadPage("/");
-        const piechartData = [
-            {"colour": "red", "title": "Malicious", "value": 75},
-            {"colour": "green", "title": "Clean", "value": 25}
-        ];
+        currentPage.caladiumFetch("GET", "/api/statistics")
+        .then(resp => {
+            const piechartData = [
+                {"colour": "red", "title": "Malicious", "value": 75},
+                {"colour": "green", "title": "Clean", "value": 25}
+            ];
 
-        this.pageList.forEach(pageRecord => {
-            acesulfamePiechart(pageRecord["canvasID"], piechartData);
+            this.pageList.forEach(pageRecord => {
+                acesulfamePiechart(pageRecord["canvasID"], piechartData);
+            });
         });
     }
 }
@@ -185,6 +188,13 @@ class ListPage extends Page {
             currentPage.loadPage(true);
         });
     }
+
+    deleteAllElements() {
+        currentPage.caladiumFetch("DELETE", currentPage.endpoint, {})
+        .then(resp => {
+            currentPage.loadPage(true);
+        });
+    }
 }
 
 class ClientsPage extends ListPage {
@@ -196,6 +206,7 @@ class ClientsPage extends ListPage {
                         (list
                           navigationBar
                           (button (hash "onclick" addClientOnClick "innerHTML" "Provision New Client"))
+                          (button (hash "onclick" deleteAllElements "innerHTML" "Delete All Clients"))
                           (table (hash "children" elementsTable))))`;
 
         this.tableHeader = `(tr (hash "children"

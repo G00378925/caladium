@@ -51,8 +51,8 @@ def create_workers_route():
 
 @workers.delete("/api/workers")
 def delete_all_workers_route():
-    for worker in database.get_caladium_collection("workers"):
-        database.get_database("workers").get(worker).delete()
+    for worker_id in database.get_caladium_collection("workers"):
+        database.get(WorkerRecord, worker_id).delete()
     return {}
 
 @workers.delete("/api/workers/<worker_id>")

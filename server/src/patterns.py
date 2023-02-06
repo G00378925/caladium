@@ -31,8 +31,8 @@ def create_patterns_route():
 
 @patterns.delete("/api/patterns")
 def delete_all_patterns_route():
-    for pattern in database.get_caladium_collection("patterns"):
-        database.get_database("patterns").get(pattern).delete()
+    for pattern_id in database.get_caladium_collection("patterns"):
+        database.get(PatternRecord, pattern_id).delete()
     return {}
 
 @patterns.delete("/api/patterns/<pattern_id>")
