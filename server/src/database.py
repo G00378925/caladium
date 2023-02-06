@@ -57,5 +57,6 @@ def get(record_class, record_id):
 
 def create(record_class, record_dict):
     record_dict["creation_time"] = time.time()
+    record_dict["creation_time_str"] = time.strftime("%Y-%m-%d", time.localtime(time.time()))
     return record_class(get_database(record_class.database_name).save(record_dict).items())
 

@@ -14,7 +14,7 @@ import dirchangelistener, provisioningframe, scanwindow, quarantine, quarantinef
 
 def scan_file(file_path=None):
     try:
-        file_handle = open(file_path) if file_path else tkinter.filedialog.askopenfile("rb")
+        file_handle = open(file_path, "rb") if file_path else tkinter.filedialog.askopenfile("rb")
         if not hasattr(file_handle, "name"): return
         file_name = file_handle.name.split('/')[-1]
         file_data = base64.b64encode(file_handle.read()).decode("utf-8")
@@ -52,7 +52,7 @@ def provisioning_complete(config, main_window):
     upload_file_button.pack()
 
     def dirchangelistener_callback(file_path):
-        if tkinter.messagebox.showyesno("New file detected " + file_path, file_path):
+        if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
             scan_file(file_path)
 
     downloads_dir_location = get_downloads_dir()
