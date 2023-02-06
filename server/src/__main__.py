@@ -62,6 +62,10 @@ def update_password(new_password):
     global administrator_password
     administrator_password = hashlib.sha256(new_password.encode()).hexdigest()
 
+@app.get("/api/test_connection")
+def test_connection_route():
+    return "OK"
+
 @app.put("/api/update_password")
 def update_password_route():
     if new_password := json.loads(flask.request.get_data()).get("password", None):

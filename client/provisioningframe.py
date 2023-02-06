@@ -34,7 +34,7 @@ class ProvisioningFrame(tkinter.ttk.Frame):
 
             globals()["config"] = provisioning.load_config(caladium_appdata_dir)
             if provisioning.test_server_connection(globals()["config"]):
-                provisioning_complete()
+                self.provisioning_complete()
         except (json.decoder.JSONDecodeError):
             tkinter.messagebox.showerror("Error", "Provision token is malformed.")
 

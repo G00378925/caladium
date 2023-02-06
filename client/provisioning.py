@@ -21,6 +21,8 @@ def save_config(caladium_appdata_dir, config):
         f.write(json.dumps(config))
 
 def test_server_connection(config):
-    try: return True
+    try:
+        req_headers = {"Authorisation": config["authorisation_token"]}
+        return urllib.request.urlopen(f"http://{config['server_address']}/api/test_connection", headers=req_headers).text == "OK"
     except: return False
 
