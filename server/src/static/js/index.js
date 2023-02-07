@@ -87,7 +87,7 @@ class IndexPage extends Page {
 
     loadPage(updatePage=false) {
         super.loadPage("/");
-        currentPage.caladiumFetch("GET", "/api/statistics")
+        currentPage.caladiumFetch("GET", "/api/admin/statistics")
         .then(resp => {
             const piechartData = [
                 {"colour": "red", "title": "Malicious", "value": 75},
@@ -145,20 +145,37 @@ class LoginPage extends Page {
 class PreferencesPage extends Page {
     constructor() {
         super();
-        this.endpoint = "/api";
+        this.endpoint = "/api/admin";
 
         this.body = ` (div (hash "children"
                         (list
                           navigationBar
                           (input (hash "type" "password" "id" "newPassword" "placeholder" "New Password"))
-                          (button (hash "onclick" changePasswordOnClick "innerHTML" "Update Password")))))`;
+                          (button (hash "onclick" changePasswordOnClick "innerHTML" "Update Password"))
+                          (hr)
+                          (button (hash "onclick" toggleAutoProvision "innerHTML" autoProvisionButtonText)))))`;
+    }
+
+    loadPage(updatePage=false) {
+        currentPage.caladiumFetch("GET", this.endpoint + "/preferences")
+        .then(resp => {
+            this.autoProvisionButtonText = (resp["auto_provision"] ? "Enable" : "Disable") + " Auto Provision";
+            super.loadPage();
+        });
     }
 
     changePasswordOnClick() {
         const newPassword = document.getElementById("newPassword").value;
         if (newPassword.length == 0) return;
 
-        currentPage.caladiumFetch("PUT", currentPage.endpoint + '/' + "update_password", {password: newPassword})
+        currentPage.caladiumFetch("PUT", currentPage.endpoint + "/update_password", {password: newPassword})
+        .then(resp => {
+            currentPage.loadPage(true);
+        });
+    }
+
+    toggleAutoProvision() {
+        currentPage.caladiumFetch("POST", currentPage.endpoint + "/toggle_auto_provision", {})
         .then(resp => {
             currentPage.loadPage(true);
         });
@@ -178,7 +195,7 @@ class ListPage extends Page {
             Object.keys(resp).forEach(elementID => {
                 this.elementsTable.push(generateDOM(this.tableData, currentPage.generateRowParameters(resp, elementID)));
             });
-            super.loadPage("/");
+            super.loadPage();
         });
     }
 

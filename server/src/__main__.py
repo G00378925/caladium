@@ -12,7 +12,11 @@ import flask, requests, uuid
 
 import clients, patterns, tasks, workers
 
-authorisation_tokens, administrator_password = [], None
+preferences = {
+    "administrator_password": None,
+    "authorisation_tokens": [],
+    "auto_provision": False,
+}
 
 app = flask.Flask(__name__)
 app.register_blueprint(clients.clients)
@@ -46,46 +50,49 @@ def serve_js_file(js_file_path):
 
 @app.post("/api/login")
 def login_route():
-    global authorisation_tokens
-
     req_body_obj = json.loads(flask.request.get_data())
     username, password = req_body_obj["username"], req_body_obj["password"]
 
-    if username == "root" and administrator_password == hashlib.sha256(password.encode()).hexdigest():
+    if username == "root" and preferences["administrator_password"] == hashlib.sha256(password.encode()).hexdigest():
         token = str(uuid.uuid1())
-        authorisation_tokens += [token]
+        preferences["authorisation_tokens"] += [token]
         return {"valid": True, "Authorisation": token}
     else:
         return {"valid": False, "message": "Incorrect username or password"}
 
 def update_password(new_password):
-    global administrator_password
-    administrator_password = hashlib.sha256(new_password.encode()).hexdigest()
+    preferences["administrator_password"] = hashlib.sha256(new_password.encode()).hexdigest()
 
-@app.get("/api/statistics")
+@app.post("/api/admin/toggle_auto_provision")
+def toggle_auto_provision():
+    preferences["auto_provision"] = not preferences["auto_provision"]
+    return {}
+
+@app.get("/api/admin/preferences")
+def preferences_route():
+    return preferences
+
+@app.get("/api/admin/statistics")
 def statistics_route():
     statistics = []
     return statistics
 
-@app.put("/api/update_password")
+@app.put("/api/admin/update_password")
 def update_password_route():
     if new_password := json.loads(flask.request.get_data()).get("password", None):
         update_password(new_password)
     return {}
 
-def get_authorisation_tokens():
-    return authorisation_tokens
-
 def before_request():
     path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
 
     if path.startswith("/api/tasks"):
-        if token not in get_authorisation_tokens() and token not in clients.get_authorisation_tokens():
+        if token not in preferences["authorisation_tokens"] and token not in clients.get_authorisation_tokens():
             resp_obj.status_code = 403
             resp_obj.set_data("Invalid authorisation token")
             return resp_obj
     elif path.startswith("/api") and not path.startswith("/api/login"):
-        if token not in get_authorisation_tokens():
+        if token not in preferences["authorisation_tokens"]:
             resp_obj.status_code = 403
             resp_obj.set_data("Invalid authorisation token")
             return resp_obj
