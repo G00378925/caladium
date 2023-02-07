@@ -145,7 +145,7 @@ class LoginPage extends Page {
 class PreferencesPage extends Page {
     constructor() {
         super();
-        this.endpoint = "/api/admin";
+        this.endpoint = "/api/admin/preferences";
 
         this.body = ` (div (hash "children"
                         (list
@@ -157,9 +157,10 @@ class PreferencesPage extends Page {
     }
 
     loadPage(updatePage=false) {
-        currentPage.caladiumFetch("GET", this.endpoint + "/preferences")
+        currentPage.caladiumFetch("GET", this.endpoint)
         .then(resp => {
-            this.autoProvisionButtonText = (resp["auto_provision"] ? "Enable" : "Disable") + " Auto Provision";
+            this.preferences = resp;
+            this.autoProvisionButtonText = (resp["auto_provision"] ? "Disable" : "Enable") + " Auto Provision";
             super.loadPage();
         });
     }
@@ -168,17 +169,13 @@ class PreferencesPage extends Page {
         const newPassword = document.getElementById("newPassword").value;
         if (newPassword.length == 0) return;
 
-        currentPage.caladiumFetch("PUT", currentPage.endpoint + "/update_password", {password: newPassword})
-        .then(resp => {
-            currentPage.loadPage(true);
-        });
+        currentPage.caladiumFetch("PUT", currentPage.endpoint, {password: newPassword})
+        .then(resp => {currentPage.loadPage(true);});
     }
 
     toggleAutoProvision() {
-        currentPage.caladiumFetch("POST", currentPage.endpoint + "/toggle_auto_provision", {})
-        .then(resp => {
-            currentPage.loadPage(true);
-        });
+        currentPage.caladiumFetch("PUT", currentPage.endpoint, {"auto_provision": !currentPage.preferences["auto_provision"]})
+        .then(resp => {currentPage.loadPage(true);});
     }
 }
 

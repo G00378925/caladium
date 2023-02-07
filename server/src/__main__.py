@@ -48,6 +48,16 @@ def serve_css_file(css_file_path):
 def serve_js_file(js_file_path):
     return flask.send_from_directory("static/js/", js_file_path)
 
+@app.post("/api/auto_provision")
+def auto_provision_route():
+    if preferences["auto_provision"]:
+        return clients.create_clients_route()
+    else:
+        resp_obj = flask.Response()
+        resp_obj.status_code = 403
+        resp_obj.set_data("Automatic provisioning is disabled")
+        return resp_obj
+
 @app.post("/api/login")
 def login_route():
     req_body_obj = json.loads(flask.request.get_data())
@@ -63,30 +73,34 @@ def login_route():
 def update_password(new_password):
     preferences["administrator_password"] = hashlib.sha256(new_password.encode()).hexdigest()
 
-@app.post("/api/admin/toggle_auto_provision")
-def toggle_auto_provision():
-    preferences["auto_provision"] = not preferences["auto_provision"]
-    return {}
-
 @app.get("/api/admin/preferences")
 def preferences_route():
     return preferences
+
+@app.put("/api/admin/preferences")
+def update_password_route():
+    put_payload = json.loads(flask.request.get_data())
+
+    if "password" in put_payload:
+        if new_password := json.loads(flask.request.get_data()).get("password", None):
+            update_password(new_password)
+    else:
+        for preference_field in put_payload:
+            preferences[preference_field] = put_payload[preference_field]
+
+    return {}
 
 @app.get("/api/admin/statistics")
 def statistics_route():
     statistics = []
     return statistics
 
-@app.put("/api/admin/update_password")
-def update_password_route():
-    if new_password := json.loads(flask.request.get_data()).get("password", None):
-        update_password(new_password)
-    return {}
-
 def before_request():
     path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
 
-    if path.startswith("/api/tasks"):
+    if path == "/api/auto_provision":
+        ...
+    elif path.startswith("/api/tasks"):
         if token not in preferences["authorisation_tokens"] and token not in clients.get_authorisation_tokens():
             resp_obj.status_code = 403
             resp_obj.set_data("Invalid authorisation token")

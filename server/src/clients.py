@@ -42,8 +42,7 @@ def get_clients_route():
 
 @clients.post("/api/clients")
 def create_clients_route():
-    new_document = json.loads(flask.request.data.decode("utf-8"))
-    resp_str = str(database.create(ClientRecord, new_document))
+    resp_str = str(database.create(ClientRecord, {}))
     update_authorisation_tokens()
     return resp_str
 

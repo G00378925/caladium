@@ -67,9 +67,9 @@ def main(argv):
 
     provisioning_frame = provisioningframe.ProvisioningFrame(main_window, provisioning_complete, get_caladium_appdata_dir())
     provisioning_frame.pack(fill=tkinter.BOTH)
-    provisioning_frame.provision()
+    provisioning_frame.provision(argv[0] if len(argv) > 0 else None)
     main_window.mainloop()
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main(sys.argv[1:])
 

@@ -6,7 +6,7 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import base64, json, tkinter, tkinter.filedialog, tkinter.ttk
+import base64, json, tkinter, tkinter.filedialog, tkinter.ttk, urllib
 
 import provisioning
 
@@ -23,8 +23,18 @@ class ProvisioningFrame(tkinter.ttk.Frame):
         self.provision_button["text"] = "Provision"
         self.provision_button.pack()
 
-    def provision(self):
+    def provision(self, server_address):
         globals()["config"] = provisioning.load_config(self.caladium_appdata_dir)
+
+        if not globals()["config"] and server_address:
+            globals()["config"] = {}
+
+            req_obj = urllib.request.Request(f"http://{server_address}/api/auto_provision", method="POST")
+            globals()["config"]["authorisation_token"] = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))["_id"]
+            globals()["config"]["server_address"] = server_address
+
+            provisioning.save_config(self.caladium_appdata_dir, globals()["config"])
+
         if globals()["config"]:
             if provisioning.test_server_connection(globals()["config"]):
                 self.pack_forget()
