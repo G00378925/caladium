@@ -30,7 +30,7 @@ def update_authorisation_tokens():
 update_authorisation_tokens()
 
 @clients.get("/api/clients")
-def get_clients_route():
+def get_records_route():
     clients = database.get_caladium_collection("clients")
     for client_id in clients:
         token_obj = {

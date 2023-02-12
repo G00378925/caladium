@@ -6,7 +6,7 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import hashlib, json, sys
+import hashlib, json, sys, time
 
 import flask, requests, uuid
 
@@ -93,6 +93,21 @@ def update_password_route():
 @app.get("/api/admin/statistics")
 def statistics_route():
     statistics = []
+
+    for endpoint, label in zip([clients, patterns, workers], ["clients", "patterns", "workers"]):
+        endpoint_statistics = {"plot_name": label + "-canvas", "plot_type": "barchart", "data": []}
+        endpoints_records = endpoint.get_records_route()
+
+        for record in endpoints_records.values():
+            data, month = endpoint_statistics["data"], time.strftime("%b", time.localtime(record["creation_time"]))
+
+            if month not in [subdata["title"] for subdata in data]:
+                data += [{"colour": "green", "title": month, "value": 1}]
+            else:
+                [*filter(lambda subdata: subdata["title"] == month, data)][0]["value"] += 1
+
+        statistics += [endpoint_statistics]
+
     return statistics
 
 def before_request():

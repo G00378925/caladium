@@ -41,7 +41,7 @@ class WorkerRecord(database.DatabaseRecord):
 workers = flask.Blueprint(__name__, "workers")
 
 @workers.get("/api/workers")
-def get_workers_route():
+def get_records_route():
     return database.get_caladium_collection("workers")
 
 @workers.post("/api/workers")

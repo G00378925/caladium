@@ -48,7 +48,7 @@ def scan_file(scan_file_obj):
     return str(task)
 
 @tasks.get("/api/tasks")
-def get_tasks_route():
+def get_records_route():
     return database.get_caladium_collection("tasks")
 
 @tasks.get("/api/tasks/test_connection")

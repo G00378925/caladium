@@ -94,8 +94,11 @@ class IndexPage extends Page {
                 {"colour": "green", "title": "Clean", "value": 25}
             ];
 
-            this.pageList.forEach(pageRecord => {
-                acesulfamePiechart(pageRecord["canvasID"], piechartData);
+            resp.forEach(plotRecord => {
+                if (plotRecord["plot_type"] == "barchart")
+                    acesulfameBarchart(plotRecord["plot_name"], plotRecord["data"]);
+                else
+                    acesulfamePiechart(plotRecord["plot_name"], plotRecord["data"]);
             });
         });
     }
