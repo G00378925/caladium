@@ -16,11 +16,15 @@ class QuarantineFrame(tkinter.ttk.Frame):
 
         self.quarantine_list = tkinter.Listbox(self)
         self._update_quarantine_list()
-        self.quarantine_list.pack(fill=tkinter.BOTH)
+        self.quarantine_list.grid()
 
         self.quarantine_button = tkinter.Button(self, command=lambda: self._quarantine_file())
         self.quarantine_button["text"] = "Quarantine file"
-        self.quarantine_button.pack()
+        self.quarantine_button.grid()
+
+        self.restore_button = tkinter.Button(self, command=lambda: self._restore_file())
+        self.restore_button["text"] = "Restore file"
+        self.restore_button.grid()
 
     def _quarantine_file(self):
         file_handle = tkinter.filedialog.askopenfile("rb")
@@ -30,6 +34,11 @@ class QuarantineFrame(tkinter.ttk.Frame):
 
         self.quarantine_obj.quarantine_file(file_location)
         self._update_quarantine_list()
+
+    def _restore_file(self):
+        if len(selected_items := self.quarantine_list.curselection()) == 1:
+            self.quarantine_obj.restore_file(self.quarantine_obj.get_file_list()[selected_items[0]]["file_id"])
+            self._update_quarantine_list()
 
     def _update_quarantine_list(self):
         self.quarantine_list.delete(0, len(list(self.quarantine_index_dict)))

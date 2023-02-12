@@ -7,6 +7,9 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
+import tkthread
+tkthread.patch()
+
 import base64, json, os, sys, tkinter, tkinter.filedialog
 import tkinter.messagebox, tkinter.ttk, threading, urllib
 
@@ -52,8 +55,10 @@ def provisioning_complete(config, main_window):
     upload_file_button.pack()
 
     def dirchangelistener_callback(file_path):
-        if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
-            scan_file(file_path)
+        @tkthread.main(main_window)
+        def scan_file_thread():
+            if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
+                scan_file(file_path)
 
     downloads_dir_location = get_downloads_dir()
     dirchangelistener_obj = dirchangelistener.DirChangeListener([downloads_dir_location], dirchangelistener_callback)
