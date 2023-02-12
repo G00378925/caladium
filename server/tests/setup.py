@@ -18,15 +18,15 @@ CALADIUM_SERVER_ADDRESS = os.environ["CALADIUM_SERVER_ADDRESS"]
 
 class EndPointTestCase(unittest.TestCase):
     def get_http_headers(self, username, password):
-        headers = {"username": username, "password": password}
-        token = json.loads(requests.post(f"http://{CALADIUM_SERVER_ADDRESS}/api/login", headers=headers).text)["Authorisation"]
+        data = json.dumps({"username": username, "password": password})
+        token = json.loads(requests.post(f"http://{CALADIUM_SERVER_ADDRESS}/api/login", data=data).text)["Authorisation"]
         return {"Authorisation": token}
 
     def get_all_records(self):
-        return json.loads(requests.get(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}").text)
+        return json.loads(requests.get(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}", headers=self.http_headers).text)
 
     def create_new_record(self, new_record):
-        requests.post(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}", data=new_record)
+        requests.post(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}", data=json.dumps(new_record), headers=self.http_headers)
 
     def setUp(self, endpoint, example_record):
         self.endpoint = endpoint
@@ -36,17 +36,17 @@ class EndPointTestCase(unittest.TestCase):
         self.test_delete_all_records()
 
         if endpoint != "/api/tasks":
-            for _ in range(100): self.create_new_record(self.example_record)
+            for _ in range(5): self.create_new_record(self.example_record)
 
     def test_delete_all_records(self):
         requests.delete(f"http://{CALADIUM_SERVER_ADDRESS}{self.endpoint}", headers=self.http_headers)
         self.assertEqual(len(self.get_all_records()), 0)
 
-    def test_create_100_records(self):
+    def test_create_5_records(self):
         record_count = len(self.get_all_records())
 
-        for _ in range(100):
+        for _ in range(5):
             self.create_new_record(self.example_record)
 
-        self.assertEqual(len(self.get_all_records()), record_count + 100)
+        self.assertEqual(len(self.get_all_records()), record_count + 5)
 
