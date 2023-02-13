@@ -404,7 +404,7 @@ class WorkersPage extends ListPage {
     pingWorker(workerID) {
         currentPage.caladiumFetch("GET", currentPage.endpoint + "/ping/" + workerID)
         .then(resp => {
-            if (resp == "pong")
+            if (resp["text"] == "pong")
                 alert(workerID);
         });
     }

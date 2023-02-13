@@ -35,7 +35,7 @@ class WorkerRecord(database.DatabaseRecord):
 
         ping_resp = flask.Response()
         ping_resp.headers["Content-Type"] = "application/json"
-        ping_resp.set_data(ping_resp_json)
+        ping_resp.set_data(json.dumps(ping_resp_json))
         return ping_resp
 
 workers = flask.Blueprint(__name__, "workers")

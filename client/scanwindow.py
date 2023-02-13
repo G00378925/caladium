@@ -35,14 +35,16 @@ class ScanWindow:
         req_url = f"http://{config['server_address']}/api/tasks"
         req_headers = {"Authorisation": config["authorisation_token"]}
         req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="POST")
-        resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
+        try: resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
+        except: ...
 
         message_count = 0
 
         while True:
             req_url = f"http://{config['server_address']}/api/tasks/{resp_obj['_id']}"
             req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="GET")
-            resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
+            try: resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
+            except: ...
 
             if len(resp_obj["updates"]) > message_count:
                 [self.display_update(update) for update in resp_obj["updates"][message_count:]]

@@ -60,8 +60,6 @@ def main(argv):
     for _ in range(10): threading.Thread(target=analysis_thread_func, args=[malicious_pattern_list]).start()
     while globals()["analysis_count"] < len(syscall_list): ...
 
-    send_progress("Complete")
-
 if __name__ == "__main__":
     main(sys.argv[1:])
 
