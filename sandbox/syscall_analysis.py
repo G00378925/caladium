@@ -32,7 +32,7 @@ def inc_analysis_count():
 def fetch_next_syscall():
     globals()["deque_lock"].acquire()
     syscall_deque = globals()["syscall_deque"]
-    syscall = syscall_deque.pop() if len(syscall_deque) > 1 else None
+    syscall = syscall_deque.pop() if len(syscall_deque) > 0 else None
     globals()["deque_lock"].release()
     return syscall
 
@@ -48,7 +48,7 @@ def main(argv):
         with open(file_location) as file_handle:
             return file_handle.readlines()
 
-    if len(argv) < 2: return
+    if len(argv) != 2: return
     syscall_file_location, malicious_pattern_file_location = argv
 
     syscall_list = get_file_lines(syscall_file_location)
@@ -59,6 +59,8 @@ def main(argv):
 
     for _ in range(10): threading.Thread(target=analysis_thread_func, args=[malicious_pattern_list]).start()
     while globals()["analysis_count"] < len(syscall_list): ...
+
+    send_progress("Complete")
 
 if __name__ == "__main__":
     main(sys.argv[1:])

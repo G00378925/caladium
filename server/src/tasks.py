@@ -22,7 +22,7 @@ def scan_file(scan_file_obj):
     scan_file_obj = json.loads(scan_file_obj)
 
     def scan_file_thread():
-        workers_dict = workers.get_workers_route()
+        workers_dict = workers.get_records_route()
         if len(list(workers_dict)) == 0:
             task.set("state", {"state": "Failure"})
             return
