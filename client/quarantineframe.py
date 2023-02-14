@@ -13,18 +13,19 @@ class QuarantineFrame(tkinter.ttk.Frame):
         super().__init__(main_window)
         self.quarantine_obj = quarantine_obj
         self.quarantine_index_dict = {}
+        self.columnconfigure(0, weight=1)
 
         self.quarantine_list = tkinter.Listbox(self)
         self._update_quarantine_list()
-        self.quarantine_list.grid()
+        self.quarantine_list.grid(column=0, row=0, columnspan=2, sticky="nsew")
 
         self.quarantine_button = tkinter.Button(self, command=lambda: self._quarantine_file())
         self.quarantine_button["text"] = "Quarantine file"
-        self.quarantine_button.grid()
+        self.quarantine_button.grid(column=0, row=1)
 
         self.restore_button = tkinter.Button(self, command=lambda: self._restore_file())
         self.restore_button["text"] = "Restore file"
-        self.restore_button.grid()
+        self.restore_button.grid(column=1, row=1)
 
     def _quarantine_file(self):
         file_handle = tkinter.filedialog.askopenfile("rb")

@@ -11,7 +11,7 @@ import tkthread
 tkthread.patch()
 
 import base64, json, os, sys, tkinter, tkinter.filedialog
-import tkinter.messagebox, tkinter.ttk, threading, urllib
+import tkinter.messagebox, tkinter.ttk, urllib
 
 import dirchangelistener, provisioningframe, scanwindow, quarantine, quarantineframe
 
@@ -23,6 +23,8 @@ def scan_file(file_path=None):
         file_data = base64.b64encode(file_handle.read()).decode("utf-8")
         data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
         file_handle.close()
+
+        main_window = tkinter.Toplevel()
 
         scanwindow.ScanWindow(main_window).start(data, globals()["config"])
     except (IsADirectoryError):
@@ -61,18 +63,26 @@ def provisioning_complete(config, main_window):
                 scan_file(file_path)
 
     downloads_dir_location = get_downloads_dir()
-    dirchangelistener_obj = dirchangelistener.DirChangeListener([downloads_dir_location], dirchangelistener_callback)
+    dirchangelistener_obj = dirchangelistener.DirChangeListener([downloads_dir_location], dirchangelistener_callback, main_window)
     dirchangelistener_obj.start()
 
 def main(argv):
     main_window = tkinter.Tk()
     main_window.minsize(640, 480)
     main_window.title("Caladium")
+
+    def kill_client():
+        if tkinter.messagebox.askokcancel("Quit", "Do you want to kill the client?"):
+            main_window.destroy()
+            sys.exit(0)
+    main_window.protocol("WM_DELETE_WINDOW", kill_client)
+
     globals()["main_window"] = main_window
 
     provisioning_frame = provisioningframe.ProvisioningFrame(main_window, provisioning_complete, get_caladium_appdata_dir())
     provisioning_frame.pack(fill=tkinter.BOTH)
     provisioning_frame.provision(argv[0] if len(argv) > 0 else None)
+
     main_window.mainloop()
 
 if __name__ == "__main__":
