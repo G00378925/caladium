@@ -10,6 +10,7 @@
 (require json)
 (require net/base64)
 
+; Locations of executables
 (define python-location
     (string-append (getenv "windir") "\\py.exe"))
 (define sandboxie-start-location
@@ -17,12 +18,14 @@
 (define procmon-location
     (string-append (getenv "SystemDrive") "\\SysinternalsSuite\\Procmon64.exe"))
 
+; Execute an execute a file with a list of parameters
 (define (subprocess-and-close-ports executable-location subprocess-parameters)
     (begin (define-values (subprocess-obj out in err)
         (apply subprocess #f #f #f executable-location subprocess-parameters))
         (close-input-port out) (close-output-port in) (close-input-port err)
         subprocess-obj))
 
+; Get a list of pids in the sandbox
 (define (listpids-in-sandbox)
     (begin (define-values (subprocess-obj out in err)
         (subprocess #f #f #f sandboxie-start-location "/listpids"))
@@ -31,6 +34,7 @@
         (close-input-port out) (close-output-port in) (close-input-port err)
         listpids-list))
 
+; Writes patterns to a file
 (define (write-patterns-to-file patterns)
     (begin
         (define malicious-patterns-file-location
@@ -39,6 +43,7 @@
         (display-to-file (string-join patterns "\n") (string->path malicious-patterns-file-location))
         malicious-patterns-file-location))
 
+; Output JSON obj to a port
 (define (output-json hash-obj out)
     (begin
         (define json-out-string
@@ -103,6 +108,7 @@
         (flush-output out)
         (close-input-port python-out) (close-output-port python-in) (close-input-port python-err)))
 
+; Execute a file in a sandbox
 (define (run-file json-obj out)
     (begin
         (semaphore-wait semaphore-obj)
@@ -127,9 +133,11 @@
         (delete-file (string->path malicious-patterns-file-location))
         (semaphore-post semaphore-obj)))
 
+; Handle a ping request
 (define (ping out)
     (output-json "pong" out))
 
+; Handle a request
 (define (poll-for-request)
     (begin (define-values (in out) (tcp-accept tcp-obj))
         (thread poll-for-request)
@@ -139,6 +147,7 @@
             [("run") (run-file json-obj out)])
         (close-input-port in) (close-output-port out)))
 
+; Main loop
 (poll-for-request)
 (define (wait-for-threads)
     (begin (sleep) (wait-for-threads)))

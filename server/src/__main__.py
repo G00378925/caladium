@@ -12,12 +12,14 @@ import flask, requests, uuid
 
 import clients, patterns, tasks, workers
 
+# Used to store server preferences
 preferences = {
     "administrator_password": None,
     "authorisation_tokens": [],
     "auto_provision": False,
 }
 
+# Setup flask app and other collections of API endpoints
 app = flask.Flask(__name__)
 app.register_blueprint(clients.clients)
 app.register_blueprint(patterns.patterns)
@@ -110,6 +112,7 @@ def statistics_route():
 
     return statistics
 
+# Execute before every request, used to check if the user is authorised to access the requested endpoint
 def before_request():
     path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
 
@@ -126,6 +129,7 @@ def before_request():
             resp_obj.set_data("Invalid authorisation token")
             return resp_obj
 
+# Used to apply CORS headers to every response
 def after_request(response_obj):
     response_obj.headers.add("Access-Control-Allow-Headers", '*')
     response_obj.headers.add("Access-Control-Allow-Methods", '*')
@@ -133,9 +137,11 @@ def after_request(response_obj):
     return response_obj
 
 def main(argv):
+    # If a port number is specified, use it, otherwise use 8080
     port_number = int(argv[1]) if len(argv) > 1 else 8080
-    update_password("root")
+    update_password("root") # Set initial administrator password to "root"
 
+    # Add request/response handlers
     app.before_request(before_request)
     app.after_request(after_request)
     app.run(host="0.0.0.0", port=port_number)

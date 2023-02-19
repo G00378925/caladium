@@ -6,10 +6,12 @@
 //  Copyright © 2022 Declan Kelly. All rights reserved.
 //
 
+// All other pages inherit from this class
 class Page {
     constructor() {
         globalThis.currentPage = this;
 
+        // This is the navigation bar at the top of the page
         this.navigationBar = generateDOM(`(div (hash "class" "clearfix" "children"
                                             (list
                                               (a (hash "class" "float-left" "href" "/"
@@ -20,6 +22,7 @@ class Page {
                                                 "innerHTML" "Preferences" "onclick" openPreferences)))))`, this);
     }
 
+    // Fetch data from Caladium API, includes authorisation token
     async caladiumFetch(method, path, body=undefined) {
         try {
             const caladiumFetchParameters = {
@@ -33,6 +36,7 @@ class Page {
         }
     }
 
+    // Called on page load, generates DOM and appends it to document.body
     generateDOM() {
         return generateDOM(this.body, this);
     }
@@ -50,11 +54,13 @@ class Page {
         }
     }
 
+    // Called when user clicks logout button
     logout() {
         localStorage["Authorisation"] = undefined;
         window.location = "/login";
     }
 
+    // Called when user clicks preferences button
     openPreferences() {
         loadPage("/preferences");
     }
@@ -410,6 +416,7 @@ class WorkersPage extends ListPage {
     }
 }
 
+// These are all the defined pages
 const routes = {
     "/": {
         "body": IndexPage, "title": "Dashboard"
@@ -434,18 +441,23 @@ const routes = {
     }
 };
 
+// Call this function to load a path
 function loadPage(path) {
     const page = routes[(new URL(window.location.origin + path)).pathname];
     window.history.replaceState(undefined, "", path);
 
+    // Fetch page title and update it dynamically
     (new page["body"]()).loadPage();
     document.title = page["title"];
 }
 
+// Load the page on initial load
 function initialLoadPage() {
+    // If no specified page, load the index page
     if (!routes[window.location.pathname]) {
         loadPage("/");
     } else {
+        // Otherwise, load the specified page
         loadPage(window.location.href.substring(window.location.origin.length));
     }
 }

@@ -6,7 +6,9 @@
 //  Copyright © 2022 Declan Kelly. All rights reserved.
 //
 
+// Generate DOM from Lisp expression
 function generateDOM(expressionStr, parameters) {
+    // Helper functions
     const isNumber = (ch) => (ch.charCodeAt(0) >= '0'.charCodeAt(0) && ch.charCodeAt(0) <= '9'.charCodeAt(0)) || ch == '.';
     const isWhitespace = (ch) => ch.trim().length == 0;
 
@@ -15,9 +17,12 @@ function generateDOM(expressionStr, parameters) {
     if (expressionStr[i++] != '(') return null;
 
     let expressionList = [];
+    // Parse expression
     while (i < expressionStr.length) {
+        // Skip whitespace
         while (i < expressionStr.length && isWhitespace(expressionStr[i])) i++;
 
+        // Parse expression
         if (expressionStr[i] == ')') {
             break;
         } else if (expressionStr[i] == '(') {
@@ -57,17 +62,22 @@ function generateDOM(expressionStr, parameters) {
         }
     }
 
+    // Expression above got converted to a list
+    // Now convert them to HTML elements
     if (expressionList.length == 0) return null;
     switch (expressionList[0]) {
+        // Hashes will be used as parameters to attributes
         case "hash": {
             let newHash = {};
             for (let j = 0; j < Math.floor((expressionList.length - 1) / 2); j++)
                 newHash[expressionList[(j * 2) + 1]] = expressionList[(j * 2) + 2];
             return newHash;
         }
+        // Lists will be used to list children
         case "list": {
             return expressionList.splice(1);
         }
+        // Everything else will be used as an HTML element
         default: {
             let newElement = document.createElement(expressionList[0]);
             if (expressionList.length < 2) return newElement;

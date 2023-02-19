@@ -30,4 +30,4 @@ class DirChangeListener:
                 current_dir_state[path] = latest_dir_state
 
             self.main_window.update()
-            # self.main_window.after(10000)
+            self.main_window.after(10000)

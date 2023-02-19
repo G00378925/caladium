@@ -6,10 +6,12 @@
 //  Copyright © 2023 Declan Kelly. All rights reserved.
 //
 
+// Get chart attributes
 function _getChartAttributes(canvasID, data) {
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext("2d");
 
+    // Get max value inside array
     function max(arr) {
         if (arr.length == 0) return 0;
         else if (arr.length == 1) return arr[0];
@@ -31,6 +33,7 @@ function _getChartAttributes(canvasID, data) {
     };
 }
 
+// Render text
 function _renderText(context, text, x, y, font) {
         context.beginPath();
         context.font = `20px ${font}`;
@@ -40,6 +43,7 @@ function _renderText(context, text, x, y, font) {
         context.closePath();
 }
 
+// Draw bar chart
 function acesulfameBarchart(canvasID, data, font="Arial") {
     const attributes = _getChartAttributes(canvasID, data);
     const context = attributes.context;
@@ -47,6 +51,7 @@ function acesulfameBarchart(canvasID, data, font="Arial") {
     const barWidth = attributes.width / (attributes.elementCount * 2);
     const barHeight = attributes.height * 0.9;
 
+    // Draw each bar
     for (let i = 0; i < attributes.elementCount; i++) {
         const barX = (barWidth / 2) + (barWidth * (i * 2));
         const barY = barHeight - (barHeight * (data[i].value / attributes.maxValue));
@@ -73,6 +78,7 @@ function acesulfamePiechart(canvasID, data, font="Arial") {
     const pieRadius = attributes.height * 0.4;
     const squareSize = 20, textBeginX = piePositionX + pieRadius;
 
+    // Draw each slice
     let currentRadians = 0;
     data.forEach(slice => {
         const sliceRadians = (Math.PI * 2) * (slice.value / attributes.totalValue);
@@ -91,6 +97,7 @@ function acesulfamePiechart(canvasID, data, font="Arial") {
         currentRadians += sliceRadians;
     });
 
+    // Draw legend
     for (let i = 0; i < data.length; i++) {
         context.beginPath();
         context.fillStyle = data[i]["colour"];
