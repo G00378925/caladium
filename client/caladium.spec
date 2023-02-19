@@ -1,8 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_submodules
+hiddenimports = collect_submodules('tkinter')
 
 block_cipher = None
-
 
 a = Analysis(
     ['src\\__main__.py'],
