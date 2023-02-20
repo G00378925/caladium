@@ -26,15 +26,17 @@ DisplayLicense=
 FinishMessage=
 TargetName=dist\caladium-setup.exe
 FriendlyName=Caladium
-AppLaunched=install.cmd
+AppLaunched=bootstrap.cmd
 PostInstallCmd=<None>
 AdminQuietInstCmd=
 UserQuietInstCmd=
-FILE0="caladium.tar.gz"
-FILE1="install.cmd"
+FILE0="bootstrap.cmd"
+FILE1="caladium.tar.gz"
+FILE2="install.cmd"
 
 [SourceFiles]
 SourceFiles0=build\caladium
 [SourceFiles0]
 %FILE0%=
 %FILE1%=
+%FILE2%=

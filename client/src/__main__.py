@@ -74,7 +74,8 @@ def main(argv):
     def kill_client():
         if tkinter.messagebox.askokcancel("Quit", "Do you want to kill the client?"):
             main_window.destroy()
-            sys.exit(0)
+            os.kill(os.getpid(), 3)
+
     main_window.protocol("WM_DELETE_WINDOW", kill_client)
 
     globals()["main_window"] = main_window
