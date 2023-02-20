@@ -10,6 +10,7 @@ import os
 
 class DirChangeListener:
     def __init__(self, path_list, callback_func, main_window):
+        # Setup directory change listener
         self.path_list = path_list
         self.callback_func = callback_func
         self.main_window = main_window
@@ -19,6 +20,7 @@ class DirChangeListener:
         for path in self.path_list:
             current_dir_state[path] = os.listdir(path)
 
+        # Continuously check the downloads directory for changes
         while True:
             for path in self.path_list:
                 latest_dir_state = os.listdir(path)

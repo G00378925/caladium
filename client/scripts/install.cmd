@@ -22,6 +22,9 @@ mkdir "%ProgramFiles%\Caladium" 2>nul
 rem Copy all in the current directory to the installation directory
 tar -xzvf caladium.tar.gz -C "%ProgramFiles%\Caladium"
 
+rem Create a shortcut on the desktop
+cscript /Nologo gen_shortcut.vbs
+
 echo Attempt Auto Provisioning
 "%ProgramFiles%\Caladium\caladium.exe" 20.166.76.162
 

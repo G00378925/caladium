@@ -32,6 +32,7 @@ def scan_file(file_path=None):
     except (urllib.error.URLError):
         tkinter.messagebox.showerror("Error", "Error establishing connection to server")
 
+# Returns the path to the Caladium file directory
 def get_caladium_appdata_dir():
     if sys.platform == "win32": return os.environ["USERPROFILE"] + "{0}AppData{0}Local{0}Caladium".format(os.path.sep)
     elif sys.platform == "darwin": return "/tmp"
@@ -56,6 +57,7 @@ def provisioning_complete(config, main_window):
     upload_file_button["text"] = "Scan file"
     upload_file_button.pack()
 
+    # Called when a new file is detected in the downloads directory
     def dirchangelistener_callback(file_path):
         @tkthread.main(main_window)
         def scan_file_thread():
@@ -71,6 +73,7 @@ def main(argv):
     main_window.minsize(640, 480)
     main_window.title("Caladium")
 
+    # Called when user presses the close button
     def kill_client():
         if tkinter.messagebox.askokcancel("Quit", "Do you want to kill the client?"):
             main_window.destroy()

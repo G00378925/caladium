@@ -58,7 +58,8 @@ class Quarantine:
         self._save_index_to_disk()
 
         return file_id
-
+    
+    # Removes file from quarantine and puts it back in its original location
     def restore_file(self, file_id):
         with open(self.quarantine_location + os.path.sep + file_id, "rb") as input_file_handle:
             file_data = input_file_handle.read()

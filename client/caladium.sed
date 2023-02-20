@@ -32,7 +32,8 @@ AdminQuietInstCmd=
 UserQuietInstCmd=
 FILE0="bootstrap.cmd"
 FILE1="caladium.tar.gz"
-FILE2="install.cmd"
+FILE2="gen_shortcut.vbs"
+FILE3="install.cmd"
 
 [SourceFiles]
 SourceFiles0=build\caladium
@@ -40,3 +41,4 @@ SourceFiles0=build\caladium
 %FILE0%=
 %FILE1%=
 %FILE2%=
+%FILE3%=
