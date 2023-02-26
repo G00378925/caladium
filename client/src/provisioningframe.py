@@ -16,6 +16,7 @@ class ProvisioningFrame(tkinter.ttk.Frame):
         self.main_window = main_window
         self.provisioning_complete, self.caladium_appdata_dir = provisioning_complete, caladium_appdata_dir
 
+        # Adding widgets for the user to enter their token
         self.token_entry_box = tkinter.Entry(self)
         self.token_entry_box.pack()
 
@@ -29,13 +30,16 @@ class ProvisioningFrame(tkinter.ttk.Frame):
         if not globals()["config"] and server_address:
             globals()["config"] = {}
 
+            # If auto-provisioning is enabled, request a token from the server
             req_obj = urllib.request.Request(f"http://{server_address}/api/auto_provision", method="POST")
             globals()["config"]["authorisation_token"] = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))["_id"]
             globals()["config"]["server_address"] = server_address
 
             provisioning.save_config(self.caladium_appdata_dir, globals()["config"])
 
+        # If the config file exists, test the connection to the server
         if globals()["config"]:
+            # If it doesn't work, delete it and ask the user to provision again
             if provisioning.test_server_connection(globals()["config"]):
                 self.pack_forget()
                 self.provisioning_complete(globals()["config"], self.main_window)

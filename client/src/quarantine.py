@@ -29,8 +29,10 @@ class Quarantine:
             json.dump(self.index, index_json_handle)
 
     def _xor_bytes(self, data_bytes, xor_key_bytes):
+        # Convert bytes to list of ints
         data_bytes = [i for i in data_bytes]
 
+        # XOR each one with the xor key
         for i in range(len(data_bytes)):
             data_bytes[i] ^= xor_key_bytes[i % len(xor_key_bytes)]
 
