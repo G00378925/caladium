@@ -13,7 +13,8 @@ tkthread.patch()
 import base64, json, os, sys, tkinter, tkinter.filedialog
 import tkinter.messagebox, tkinter.ttk, urllib
 
-import dirchangelistener, provisioningframe, scanwindow, quarantine, quarantineframe
+import dirchangelistener, preferencesframe, provisioningframe
+import quarantine, quarantineframe, scanwindow
 
 def scan_file(file_path=None):
     try:
@@ -52,6 +53,8 @@ def provisioning_complete(config, main_window):
     main_window_notebook.add(main_frame, text="Caladium")
     quarantine_frame = quarantineframe.QuarantineFrame(main_window, quarantine_obj)
     main_window_notebook.add(quarantine_frame, text="Quarantine")
+    preferences_frame = preferencesframe.PreferencesFrame()
+    main_window_notebook.add(preferences_frame, text="Preferences")
 
     upload_file_button = tkinter.Button(main_frame, command=scan_file)
     upload_file_button["text"] = "Scan file"
@@ -91,4 +94,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
