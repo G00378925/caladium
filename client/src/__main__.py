@@ -47,7 +47,7 @@ def provisioning_complete(config, main_window):
     quarantine_obj = quarantine.Quarantine(get_caladium_appdata_dir() + os.path.sep + "Quarantine")
 
     main_window_notebook = tkinter.ttk.Notebook(main_window)
-    main_window_notebook.pack(fill=tkinter.BOTH)
+    main_window_notebook.pack(fill=tkinter.BOTH, expand=True)
 
     main_frame = tkinter.ttk.Frame()
     main_window_notebook.add(main_frame, text="Caladium")
