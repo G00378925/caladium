@@ -13,4 +13,3 @@ technicans will have the ability to setup analysis computers, and add them to th
 
 The following is the architecture of the solution:
 ![test](/dissertation/images/architecture.png)
-

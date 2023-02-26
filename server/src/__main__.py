@@ -14,9 +14,9 @@ import clients, patterns, tasks, workers
 
 # Used to store server preferences
 preferences = {
-    "administrator_password": None,
-    "authorisation_tokens": [],
-    "auto_provision": False,
+    "administrator_password": None, # Hash of the administrator password
+    "authorisation_tokens": [], # List of tokens that can be used to access the dashboard
+    "auto_provision": False # If true, the server will automatically provision new clients
 }
 
 # Setup flask app and other collections of API endpoints

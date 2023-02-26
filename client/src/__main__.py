@@ -53,7 +53,7 @@ def provisioning_complete(config, main_window):
     main_window_notebook.add(quarantine_frame, text="Quarantine")
 
     # Adding the preferences frame
-    preferences_frame = preferencesframe.PreferencesFrame()
+    preferences_frame = preferencesframe.PreferencesFrame(main_window)
     main_window_notebook.add(preferences_frame, text="Preferences")
 
     # Adding the scan file button to the main frame
@@ -68,7 +68,7 @@ def provisioning_complete(config, main_window):
             if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
                 scan_file(file_path)
 
-    dirchangelistener_obj = dirchangelistener.DirChangeListener(globals()["config"], dirchangelistener_callback, main_window)
+    dirchangelistener_obj = dirchangelistener.DirChangeListener(dirchangelistener_callback, main_window)
     dirchangelistener_obj.start()
 
 def main(argv):

@@ -13,11 +13,14 @@ import flask
 import database
 
 def read_json_from_socket(sandbox_socket):
+    # Packets begin with a 4-byte unsigned integer indicating the size of the JSON data
     json_size = struct.unpack(">I", sandbox_socket.recv(4))[0]
+    # Read the JSON data of that size
     json_data = sandbox_socket.recv(json_size).decode("utf-8")
     return json.loads(json_data)
 
 def establish_connection(server_address):
+    # Connect to that server_address
     host, port = server_address.strip().split(':')
 
     sandbox_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

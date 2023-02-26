@@ -49,7 +49,7 @@ function acesulfameBarchart(canvasID, data, font="Arial") {
     const context = attributes.context;
 
     const barWidth = attributes.width / (attributes.elementCount * 2);
-    const barHeight = attributes.height * 0.9;
+    const barHeight = attributes.height * 0.8;
 
     // Draw each bar
     for (let i = 0; i < attributes.elementCount; i++) {

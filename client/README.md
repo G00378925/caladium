@@ -14,6 +14,10 @@ To build the client, run the following command, (use must be on Windows, because
     build.cmd
 
 This will create a `dist` directory containing an installer called `caladium-setup.exe`.
-Before building make sure you have the latest version of Python and pyinstaller installed:
+Before building make sure you have the latest version of Python, pyinstaller and tkthread installed:
 
-    python3 -m pip install pyinstaller
+    pip install -r requirements.txt
+
+## Credits
+
+Pill icon is from: [https://freeicons.io/healthcare-2/healthcare-medical-pill-icon-43053](https://freeicons.io/healthcare-2/healthcare-medical-pill-icon-43053)

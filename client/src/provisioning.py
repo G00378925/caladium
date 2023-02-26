@@ -15,6 +15,13 @@ def get_caladium_appdata_dir():
     elif sys.platform == "darwin": return "/tmp"
     else: return None
 
+def unprovision_caladium(caladium_appdata_dir):
+    if os.path.exists(caladium_appdata_dir + os.path.sep + "config.json"):
+        os.remove(caladium_appdata_dir + os.path.sep + "config.json")
+
+def get_config():
+    return load_config(get_caladium_appdata_dir())
+
 def load_config(caladium_appdata_dir):
     config_json_location = caladium_appdata_dir + os.path.sep + "config.json"
 
@@ -22,7 +29,8 @@ def load_config(caladium_appdata_dir):
     if not os.path.exists(config_json_location): return None
 
     with open(config_json_location) as config_json_handle:
-        return json.load(config_json_handle)
+        globals()["config"] = json.load(config_json_handle)
+        return globals()["config"]
 
 def save_config(caladium_appdata_dir, config):
     # Encode the config as JSON and save it to the config file
