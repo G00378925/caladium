@@ -257,8 +257,13 @@ class ClientsPage extends ListPage {
         });
     }
 
-    getProvisionTokenFunc(clientID) {
-        navigator.clipboard.writeText(clientID);
+    getProvisionTokenFunc(provisionToken) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(provisionToken);
+            alert("Provisioning token copied to the clipboard.");
+        } else {
+            alert("Token: " + provisionToken);
+        }
     }
 
     generateRowParameters(resp, elementID) {

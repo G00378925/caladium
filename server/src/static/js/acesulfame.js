@@ -28,7 +28,7 @@ function _getChartAttributes(canvasID, data) {
         "elementCount": data.length,
         "height": canvas.height,
         "maxValue": max(data.map(i => i.value)),
-        "totalValue": data.map(i => i.value).reduce((i, j) => i + j),
+        "totalValue": data.map(i => i.value).reduce((i, j) => i + j, 0),
         "width": canvas.width
     };
 }
