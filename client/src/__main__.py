@@ -29,7 +29,7 @@ def scan_file(file_path=None):
         data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
         file_handle.close()
 
-        main_window = tkinter.Toplevel()
+        main_window = globals()["main_window"]
         scanwindow.ScanWindow(main_window).start(data, globals()["config"])
     except (IsADirectoryError):
         tkinter.messagebox.showerror("Error", "Error opening file")

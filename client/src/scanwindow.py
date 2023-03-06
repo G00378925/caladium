@@ -6,11 +6,13 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import json, threading, time, tkinter
-import tkinter.scrolledtext, tkinter.ttk, urllib.request
+import json, tkinter, tkinter.scrolledtext, tkinter.ttk, urllib.request
+
+import tkthread
 
 class ScanWindow:
     def __init__(self, main_window):
+        self.main_window = main_window
         self.window_handle = tkinter.Toplevel(main_window)
 
         self.scrolled_text = tkinter.scrolledtext.ScrolledText(self.window_handle)
@@ -50,11 +52,13 @@ class ScanWindow:
                 [self.display_update(update) for update in resp_obj["updates"][message_count:]]
                 message_count = len(resp_obj["updates"])
 
-            time.sleep(2)
+            self.main_window.update()
+            self.main_window.after(100)
 
     def start(self, data, config):
         globals()["data"], globals()["config"] = data, config
 
-        threading.Thread(target=self.scan_file).start()
-        self.window_handle.mainloop()
+        @tkthread.main(self.main_window)
+        def start_thread():
+            self.scan_file()
 
