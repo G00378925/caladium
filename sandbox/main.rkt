@@ -103,13 +103,22 @@
     (begin
         (define-values (subprocess-obj python-out python-in python-err)
             (subprocess #f #f #f python-location "syscall_analysis.py" syscall-list-file-location malicious-patterns-file-location))
-        (subprocess-wait subprocess-obj)
         (display (port->string python-out) out)
         (flush-output out)
-        (close-input-port python-out) (close-output-port python-in) (close-input-port python-err)))
+        (close-input-port python-out) (close-output-port python-in) (close-input-port python-err)
+        subprocess-obj))
+
+(define (static-analysis file-location out)
+    (begin
+        (define-values (subprocess-obj python-out python-in python-err)
+            (subprocess #f #f #f python-location "static_analysis.py" file-location))
+        (display (port->string python-out) out)
+        (flush-output out)
+        (close-input-port python-out) (close-output-port python-in) (close-input-port python-err)
+        subprocess-obj))
 
 ; Execute a file in a sandbox
-(define (run-file json-obj out)
+(define (analyse-file json-obj out)
     (begin
         (semaphore-wait semaphore-obj)
         (send-message "Scan beginning" out)
@@ -122,9 +131,17 @@
 
         (define procmon-csv-file-location (run-in-sandbox file-location out))
 
-        (send-message "Syscall analysis" out)
+        (send-message "Beginning analysis" out)
         (send-progress 90 out)
-        (analyse-syscalls procmon-csv-file-location malicious-patterns-file-location out)
+
+        ; Run syscall analysis and static analysis in parallel
+        (define syscall-analysis-subprocess
+            (analyse-syscalls procmon-csv-file-location malicious-patterns-file-location out))
+        (define static-analysis-subprocess (static-analysis file-location out))
+
+        ; Wait for the analysis to complete
+        (subprocess-wait syscall-analysis-subprocess)
+        (subprocess-wait static-analysis-subprocess)
 
         (send-message "Analysis complete" out)
         (send-progress 100 out)
@@ -144,7 +161,7 @@
         (define json-obj (read-json in))
         (case (hash-ref json-obj 'command)
             [("ping") (ping out)]
-            [("run") (run-file json-obj out)])
+            [("run") (analyse-file json-obj out)])
         (close-input-port in) (close-output-port out)))
 
 ; Main loop

@@ -28,14 +28,4 @@ cscript /Nologo gen_shortcut.vbs
 echo Attempt Auto Provisioning
 "%ProgramFiles%\Caladium\caladium.exe" 20.166.76.162
 
-rem JUST FOR RELEASES
-rem Delete old caladium installation
-rem rd /s /q "%ProgramFiles%\Caladium"
-
-rem delete desktop icon
-rem del "%userprofile%\Desktop\Caladium.lnk"
-
-rem delete start icon in startup folder in programdata
-rem del "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Startup\Caladium.lnk"
-
 del install.cmd
