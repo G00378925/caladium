@@ -6,14 +6,18 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import json, tkinter, tkinter.scrolledtext, tkinter.ttk, urllib.request
+import json, tkinter, tkinter.scrolledtext
 
 import tkthread
 
+import provisioning
+
 class ScanWindow:
     def __init__(self, main_window):
-        self.main_window = main_window
+        # This is the handle for the scanning window
         self.window_handle = tkinter.Toplevel(main_window)
+        self.window_handle.title("Scanning in progress . . .")
+        self.window_handle.protocol("WM_DELETE_WINDOW", lambda: self._stop_scan())
 
         self.scrolled_text = tkinter.scrolledtext.ScrolledText(self.window_handle)
         self.scrolled_text.grid(row=0, column=0, columnspan=2)
@@ -24,8 +28,9 @@ class ScanWindow:
 
         self.current_log_text = str()
         self.stop_scan = False # Used to stop the scan thread
+        self.scan_in_progress = False
 
-    def display_update(self, update_obj):
+    def _display_update(self, update_obj):
         match update_obj["type"]:
             case "message":
                 self.scrolled_text["state"] = "normal"
@@ -39,32 +44,37 @@ class ScanWindow:
             case "progress":
                 self.progress_bar["value"] = update_obj["value"]
 
-    def scan_file(self):
-        data, config = globals()["data"], globals()["config"]
-
-        req_url = f"http://{config['server_address']}/api/tasks"
-        req_headers = {"Authorisation": config["authorisation_token"]}
-        req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="POST")
-        try: resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
-        except: ...
+    def _scan_file(self, data, config):
+        try:
+            resp_obj = provisioning.caladium_api("/api/tasks", method="POST", data=data)
+            self.scan_in_progress = True
+            self.task_id = json.loads(resp_obj)["_id"]
+        except:
+            # Exception when creating task
+            tkinter.messagebox.showerror("Error", "An error occurred when creating the task.")
+            self.window_handle.destroy() # Close the window and return
+            return
 
         message_count = 0
 
         while not self.stop_scan:
-            req_url = f"http://{config['server_address']}/api/tasks/{resp_obj['_id']}"
-            req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="GET")
-            try: resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
+            try: resp_obj = json.loads(provisioning.caladium_api(f"/api/tasks/{self.task_id}"))
             except: ...
 
             if len(resp_obj["updates"]) > message_count:
-                [self.display_update(update) for update in resp_obj["updates"][message_count:]]
+                [self._display_update(update) for update in resp_obj["updates"][message_count:]]
                 message_count = len(resp_obj["updates"])
 
+            # Allow UI to update
             self.main_window.update()
             self.main_window.after(100)
 
-    def start(self, data, config):
-        globals()["data"], globals()["config"] = data, config
+    def _stop_scan(self):
+        if self.scan_in_progress:
+            self.stop_scan = True
+            provisioning.caladium_api(f"/api/tasks/{self.task_id}", method="DELETE")
+            self.window_handle.destroy()
 
+    def start(self, data, config):
         @tkthread.main(self.main_window)
-        def start_thread(): self.scan_file()
+        def start_thread(): self._scan_file(data, config)

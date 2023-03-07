@@ -17,7 +17,7 @@ import dirchangelistener, preferencesframe, provisioning, provisioningframe
 import quarantine, quarantineframe, scanwindow
 
 # Called when the "Scan File" button is pressed
-def scan_file(file_path=None):
+def scan_file(main_window, file_path=None):
     try:
         file_handle = open(file_path, "rb") if file_path else tkinter.filedialog.askopenfile("rb")
         if not hasattr(file_handle, "name"): return
@@ -29,15 +29,11 @@ def scan_file(file_path=None):
         data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
         file_handle.close()
 
-        main_window = globals()["main_window"]
         scanwindow.ScanWindow(main_window).start(data, globals()["config"])
     except (IsADirectoryError):
         tkinter.messagebox.showerror("Error", "Error opening file")
-    except (urllib.error.URLError):
-        tkinter.messagebox.showerror("Error", "Error establishing connection to server")
 
-def provisioning_complete(config, main_window):
-    globals()["config"], globals()["main_window"] = config, main_window
+def setup_notebook(config, main_window):
     quarantine_obj = quarantine.Quarantine(provisioning.get_caladium_appdata_dir() + os.path.sep + "Quarantine")
 
     # Each frame is stored as a tab in the main window
@@ -57,7 +53,7 @@ def provisioning_complete(config, main_window):
     main_window_notebook.add(preferences_frame, text="Preferences")
 
     # Adding the scan file button to the main frame
-    upload_file_button = tkinter.Button(main_frame, command=scan_file)
+    upload_file_button = tkinter.Button(main_frame, command=lambda: scan_file(main_window))
     upload_file_button["text"] = "Scan file"
     upload_file_button.pack()
 
@@ -66,7 +62,7 @@ def provisioning_complete(config, main_window):
         @tkthread.main(main_window)
         def scan_file_thread():
             if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
-                scan_file(file_path)
+                scan_file(main_window, file_path)
 
     dirchangelistener_obj = dirchangelistener.DirChangeListener(dirchangelistener_callback, main_window)
     dirchangelistener_obj.start()
@@ -83,11 +79,11 @@ def main(argv):
             os.kill(os.getpid(), 3)
 
     main_window.protocol("WM_DELETE_WINDOW", kill_client)
-    globals()["main_window"] = main_window
 
     # If the computer isn't already provisioned, show the provisioning frame
-    provisioning_frame = provisioningframe.ProvisioningFrame(main_window, provisioning_complete, provisioning.get_caladium_appdata_dir())
+    provisioning_frame = provisioningframe.ProvisioningFrame(main_window, setup_notebook, provisioning.get_caladium_appdata_dir())
     provisioning_frame.pack(fill=tkinter.BOTH)
+    # Optionally pass a IP address for automatic provisioning
     provisioning_frame.provision(argv[0] if len(argv) > 0 else None)
 
     main_window.mainloop() # Main loop of execution

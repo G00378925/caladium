@@ -64,7 +64,7 @@ class PreferencesFrame(tkinter.ttk.Frame):
     def _uninstall_caladium(self):
         # Check if the user is running as admin
         if not ctypes.windll.shell32.IsUserAnAdmin():
-            tkinter.messagebox.showerror("Error", "Caladium must be running as administrator to unistall")
+            tkinter.messagebox.showerror("Error", "Caladium must be running as administrator to uninstall")
             return
 
         if tkinter.messagebox.askyesno("Uninstall Caladium", "Are you sure you want to uninstall?"):

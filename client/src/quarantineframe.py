@@ -6,7 +6,7 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import tkinter, tkinter.filedialog, tkinter.ttk
+import tkinter
 
 class QuarantineFrame(tkinter.ttk.Frame):
     def __init__(self, main_window, quarantine_obj):
