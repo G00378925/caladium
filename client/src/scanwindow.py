@@ -22,11 +22,19 @@ class ScanWindow:
         self.progress_bar = tkinter.ttk.Progressbar(self.window_handle)
         self.progress_bar.grid(row=1, column=0, columnspan=2)
 
+        self.current_log_text = str()
+        self.stop_scan = False # Used to stop the scan thread
+
     def display_update(self, update_obj):
         match update_obj["type"]:
             case "message":
                 self.scrolled_text["state"] = "normal"
-                self.scrolled_text.insert(tkinter.CURRENT, update_obj["text"] + '\n')
+                self.current_log_text += update_obj["text"] + "\n"
+
+                # Update the text log box
+                self.scrolled_text.delete("1.0", "end")
+                self.scrolled_text.insert("1.0", self.current_log_text)
+
                 self.scrolled_text["state"] = "disabled"
             case "progress":
                 self.progress_bar["value"] = update_obj["value"]
@@ -42,7 +50,7 @@ class ScanWindow:
 
         message_count = 0
 
-        while True:
+        while not self.stop_scan:
             req_url = f"http://{config['server_address']}/api/tasks/{resp_obj['_id']}"
             req_obj = urllib.request.Request(req_url, data=data, headers=req_headers, method="GET")
             try: resp_obj = json.loads(urllib.request.urlopen(req_obj).read().decode("utf-8"))
@@ -59,6 +67,4 @@ class ScanWindow:
         globals()["data"], globals()["config"] = data, config
 
         @tkthread.main(self.main_window)
-        def start_thread():
-            self.scan_file()
-
+        def start_thread(): self.scan_file()

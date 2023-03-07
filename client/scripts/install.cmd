@@ -26,6 +26,6 @@ rem Create a shortcut on the desktop
 cscript /Nologo gen_shortcut.vbs
 
 echo Attempt Auto Provisioning
-"%ProgramFiles%\Caladium\caladium.exe" 20.166.76.162
+"%ProgramFiles%\Caladium\caladium.exe" {0}
 
 del install.cmd

@@ -6,7 +6,7 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import collections, json, struct, sys, threading
+import collections, sys, threading
 
 import caladium
 
@@ -46,7 +46,7 @@ def main(argv):
     malicious_pattern_list = get_file_lines(malicious_pattern_file_location)
 
     # Locks for thread synchronisation
-    globals()["count_lock"], globals()["deque_lock"], globals()["stdout_lock"] = [threading.Lock()] * 3
+    globals()["count_lock"], globals()["deque_lock"] = [threading.Lock()] * 2
     globals()["analysis_count"], globals()["syscall_deque"] = 0, collections.deque(syscall_list)
 
     # Spawn analysis threads

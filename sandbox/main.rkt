@@ -135,17 +135,18 @@
         (send-progress 90 out)
 
         ; Run syscall analysis and static analysis in parallel
+        (define static-analysis-subprocess (static-analysis file-location out))
         (define syscall-analysis-subprocess
             (analyse-syscalls procmon-csv-file-location malicious-patterns-file-location out))
-        (define static-analysis-subprocess (static-analysis file-location out))
 
         ; Wait for the analysis to complete
-        (subprocess-wait syscall-analysis-subprocess)
         (subprocess-wait static-analysis-subprocess)
-
+        (subprocess-wait syscall-analysis-subprocess)
+        
         (send-message "Analysis complete" out)
         (send-progress 100 out)
         (send-state "complete" out)
+        
         (delete-file (string->path procmon-csv-file-location))
         (delete-file (string->path malicious-patterns-file-location))
         (semaphore-post semaphore-obj)))

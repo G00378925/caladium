@@ -1,9 +1,12 @@
 # 16:56 27-02-2023
 
-import json, struct, sys
+import json, struct, sys, threading
 
 # Call this to send JSON back to the client
 def output_json(json_obj):
+    if "stdout_lock" not in globals():
+        globals()["stdout_lock"] = threading.Lock()
+
     globals()["stdout_lock"].acquire()
     json_obj_bytes = json.dumps(json_obj).encode()
     sys.stdout.buffer.write(struct.pack(">I", len(json_obj_bytes)))
