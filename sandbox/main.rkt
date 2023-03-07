@@ -18,6 +18,8 @@
 (define procmon-location
     (string-append (getenv "SystemDrive") "\\SysinternalsSuite\\Procmon64.exe"))
 
+(define port-number 37373)
+
 ; Execute an execute a file with a list of parameters
 (define (subprocess-and-close-ports executable-location subprocess-parameters)
     (begin (define-values (subprocess-obj out in err)
@@ -97,7 +99,9 @@
         procmon-csv-file-location))
 
 (define semaphore-obj (make-semaphore 1))
-(define tcp-obj (tcp-listen 8080 8 #f "0.0.0.0"))
+
+; Need to open TCP even if its being used by another process
+(define tcp-obj (tcp-listen port-number 8 #f "0.0.0.0"))
 
 (define (analyse-syscalls syscall-list-file-location malicious-patterns-file-location out)
     (begin
@@ -129,6 +133,8 @@
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
         (define malicious-patterns-file-location (write-patterns-to-file (hash-ref json-obj 'patterns)))
 
+        (display (string-append "Analysing: " file-location) (current-output-port))
+
         (define procmon-csv-file-location (run-in-sandbox file-location out))
 
         (send-message "Beginning analysis" out)
@@ -155,6 +161,10 @@
 (define (ping out)
     (output-json "pong" out))
 
+(define (kill-sandbox)
+    (begin 
+        (tcp-close tcp-obj) (exit)))
+
 ; Handle a request
 (define (poll-for-request)
     (begin (define-values (in out) (tcp-accept tcp-obj))
@@ -162,8 +172,12 @@
         (define json-obj (read-json in))
         (case (hash-ref json-obj 'command)
             [("ping") (ping out)]
+            [("kill") (kill-sandbox)]
             [("run") (analyse-file json-obj out)])
         (close-input-port in) (close-output-port out)))
+
+(display (string-append "Listening on port "
+    (number->string port-number) "\n") (current-error-port))
 
 ; Main loop
 (poll-for-request)

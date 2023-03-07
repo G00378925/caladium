@@ -380,6 +380,7 @@ class WorkersPage extends ListPage {
                               (list
                                 (th (hash "innerHTML" "Worker Address"))
                                 (th (hash "innerHTML" "Ping Worker"))
+                                (th (hash "innerHTML" "Kill Worker"))
                                 (th (hash "innerHTML" "Delete Worker")))))`;
 
         this.tableData = `(tr (hash "children"
@@ -388,6 +389,9 @@ class WorkersPage extends ListPage {
                               (td (hash "children"
                                 (list (button (hash "style" "background-color: blue; border-color: blue"
                                   "onclick" workerPingFunc "innerHTML" "Ping")))))
+                              (td (hash "children"
+                                (list (button (hash "style" "background-color: red; border-color: red"
+                                  "onclick" workerKillFunc "innerHTML" "Kill")))))
                               (td (hash "children"
                                 (list (button (hash "style" "background-color: red; border-color: red"
                                   "onclick" workerDeleteFunc "innerHTML" "Delete"))))))))`;
@@ -407,6 +411,7 @@ class WorkersPage extends ListPage {
         const rowParameters = {
             workerAddress: resp[elementID]["workerAddress"],
             workerPingFunc: () => currentPage.pingWorker(elementID),
+            workerKillFunc: () => currentPage.killWorker(elementID),
             workerDeleteFunc: () => currentPage.deleteElement(elementID)
         };
         return rowParameters;
@@ -417,6 +422,10 @@ class WorkersPage extends ListPage {
         .then(resp => {
             alert(workerID + " is alive!");
         });
+    }
+
+    killWorker(workerID) {
+        currentPage.caladiumFetch("GET", currentPage.endpoint + "/kill/" + workerID)
     }
 }
 

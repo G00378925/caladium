@@ -24,3 +24,4 @@ def send_progress(value):
 # Send the current state of the analysis to the client
 def send_state(state):
     output_json({"type": "state", "state": state})
+

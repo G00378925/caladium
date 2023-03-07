@@ -30,16 +30,25 @@ def establish_connection(server_address):
 class WorkerRecord(database.DatabaseRecord):
     database_name = "workers"
 
-    def ping(self):
+    def _send_command(self, command):
         sandbox_socket = establish_connection(self.get("workerAddress"))
-        sandbox_socket.send(json.dumps({"command": "ping"}).encode())
-        ping_resp_json = read_json_from_socket(sandbox_socket)
+        sandbox_socket.send(json.dumps({"command": command}).encode())
+        command_resp_json = read_json_from_socket(sandbox_socket)
         sandbox_socket.close()
+        return command_resp_json
+    
+    def _send_response(self, response):
+        resp = flask.Response()
+        resp.headers["Content-Type"] = "application/json"
+        resp.set_data(json.dumps(response))
+        return resp
 
-        ping_resp = flask.Response()
-        ping_resp.headers["Content-Type"] = "application/json"
-        ping_resp.set_data(json.dumps(ping_resp_json))
-        return ping_resp
+    def ping(self):
+        return self._send_response(self._send_command("ping"))
+    
+    def kill(self):
+        try: self._send_command("kill")
+        except: ... # For once an exception is a good thing
 
 workers = flask.Blueprint(__name__, "workers")
 
@@ -68,4 +77,9 @@ def delete_workers_route(worker_id):
 def ping_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):
         return worker.ping()
-
+    
+@workers.get("/api/workers/kill/<worker_id>")
+def kill_workers_route(worker_id):
+    if worker := database.get(WorkerRecord, worker_id):
+        worker.kill()
+        return {}

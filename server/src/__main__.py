@@ -118,11 +118,13 @@ def before_request():
 
     if path == "/api/auto_provision":
         ...
-    elif path.startswith("/api/tasks"):
+    # Windows clients authentication
+    elif path.startswith("/api/tasks") or path.startswith("/api/workers"):
         if token not in preferences["authorisation_tokens"] and token not in clients.get_authorisation_tokens():
             resp_obj.status_code = 403
             resp_obj.set_data("Invalid authorisation token")
             return resp_obj
+    # Dashboard authentication
     elif path.startswith("/api") and not path.startswith("/api/login"):
         if token not in preferences["authorisation_tokens"]:
             resp_obj.status_code = 403

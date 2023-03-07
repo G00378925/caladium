@@ -10,28 +10,37 @@
 import tkthread
 tkthread.patch() # Patch tkinter to allow async operations
 
-import base64, json, os, sys, tkinter, tkinter.filedialog
-import tkinter.messagebox, tkinter.ttk, urllib
+import base64, json, os, sys, tkinter
 
 import dirchangelistener, preferencesframe, provisioning, provisioningframe
 import quarantine, quarantineframe, scanwindow
 
 # Called when the "Scan File" button is pressed
-def scan_file(main_window, file_path=None):
+def scan_file(main_window, quarantine_obj, quarantine_frame, file_path=None):
     try:
         file_handle = open(file_path, "rb") if file_path else tkinter.filedialog.askopenfile("rb")
         if not hasattr(file_handle, "name"): return
 
         # Encode file data as base64 to be sent to server
         # As raw bytes cannot be stored in JSON
-        file_name = file_handle.name.split('/')[-1]
+        file_path = file_handle.name
+        file_name = file_path.split('/')[-1]
+
         file_data = base64.b64encode(file_handle.read()).decode("utf-8")
-        data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
+        file_data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
         file_handle.close()
 
-        scanwindow.ScanWindow(main_window).start(data, globals()["config"])
+        def malware_detected_callback(file_path):
+            # Ask the user if they want to quarantine the file
+            if tkinter.messagebox.askyesno("Do you wish to quarantine?", "Malware detected in file " + file_name):
+                quarantine_obj.quarantine_file(file_path)
+                quarantine_frame.update_quarantine_list()
+
+        scanwindow.ScanWindow(main_window, malware_detected_callback).start(file_path, file_data)
     except (IsADirectoryError):
         tkinter.messagebox.showerror("Error", "Error opening file")
+    except (FileNotFoundError):
+        tkinter.messagebox.showerror("Error", "File not found")
 
 def setup_notebook(config, main_window):
     quarantine_obj = quarantine.Quarantine(provisioning.get_caladium_appdata_dir() + os.path.sep + "Quarantine")
@@ -53,7 +62,8 @@ def setup_notebook(config, main_window):
     main_window_notebook.add(preferences_frame, text="Preferences")
 
     # Adding the scan file button to the main frame
-    upload_file_button = tkinter.Button(main_frame, command=lambda: scan_file(main_window))
+    upload_file_button = tkinter.Button(main_frame, \
+        command=lambda: scan_file(main_window, quarantine_obj, quarantine_frame))
     upload_file_button["text"] = "Scan file"
     upload_file_button.pack()
 
@@ -62,7 +72,7 @@ def setup_notebook(config, main_window):
         @tkthread.main(main_window)
         def scan_file_thread():
             if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
-                scan_file(main_window, file_path)
+                scan_file(main_window, quarantine_obj, quarantine_frame, file_path)
 
     dirchangelistener_obj = dirchangelistener.DirChangeListener(dirchangelistener_callback, main_window)
     dirchangelistener_obj.start()
@@ -76,7 +86,7 @@ def main(argv):
     def kill_client():
         if tkinter.messagebox.askokcancel("Quit", "Do you want to kill the client?"):
             main_window.destroy()
-            os.kill(os.getpid(), 3)
+            os.kill(os.getpid(), 3) # Kill the process
 
     main_window.protocol("WM_DELETE_WINDOW", kill_client)
 

@@ -18,6 +18,7 @@ class Quarantine:
             dir_path = os.path.sep.join(self.index_json_location.split(os.path.sep)[:i])
             if len(dir_path) != 0 and not os.path.isdir(dir_path): os.mkdir(dir_path)
 
+        # Load the index from disk
         if os.path.exists(self.index_json_location):
             with open(self.index_json_location) as index_json_handle:
                 self.index = json.load(index_json_handle)
@@ -39,18 +40,21 @@ class Quarantine:
         return bytes(data_bytes)
 
     def get_file_list(self):
-        return self.index
+        return self.index # Returns all files in quarantine
 
     def quarantine_file(self, file_location):
+        # Each file is given a unique ID and a random XOR key
         file_id = str(uuid.uuid1())
         file_xor_key = secrets.token_bytes(self.xor_key_size)
 
+        # XOR the file with the key and write it to the quarantine
         with open(file_location, "rb") as input_file_handle:
             file_data = file_xor_key + self._xor_bytes(input_file_handle.read(), file_xor_key)
 
             with open(self.quarantine_location + os.path.sep + file_id, "wb") as output_file_handle:
                 output_file_handle.write(file_data)
 
+        # Remove the original file
         os.remove(file_location)
 
         self.index += [{

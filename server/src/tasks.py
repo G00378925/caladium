@@ -26,8 +26,11 @@ def scan_file(scan_file_obj):
         if len(list(workers_dict)) == 0:
             task.set("state", {"state": "Failure"})
             return
+        
+        random_worker_key = list(workers_dict)[0]
+        task.set("worker_id", workers_dict[random_worker_key]["_id"])
 
-        sandbox_socket = workers.establish_connection(workers_dict[list(workers_dict)[0]]["workerAddress"])
+        sandbox_socket = workers.establish_connection(workers_dict[random_worker_key]["workerAddress"])
         scan_file_obj["patterns"] = patterns.get_patterns()
         sandbox_socket.send(json.dumps(scan_file_obj).encode())
 
@@ -42,9 +45,7 @@ def scan_file(scan_file_obj):
 
         sandbox_socket.close()
 
-    thread_obj = threading.Thread(target=scan_file_thread)
-    thread_obj.start()
-
+    threading.Thread(target=scan_file_thread).start()
     return str(task)
 
 @tasks.get("/api/tasks")
@@ -77,3 +78,9 @@ def delete_tasks_route(task_id):
 def create_task_route():
     return scan_file(flask.request.get_data())
 
+@tasks.delete("/api/tasks/kill/<task_id>")
+def kill_task_route(task_id):
+    if task := database.get(TaskRecord, task_id):
+        if worker := database.get(workers.WorkerRecord, task.get("worker_id")):
+            worker.kill()
+    return {}

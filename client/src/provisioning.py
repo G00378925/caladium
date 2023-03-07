@@ -37,11 +37,11 @@ def save_config(caladium_appdata_dir, config):
     with open(caladium_appdata_dir + os.path.sep + "config.json", "w") as f:
         f.write(json.dumps(config))
 
-def caladium_api(resource_path, method="GET", data=None):
+def caladium_api(resource_path, method="GET", data=None, timeout=None):
     config = get_config()
     req_headers = {"Authorisation": config["authorisation_token"]}
     req_obj = urllib.request.Request(f"http://{config['server_address']}{resource_path}", headers=req_headers, data=data, method=method)
-    return urllib.request.urlopen(req_obj).read().decode("utf-8")
+    return urllib.request.urlopen(req_obj, timeout=timeout).read().decode("utf-8")
 
 def test_server_connection(config):
     # Check if the caladium server is running

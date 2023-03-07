@@ -16,7 +16,7 @@ class QuarantineFrame(tkinter.ttk.Frame):
         self.columnconfigure(0, weight=1)
         
         self.quarantine_list = tkinter.Listbox(self)
-        self._update_quarantine_list()
+        self.update_quarantine_list()
         self.quarantine_list.grid(column=0, row=0, sticky="nsew", rowspan=1, columnspan=2)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -40,7 +40,7 @@ class QuarantineFrame(tkinter.ttk.Frame):
         file_handle.close()
 
         self.quarantine_obj.quarantine_file(file_location)
-        self._update_quarantine_list()
+        self.update_quarantine_list()
 
     # Executed upon the restore button being pressed
     def _restore_file(self):
@@ -50,10 +50,10 @@ class QuarantineFrame(tkinter.ttk.Frame):
             except FileNotFoundError:
                 tkinter.messagebox.showerror("Error", "Directory that file was quarantined from no longer exists.")
             finally:
-                self._update_quarantine_list()
+                self.update_quarantine_list()
 
     # Updates the quarantine list in the quarantine frame
-    def _update_quarantine_list(self):
+    def update_quarantine_list(self):
         self.quarantine_list.delete(0, len(list(self.quarantine_index_dict)))
         self.quarantine_index_dict = {}
 
