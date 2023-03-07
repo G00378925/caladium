@@ -8,6 +8,17 @@
     * {
         font-family: Arial;
     }
+
+    .card-container {
+        display: grid;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .right-card {
+        grid-column: 2 / 3;
+        padding: 1rem;
+    }
     </style>
 
     <!-- https://milligram.io/#getting-started -->
@@ -58,22 +69,34 @@
         </div>
     </center>
 
-    <div class="float-right" data-aos="fade-up" width="100%">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/l4bDVq-nP-0" title="YouTube video player"
-        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
-        picture-in-picture; web-share" allowfullscreen></iframe>
-    </div><br>
+    <br><br><br><br><br><br>
 
-    <div data-aos="fade-up">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/l4bDVq-nP-0" title="YouTube video player"
-        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
-        picture-in-picture; web-share" allowfullscreen></iframe>
-    </div><br>
+    <div data-aos="fade-up" class="card-container clearfix">
+        <div>
+            <h2>Windows GUI Client</h2>
+            <p>Description Description Description Description Description Description Description
+            Description Description Description Description Description Description Description</p>
+        </div>
 
-    <div class="float-right" data-aos="fade-up">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/l4bDVq-nP-0" title="YouTube video player"
-        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
-        picture-in-picture; web-share" allowfullscreen></iframe>
+        <div class="right-card">
+            <img src="https://www.enchanted.media/wp-content/uploads/edd/2022/04/HD-SMPTE-Color-Bars.png">
+        </div>
     </div>
+
+    <br><br><br><br><br><br>
+
+    <div data-aos="fade-up" class="card-container clearfix">
+        <div>
+            <img src="https://www.enchanted.media/wp-content/uploads/edd/2022/04/HD-SMPTE-Color-Bars.png">
+        </div>
+
+        <div class="right-card">
+            <h2>Administrator Dashboard</h2>
+            <p>Description Description Description Description Description Description Description
+            Description Description Description Description Description Description Description</p>
+        </div>
+    </div>
+
+    <br><br><br><br><br><br>
 </body>
 </html>
