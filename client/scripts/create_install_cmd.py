@@ -1,3 +1,6 @@
+# 14:07 07/03/2023
+# This generates a custom install.cmd, with the desired IP address of caladium
+
 def main():
     caladium_server_address = "20.166.76.162" # This is the default IP for the caladium instance
 

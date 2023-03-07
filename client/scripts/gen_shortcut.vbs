@@ -1,8 +1,9 @@
 Set WShell = WScript.CreateObject("WScript.Shell")
 
-' Function to create a short to caladium
+' This function creates a shortcut to caladium
 Function CreateCaladiumShortcut(lnkLocation)
     Set shortcut = WShell.CreateShortcut(lnkLocation)
+    ' Caladium is installed to "Program Files"
     shortcut.TargetPath = WShell.ExpandEnvironmentStrings("%ProgramFiles%") & "\Caladium\caladium.exe"
     shortcut.Save()
 End Function

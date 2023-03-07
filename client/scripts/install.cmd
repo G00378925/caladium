@@ -1,6 +1,6 @@
 @echo off
 color 06
-echo CALADIUM SETUP
+echo Caladium Setup
 
 rem Exit if not running as administrator
 net session >nul 2>&1
@@ -13,7 +13,7 @@ if %errorlevel% == 0 (
 )
 :admin
 
-rem Delete old caladium installation
+rem Delete files of last caladium installation
 rd /s /q "%ProgramFiles%\Caladium" 2>nul
 
 rem Create the directory if it doesn't exist
