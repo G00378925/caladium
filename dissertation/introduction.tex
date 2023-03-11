@@ -68,9 +68,9 @@ The client will be a native GUI application targeted at Microsoft Windows.
 Users will have to install this on their computer,
 it will automatically start on system boot.
 
-When the user downloads a file they will be prompted to uploaded it to be scanned.
-During the scanning process the user will be given real-time updates on the status of the file.
-This will include a log box of currently executing task, and a progress bar of the scan progress.
+When the user downloads a file they will be prompted to upload it to be scanned.
+During the scanning process, the user will be given real-time updates on the status of the file.
+This will include a log box of the currently executing task and a progress bar of the scan progress.
 
 The client will feature a quarantine, locking away malicious files into a safe location,
 the user will also have the option of restoring the file to its original location.
@@ -89,8 +89,9 @@ executing the files and logging the system calls.
 \section{Objectives}
 The objectives of this project are as follows:
 \begin{itemize}
-    \item Develop a software platform capable of detecting malicious software based on its behavior.
-    \item The platform must be able to detect malware that is designed to run on Microsoft Windows.
+    \item Develop a software platform capable of detecting malicious software based on its behaviour.
+    \item Create a user-friendly dashboard for administrators to perform administrative tasks.
+    \item 
 \end{itemize}
 
 \subsection{Client}
@@ -103,11 +104,11 @@ The client will feature 3 pages, Main Page (Caladium), Quarantine and Preference
 As running Python code, requires Python to be installed,
 I am using a tool called PyInstaller to bundle in everything it needs to run on any computer.
 
-Unforuntely PyInstaller doesn't output a single executable file,
-it outputs a directory of files, fortunely I have a tool called iexpress that can create an installer,
+Unfortunately, PyInstaller doesn't output a single executable file,
+it outputs a directory of files, fortunately, I have found a tool called "iexpress" that comes with Windows by default, that can create an installer,
 and that outputs a single executable.
 
-Users will have the option of uninstalling the client, by using the "Unistall" button in the preferences page.
+Users will have the option of uninstalling the client, by using the "Uninstall" button on the preferences page.
 
 \subsection{Server}
 The code of the server will be found in the \texttt{server} directory.
@@ -132,10 +133,10 @@ The code of the sandbox can be found in the \texttt{sandbox} directory.
 The main part is written in Racket (a functional programming language),
 
 
-Since this platform is targetting malware that is designed to run on Microsoft Windows,
+Since this platform is targeting malware that is designed to run on Microsoft Windows,
 the sandbox must run on Microsoft Windows.
 
-It make use of Sandboxie to isolate the malware from the host system,
+It makes use of Sandboxie to isolate the malware from the host system,
 a tool called Process Monitor to log system calls,
 
 
@@ -146,6 +147,3 @@ a tool called Process Monitor to log system calls,
 % – List the resource URL (GitHub address) for the project and provide
 % a brief list and description of the main elements at the URL.
 
-
-
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
