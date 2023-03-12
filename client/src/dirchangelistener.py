@@ -16,11 +16,12 @@ def get_downloads_dir():
     return (os.environ["USERPROFILE"] if sys.platform == "win32" else os.environ["HOME"]) + "{0}Downloads".format(os.path.sep)
 
 class DirChangeListener:
-    def __init__(self, callback_func, main_window):
+    def __init__(self, callback_func, main_window, update_scan_dir_label_func):
         # Setup directory change listener
         self.config = provisioning.get_config()
         self.callback_func = callback_func
         self.main_window = main_window
+        self.update_scan_dir_label_func = update_scan_dir_label_func
 
     def _get_scanning_dir(self):
         return provisioning.get_config().get("scanning_directory", get_downloads_dir())
@@ -32,7 +33,7 @@ class DirChangeListener:
 
         # Continuously check the downloads directory for changes
         while True:
-            current_scan_directory = self._get_scanning_dir()
+            self.update_scan_dir_label_func(current_scan_directory := self._get_scanning_dir())
             latest_dir_state = os.listdir(current_scan_directory)
 
             # Check if the scanning directory has changed

@@ -53,6 +53,18 @@ def setup_notebook(config, main_window):
     main_frame = tkinter.ttk.Frame()
     main_window_notebook.add(main_frame, text="Caladium")
 
+    # Scanning directory label
+    scanning_directory_label = tkinter.ttk.Label(main_frame)
+    scanning_directory_label.pack()
+    def update_scan_dir_label(scan_dir_path):
+        scanning_directory_label["text"] = f"Currently scanning: {scan_dir_path}"
+
+    # Adding the scan file button to the main frame
+    upload_file_button = tkinter.Button(main_frame, \
+        command=lambda: scan_file(main_window, quarantine_obj, quarantine_frame))
+    upload_file_button["text"] = "Scan file"
+    upload_file_button.pack()
+
     # Adding the quarantine frame
     quarantine_frame = quarantineframe.QuarantineFrame(main_window, quarantine_obj)
     main_window_notebook.add(quarantine_frame, text="Quarantine")
@@ -61,12 +73,6 @@ def setup_notebook(config, main_window):
     preferences_frame = preferencesframe.PreferencesFrame(main_window)
     main_window_notebook.add(preferences_frame, text="Preferences")
 
-    # Adding the scan file button to the main frame
-    upload_file_button = tkinter.Button(main_frame, \
-        command=lambda: scan_file(main_window, quarantine_obj, quarantine_frame))
-    upload_file_button["text"] = "Scan file"
-    upload_file_button.pack()
-
     # Called when a new file is detected in the downloads directory
     def dirchangelistener_callback(file_path):
         @tkthread.main(main_window)
@@ -74,7 +80,7 @@ def setup_notebook(config, main_window):
             if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
                 scan_file(main_window, quarantine_obj, quarantine_frame, file_path)
 
-    dirchangelistener_obj = dirchangelistener.DirChangeListener(dirchangelistener_callback, main_window)
+    dirchangelistener_obj = dirchangelistener.DirChangeListener(dirchangelistener_callback, main_window, update_scan_dir_label)
     dirchangelistener_obj.start()
 
 def main(argv):
