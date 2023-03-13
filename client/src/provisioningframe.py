@@ -26,17 +26,20 @@ class ProvisioningFrame(tkinter.ttk.Frame):
         self.provision_button.pack()
 
     def provision(self, server_address):
-        globals()["config"] = provisioning.load_config(self.caladium_appdata_dir)
-
-        if not globals()["config"] and server_address:
-            globals()["config"] = {}
+        if server_address:
+            globals()["config"] = {"server_address": server_address}
+            provisioning.save_config(self.caladium_appdata_dir, globals()["config"])
 
             # If auto-provisioning is enabled, request a token from the server
-            req_obj = json.loads(provisioning.caladium_api("/api/authorisation/request_token", method="POST"))
-            globals()["config"]["authorisation_token"] = req_obj["_id"]
-            globals()["config"]["server_address"] = server_address
+            try:
+                req_obj = json.loads(provisioning.caladium_api("/api/auto_provision", method="POST"))
+                globals()["config"]["authorisation_token"] = req_obj["_id"]
 
-            provisioning.save_config(self.caladium_appdata_dir, globals()["config"])
+                provisioning.save_config(self.caladium_appdata_dir, globals()["config"])
+            except:
+                tkinter.messagebox.showerror("Error", "Problem occurred during auto-provision")
+        else:
+            globals()["config"] = provisioning.load_config(self.caladium_appdata_dir)
 
         # If the config file exists, test the connection to the server
         if globals()["config"]:

@@ -116,7 +116,8 @@ def statistics_route():
 def before_request():
     path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
 
-    if path == "/api/auto_provision":
+    # Allows auto provisioning
+    if path == "/api/auto_provision" and preferences["auto_provision"]:
         ...
     # Windows clients authentication
     elif path.startswith("/api/tasks") or path.startswith("/api/workers"):
