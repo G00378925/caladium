@@ -56,6 +56,9 @@ class ScanWindow:
                 malware_callback(self.file_path)
                 self._stop_scan() # No need to continue scanning
 
+    def show_error(self, error_message):
+        tkinter.messagebox.showerror("Error", error_message, parent=self.window_handle)
+
     def _scan_file(self, file_data):
         try:
             resp_obj = provisioning.caladium_api("/api/tasks", method="POST", data=file_data, timeout=2)
@@ -63,15 +66,19 @@ class ScanWindow:
             self.task_id = json.loads(resp_obj)["_id"]
         except:
             # Exception when creating task
-            tkinter.messagebox.showerror("Error", "An error occurred when creating the task.")
+            self.show_error("An error occurred when creating the task.")
             self.window_handle.destroy() # Close the window and return
             return
 
         message_count = 0
 
         while not self.stop_scan:
-            try: resp_obj = json.loads(provisioning.caladium_api(f"/api/tasks/{self.task_id}"))
-            except: ...
+            try:
+                resp_obj = json.loads(provisioning.caladium_api(f"/api/tasks/{self.task_id}"))
+            except:
+                self.show_error("An error occurred when creating the task.")
+                self.window_handle.destroy() # Close the window and return
+                return
 
             if len(resp_obj["updates"]) > message_count:
                 [self._display_update(update) for update in resp_obj["updates"][message_count:]]
@@ -84,8 +91,10 @@ class ScanWindow:
     def _stop_scan(self):
         if self.scan_in_progress:
             self.stop_scan = True
-            provisioning.caladium_api(f"/api/tasks/kill/{self.task_id}", method="DELETE", timeout=1)
-            self.window_handle.destroy()
+
+            try: provisioning.caladium_api(f"/api/tasks/kill/{self.task_id}", method="DELETE", timeout=1)
+            except: ... # Ignore exceptions when deleting a task
+            finally: self.window_handle.destroy()
 
     def start(self, file_path, file_data):
         self.file_path = file_path

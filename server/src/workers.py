@@ -59,6 +59,7 @@ def get_records_route():
 @workers.post("/api/workers")
 def create_workers_route():
     new_document = json.loads(flask.request.data.decode("utf-8"))
+    new_document["busy"] = False
     return str(database.create(WorkerRecord, new_document))
 
 @workers.delete("/api/workers")
@@ -83,3 +84,7 @@ def kill_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):
         worker.kill()
         return {}
+
+def get_free_workers():
+    # Get list of workers not currently doing jobs
+    return [*filter(lambda worker: not worker.get("busy", True), get_records_route().values())]

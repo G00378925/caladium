@@ -18,7 +18,7 @@
 (define procmon-location
     (string-append (getenv "SystemDrive") "\\SysinternalsSuite\\Procmon64.exe"))
 
-(define port-number 37373)
+(define port-number 37372)
 
 ; Execute an execute a file with a list of parameters
 (define (subprocess-and-close-ports executable-location subprocess-parameters)
@@ -133,7 +133,7 @@
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
         (define malicious-patterns-file-location (write-patterns-to-file (hash-ref json-obj 'patterns)))
 
-        (display (string-append "Analysing: " file-location) (current-output-port))
+        (display (string-append "Analysing: " file-location "\n") (current-output-port))
 
         (define procmon-csv-file-location (run-in-sandbox file-location out))
 

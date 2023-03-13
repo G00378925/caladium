@@ -30,6 +30,7 @@ def analysis_thread_func(malicious_pattern_list):
         for pattern in malicious_pattern_list:
             if pattern in syscall:
                 caladium.send_message(pattern + ", " + syscall)
+                caladium.send_state("malware_detected")
         inc_analysis_count()
 
 def main(argv):
