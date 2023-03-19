@@ -79,7 +79,7 @@ def ping_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):
         return worker.ping()
     
-@workers.get("/api/workers/kill/<worker_id>")
+@workers.post("/api/workers/kill/<worker_id>")
 def kill_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):
         worker.kill()

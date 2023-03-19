@@ -8,7 +8,7 @@
 
 import collections, sys, threading
 
-import caladium
+import caladium_resp as caladium
 
 # Increment the count of analysed syscalls
 def inc_analysis_count():
@@ -24,13 +24,16 @@ def fetch_next_syscall():
     globals()["deque_lock"].release()
     return syscall
 
+def send_message(text):
+    globals()["output"][0] += text
+
 # This is the function that is run by each analysis thread
 def analysis_thread_func(malicious_pattern_list):
     while syscall := fetch_next_syscall():
         for pattern in malicious_pattern_list:
             if pattern in syscall:
-                caladium.send_message(pattern + ", " + syscall)
-                caladium.send_state("malware_detected")
+                caladium.send_message(pattern + ", " + syscall, send_message)
+                caladium.send_state("malware_detected", send_message)
         inc_analysis_count()
 
 def main(argv):
@@ -50,9 +53,17 @@ def main(argv):
     globals()["count_lock"], globals()["deque_lock"] = [threading.Lock()] * 2
     globals()["analysis_count"], globals()["syscall_deque"] = 0, collections.deque(syscall_list)
 
+    # Setup the output buffer
+    globals()["output"] = [bytes()]
+
     # Spawn analysis threads
     for _ in range(10): threading.Thread(target=analysis_thread_func, args=[malicious_pattern_list]).start()
     while globals()["analysis_count"] < len(syscall_list): ...
+
+    # Send the output to the client
+    if len(globals()["output"][0]) == 0:
+        caladium.send_message("No threats found")
+    sys.stdout.buffer.write(globals()["output"][0])
 
 if __name__ == "__main__":
     main(sys.argv[1:])

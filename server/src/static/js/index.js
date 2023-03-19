@@ -25,8 +25,10 @@ class Page {
     // Fetch data from Caladium API, includes authorisation token
     async caladiumFetch(method, path, body=undefined) {
         try {
+            // These are the parameters for the fetch request
             const caladiumFetchParameters = {
-                method: method, headers: {"Authorisation": localStorage["Authorisation"]}, body: body ? JSON.stringify(body) : undefined
+                method: method, headers: {"Authorisation": localStorage["Authorisation"]},
+                body: body ? JSON.stringify(body) : undefined
             };
             const resp = await fetch(path, caladiumFetchParameters);
             return await resp.json();
@@ -42,13 +44,16 @@ class Page {
     }
 
     loadPage(updatePage=false) {
+        // Make sure the page has no HTML elements before appending the new ones
         while (document.body.childNodes[0]) {
             document.body.childNodes[0].remove();
         }
 
+        // Append the new HTML elements
         document.body.append(this.generateDOM());
         const anchorTagArray = document.getElementsByTagName('a');
         for (let i = 0; i < anchorTagArray.length; i++) {
+            // Update all links to call loadPage()
             if (!anchorTagArray[i]["href"].startsWith("javascript:"))
                 anchorTagArray[i]["href"] = "javascript:loadPage('" + (new URL(anchorTagArray[i]["href"])).pathname + "')";
         }
@@ -56,6 +61,7 @@ class Page {
 
     // Called when user clicks logout button
     logout() {
+        // Remove authorisation token from localStorage and redirect to login page
         localStorage["Authorisation"] = undefined;
         window.location = "/login";
     }
@@ -81,6 +87,7 @@ class IndexPage extends Page {
                           (div (hash "class" "column column-25" "children"
                             (list (canvas (hash "id" canvasID))))))))`;
 
+        // This is the list of cards on the index page
         this.pageList = [
             {canvasID: "clients-canvas", cardOnClickFunc: () => loadPage("/clients"), pageName: "Clients"},
             {canvasID: "patterns-canvas", cardOnClickFunc: () => loadPage("/patterns"), pageName: "Patterns"},
@@ -95,11 +102,13 @@ class IndexPage extends Page {
         super.loadPage("/");
         currentPage.caladiumFetch("GET", "/api/admin/statistics")
         .then(resp => {
+            // This is the data for the piechart
             const piechartData = [
                 {"colour": "red", "title": "Malicious", "value": 75},
                 {"colour": "green", "title": "Clean", "value": 25}
             ];
 
+            // Render each of the piecharts
             resp.forEach(plotRecord => {
                 if (plotRecord["plot_type"] == "barchart")
                     acesulfameBarchart(plotRecord["plot_name"], plotRecord["data"]);
@@ -113,6 +122,8 @@ class IndexPage extends Page {
 class LoginPage extends Page {
     constructor() {
         super();
+
+        // This is the error message that appears when the user enters invalid credentials
         [this.errMessage, this.errMessageHidden] = [undefined, true];
         this.body = ` (div (hash "children"
                         (list
@@ -128,13 +139,16 @@ class LoginPage extends Page {
     }
 
     loginButtonOnClick() {
-        const [username, password] = ["username", "password"].map(id => document.getElementById(id).value);
+        const [username, password] = ["username", "password"]
+        .map(id => document.getElementById(id).value);
 
+        // Check if the username and password fields are empty
         if (!username.length || !password.length) {
             alert("Either the username or password field is empty.");
             return;
         }
 
+        // Send POST request to login endpoint
         const requestBody = JSON.stringify({"username": username, "password": password});
         fetch("/api/login", {method: "POST", body: requestBody})
         .then(resp => resp.json())
@@ -143,6 +157,7 @@ class LoginPage extends Page {
                 localStorage["Authorisation"] = resp["Authorisation"];
                 loadPage("/");
             } else {
+                // Show the error message
                 currentPage.errMessage = resp["message"];
                 currentPage.errMessageHidden = false;
                 currentPage.loadPage(true);
@@ -156,6 +171,7 @@ class PreferencesPage extends Page {
         super();
         this.endpoint = "/api/admin/preferences";
 
+        // This is the DOM Lisp expression for the preferences page
         this.body = ` (div (hash "children"
                         (list
                           navigationBar
@@ -178,11 +194,13 @@ class PreferencesPage extends Page {
         const newPassword = document.getElementById("newPassword").value;
         if (newPassword.length == 0) return;
 
+        // Update admin password
         currentPage.caladiumFetch("PUT", currentPage.endpoint, {password: newPassword})
         .then(resp => {currentPage.loadPage(true);});
     }
 
     toggleAutoProvision() {
+        // Toggle the auto provision preference
         currentPage.caladiumFetch("PUT", currentPage.endpoint, {"auto_provision": !currentPage.preferences["auto_provision"]})
         .then(resp => {currentPage.loadPage(true);});
     }
@@ -205,6 +223,7 @@ class ListPage extends Page {
         });
     }
 
+    // Delete the element with the given ID
     deleteElement(elementID) {
         currentPage.caladiumFetch("DELETE", currentPage.endpoint + '/' + elementID, {})
         .then(resp => {
@@ -212,6 +231,7 @@ class ListPage extends Page {
         });
     }
 
+    // Delete all elements
     deleteAllElements() {
         currentPage.caladiumFetch("DELETE", currentPage.endpoint, {})
         .then(resp => {
@@ -425,7 +445,8 @@ class WorkersPage extends ListPage {
     }
 
     killWorker(workerID) {
-        currentPage.caladiumFetch("GET", currentPage.endpoint + "/kill/" + workerID)
+        // This will kill a worker by ID
+        currentPage.caladiumFetch("POST", currentPage.endpoint + "/kill/" + workerID)
     }
 }
 
