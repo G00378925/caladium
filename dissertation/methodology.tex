@@ -2,17 +2,28 @@
 % Describe the way you went about your project. Was your approach to the problem valid?
 % You need to discuss both your software development methodology and your research methodology.
 
-At the beginning I decided to break the project into three parts, the client, server, and sandbox.
+This chapter will be discussing the methodology I used whilst developing my project
 
-I am using Test Driven Development (TDD) to develop the server endpoints.
-I am using the unittest python library to write unit tests for the server endpoints.
+When I figured out what I wanted to do my project on (that being malware detection),
+I had to research technologies that would aid with this, so I began researching tools that I would use to log the system calls on Windows,
+I initially was thinking of writing the logging software myself, but I then concluded that this would take too much time and I would end up not fulfilling my initial objectives of creating an entire platform, so then I found a piece of software called "Process Monitor" that could do this.
 
-The tests are used as a specification for the server endpoints.
+In the beginning, I decided to break the project into three parts, the client, server, and sandbox.
 
-Throughout the development I identified tasks that needed to be done.
-I created a story in my kanban board for each task, placed it in the Todo column.
+I used test-driven approach (TDD) to develop the server endpoints.
+I used the "unittest" python library to write unit tests for the server endpoints.
 
-I then moved the story to the In Progress column when I started working on it.
+I used the tests as a specification for the server endpoints.
+If the tests failed I wasn't implementing the endpoints correctly
+
+I decided I wanted to break up all the tasks into user stories, I was initially going to use Jira but I then found out that GitHub supported the kanban board, this was
+Throughout the development, I identified tasks that needed to be done.
+
+I created three columns in the kanban board, they being "Todo", "In Progress" and "Done".
+
+When I identified tasks to be done I placed them in the "Todo" column, and the tasks I was currently working on I had in the "In Progress"
+
+I moved the story to the In Progress column when I started working on it.
 When I finished working on the story, I moved it to the Done column.
 
 Git was used for version control.

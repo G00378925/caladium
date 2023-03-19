@@ -22,7 +22,7 @@ I have decided to create a platform that can detect malware based on its behavio
 using dynamic heuristic analysis, which involves executing files in a sandboxed environment,
 and observing what the file does during its execution,
 then comparing its behaviour to known malicious actions.
-Its behaviour meaning how the software interacts with the operating system,
+Its behaviour means how the software interacts with the operating system,
 examples of this include reading and writing files.
 
 It's easy to bypass traditional anti-malware scanning techniques,
@@ -97,12 +97,14 @@ The objectives of this project are as follows:
 \subsection{Client}
 The code of the client can be found in the \texttt{client} directory.
 
-It is written in Python, using the Tkinter library to create the GUI.
+It is written in Python, using the Tkinter library to create the GUI and using a library called "tkthread" to manage threading.
 
 The client will feature 3 pages, Main Page (Caladium), Quarantine and Preferences.
 
+On the "Main Page" (Caladium) you will find a text box stating the current directory being scanned, and there will be a button allowing you to manually scan files.
+
 As running Python code, requires Python to be installed,
-I am using a tool called PyInstaller to bundle in everything it needs to run on any computer.
+I am using a tool called PyInstaller to bundle everything it needs to run on any computer.
 
 Unfortunately, PyInstaller doesn't output a single executable file,
 it outputs a directory of files, fortunately, I have found a tool called "iexpress" that comes with Windows by default, that can create an installer,
@@ -123,7 +125,11 @@ This includes provisioning clients and adding new detection patterns.
 The code of the dashboard will be found in the \texttt{server/src/static} directory.
 
 Administrators will be able to login into the dashboard and perform administrative tasks.
+They will also have the ability to change their password and new workers to the system.
 The dashboard will be written in JavaScript, it will be a single-page application.
+
+Upon opening the dashboard you will be presented with a login page, prompting you to enter a username and password, the default for these is "root" and "root".
+The password is changeable using the preferences menu.
 
 
 

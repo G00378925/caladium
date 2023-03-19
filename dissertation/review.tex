@@ -9,7 +9,7 @@
 
 \section{Flask}
 Flask is a micro web framework written in Python.
-It is classified as a microframework because it does not require particular tools or libraries.
+It is classified as a micro-framework because it does not require particular tools or libraries.
 This allowed me to create the HTTP endpoints for the RESTful API without having to worry about the underlying HTTP server.
 
 \section{Python}
@@ -17,15 +17,18 @@ Python is an interpreted, high-level, general-purpose programming language.
 I chose to use Python because I wanted to use the same language for the client and server.
 When I serialised data in the client I could use the same deserialisation function on the server.
 
+Python is also a very simple language and is interpreted, this allowed me to quickly test code, without having to compile it everytime.
+
 \subsection{Tkinter}
 Tkinter is the standard GUI library for Python,
 It is also cross-platform, allowing the client to run on Windows, Linux and macOS.
-It is stable and mature with a plethora of documentation to found on the internet.
+It is stable and mature with a plethora of documentation to be found on the internet.
 
 \section{Docker}
-To create a reproducable environment I decided to use Docker.
+To create a reproducible environment I decided to use Docker.
 Docker is a containerization platform that allows you to create containers that can be run on any machine.
 Docker is a platform that allows you to create containers that can be run on any machine.
+The Dockerfile I am using in my project can be found here: \texttt{server/Dockerfile}
 
 \section{CouchDB}
 CouchDB is a document-oriented NoSQL database.
@@ -35,7 +38,7 @@ Sandboxie is a sandboxing program that allows you to run untrusted programs in a
 
 \section{Process Monitor}
 Process Monitor is a system monitoring program that allows you to log system calls.
-I neeed a way of finding out what the malware is doing, so I decided to use Process Monitor to log system calls.
+I needed a way of finding out what the malware is doing, so I decided to use Process Monitor to log system calls.
 I originally was thinking of using a driver to log system calls, but I decided to use Process Monitor instead to avoid reinventing the wheel.
 
 \section{Racket}
@@ -43,5 +46,5 @@ Racket is a functional programming language.
 
 \section{Pyinstaller}
 Pyinstaller is a module for python that allows you to create a single executable file from a python script.
-This allow your software to be self contained and portable, users don't have to install python on their computer to install your software.
+This allows your software to be self-contained and portable, users don't have to install python on their computer to install your software.
 

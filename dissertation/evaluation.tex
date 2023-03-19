@@ -8,7 +8,7 @@ The main goal of the project was to develop a platform capable of detecting mali
 This was done by executing the software in a sandboxed environment and logging the system calls.
 And then comparing the system calls to a list of malicious patterns.
 When I searched for databases on the internet of known malicious patterns,
-I didn't find many results, so I opted to include static analysis aswell as a fallback.
+I didn't find many results, so I opted to include static analysis as well as a fallback.
 
 As static analysis is a tried and true method of detecting malware,
 there is a plethora of definitions for malicious patterns.
@@ -17,17 +17,17 @@ there is a plethora of definitions for malicious patterns.
 The server is capable of handling multiple clients, but there is only one instance of the server running.
 This means in the event of the server crashing, clients will not be able to scan files.
 
-The platform can handle muliple scans at the same time, as multiple workers are supported.
+The platform can handle multiple scans at the same time, as multiple workers are supported.
 
 \section{Time Complexity}
 When a file was scanned 
 
 \section{Security}
-To get into the dashboard you must login with a username and password.
+To get into the dashboard you must log in with a username and password.
 The password is hashed using the SHA-256 algorithm.
-Meaning if the server is compromised, the admins password won't be readable.
+If the server is compromised, the admin's password won't be readable.
 
-When you login you are given a session token this is stored in the browser's local storage.
+When you log in you are given a session token which is stored in the browser's local storage.
 All RESTful API calls require the session token to be sent with the request.
 
 \section{Working with Tables}
