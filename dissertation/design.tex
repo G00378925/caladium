@@ -4,11 +4,17 @@
 % Use UML, system architecture diagrams, screenshots, code snippets 
 % and algorithms to illustrate your design.
 
+In this chapter, I will be discussing how when about designing my project and the design principles I used throughout.
+
+\section{Design and Structure}
+
 \section{Client}
 Python files with the $frame.py$ suffix contain Tkinter frame classes.
 
 \section{Server Dashboard}
 The dashboard is a single-page web application (SPA) it is fully written in JavaScript.
+This means when you navigate to another page in the dashboard it doesn't have to pull it from the server, just fetch the data specific to that page, then render it dynamically using JavaScript.
+
 And doesn't make use of any external libraries.
 I made this decision early because I wanted to keep the project as self-contained as possible.
 
@@ -21,6 +27,26 @@ All pages inherit the \textbf{Page} class, as they share common functionality wh
 Each page class must implement the \textbf{loadPage} method, which is called when the page is loaded.
 This can be used for fetching data from the backend.
 
+\section{DOM Lisp Expressions}
+In a single-page application (SPA) everything on the page is generated dynamically and isn't pulling HTML from a server when you navigate to new pages, I figured this out early on in the development.
+
+Web applications are stored in a document object model in the browser, this is a tree of nested components, inspired by the LISP programming language I made a small DSL language for representing DOMs as lisp expressions.
+
+This allowed me to then encapsulate these DOM expressions in the Page classes.
+
+\lstset{basicstyle=\fontsize{10}{12}\ttfamily}
+\begin{lstlisting}
+this.body = ` (div (hash "children"
+                (list
+                    navigationBar
+                    (input (hash "type" "password" "id"
+                        "newPassword" "placeholder" "New Password"))
+                    (button (hash "onclick" changePasswordOnClick
+                        "innerHTML" "Update Password"))
+                    (hr)
+                    (button (hash "onclick" toggleAutoProvision
+                        "innerHTML" autoProvisionButtonText)))))`;
+\end{lstlisting}
 
 
 \section{Server Endpoints}
