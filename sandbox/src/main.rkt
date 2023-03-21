@@ -64,6 +64,9 @@
 (define (send-state state out)
     (output-json (hash 'type "state" 'state state) out))
 
+(define (send-update text value out)
+    (begin (send-message text out) (send-progress value out)))
+
 (define (run-in-sandbox executable-location out)
     (begin
         (define procmon-pml-file-location
@@ -71,17 +74,15 @@
         (define procmon-csv-file-location
             (path->string (make-temporary-file "caladium_~a.csv")))
 
-        (send-message "Starting process monitor" out)
-        (send-progress 10 out)
+        (send-update "[*] Starting Process Monitor" 10 out)
         (define procmon-subprocess (subprocess-and-close-ports procmon-location
             (list "/Minimized" "/BackingFile" procmon-pml-file-location)))
 
-        (send-message "Executing file in sandboxie" out)
-        (send-progress 20 out)
+        (send-update "[*] Executing file in Sandboxie" 20 out)
         (define sandboxed-subprocess (subprocess-and-close-ports sandboxie-start-location
             (list "/wait" executable-location)))
 
-        (sleep 1)
+        (sleep 10) ; Pause for a bit, to avoid racing
         (define listpids-list (listpids-in-sandbox))
         (subprocess-wait sandboxed-subprocess)
 
@@ -91,7 +92,7 @@
         (system (string-join (list procmon-location "/OpenLog" procmon-pml-file-location
             "/SaveAs" procmon-csv-file-location) " "))
 
-        (send-message "Filtering system calls" out)
+        (send-update "[*] Filtering system calls" 25 out)
         (system (string-join (append (list python-location "procmon_csv_filter.py"
             procmon-csv-file-location executable-location) listpids-list) " "))
 
@@ -126,8 +127,8 @@
     (begin
         (define dynamic-analysis-enabled (hash-ref json-obj 'dynamic-analysis))
 
-        (send-message "Scan beginning" out)
-        (send-progress 0 out)
+        (send-update (string-append "[*] Beginning analysis of \""
+            (hash-ref json-obj 'file-name) "\"") 0 out)
         (set! scan-in-progress #t)
 
         ; Write file to disk
@@ -139,29 +140,25 @@
         (if dynamic-analysis-enabled
             (let ([malicious-patterns-file-location (write-patterns-to-file (hash-ref json-obj 'patterns))]
                 [procmon-csv-file-location (run-in-sandbox file-location out)])
-                (send-message "Beginning analysis" out)
-                (send-progress 25 out)
+                (send-update "[*] Beginning analysis of system calls" 25 out)
 
                 ; Wait for the syscall analysis to complete
                 (subprocess-wait
                     (analyse-syscalls procmon-csv-file-location malicious-patterns-file-location out))
 
-                ; Clean up
                 (delete-file (string->path procmon-csv-file-location))
                 (delete-file (string->path malicious-patterns-file-location))
 
-                (send-message "Dynamic Analysis complete" out))
-            (send-message "Dynamic Analysis disabled, Skipping" out))
+                (send-message "[+] Dynamic analysis complete" out))
+            (send-message "[!] Dynamic analysis disabled, Skipping" out))
 
         ; Run static analysis
-        (send-message "Beginning static analysis" out)
-        (send-progress 50 out)
+        (send-update "[*] Beginning static analysis" 50 out)
 
         (define static-analysis-subprocess (static-analysis file-location out))
         (subprocess-wait static-analysis-subprocess) ; Wait for the analysis to complete
         
-        (send-message "Analysis complete" out)
-        (send-progress 100 out)
+        (send-update "[+] Static analysis complete" 100 out)
         (send-state "complete" out)
         
         ; Set scan-in-progress to false
@@ -197,7 +194,7 @@
 (display (string-append "Listening on port "
     (number->string port-number) "\n") (current-error-port))
 
-; Main loop
+; Main loop of execution
 (poll-for-request)
 (define (wait-for-threads)
     (begin (sleep) (wait-for-threads)))

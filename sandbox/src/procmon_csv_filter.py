@@ -14,7 +14,7 @@ and their child processes.
 import os, sys
 
 def main(argv):
-    if len(argv) <= 3: return 1
+    if len(argv) <= 2: return 1
     
     # Load CSV from command line argument
     csv_file_location = argv[1]
@@ -22,8 +22,7 @@ def main(argv):
     # Executable name
     exe_name = argv[2].split(os.path.sep)[-1]
 
-    # Load PID numbers from command line arguments
-    arg_pid_list = [int(i) for i in argv[3:]]
+    # List of PIDs to be allowed
     pid_list = []
 
     # Read CSV convert it to string, and split it into its syscalls
@@ -37,11 +36,9 @@ def main(argv):
     f_tmp.write('"{}"\n'.format(csv_file_data[0]))
     for record_line in csv_file_data[1:]:
         record = record_line.split('","')
-        if int(record[2]) in arg_pid_list and record[1] == "Start.exe":
-            pid_list += [int(record[2])] # Add PIDs to list
 
         # Check if input PIDs are in the syscall
-        if record[1] == exe_name or (int(record[2]) in pid_list):
+        if (record[1] == exe_name) or (int(record[2]) in pid_list):
             f_tmp.write('"{}"\n'.format(record_line))
             if record[3] == "Process Create":
                 pid_list += [int(record[6].split()[1][:-1])]

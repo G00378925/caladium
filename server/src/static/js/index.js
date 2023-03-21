@@ -17,6 +17,7 @@ class Page {
                                             (list
                                               (a (hash "class" "float-left" "href" "/"
                                                 "children" (list (h1 (hash "innerHTML" "Caladium Dashboard")))))
+
                                               (button (hash "class" "float-right"
                                                 "innerHTML" "Logout" "onclick" logout))
                                               (button (hash "class" "float-right" "style" "background-color: grey; border-color: grey"
@@ -102,7 +103,7 @@ class IndexPage extends Page {
 
     loadPage(updatePage=false) {
         super.loadPage("/");
-        currentPage.caladiumFetch("GET", "/api/admin/statistics")
+        currentPage.caladiumFetch("GET", "/api/preferences/statistics")
         .then(resp => {
             // This is the data for the piechart
             const piechartData = [
@@ -171,7 +172,7 @@ class LoginPage extends Page {
 class PreferencesPage extends Page {
     constructor() {
         super();
-        this.endpoint = "/api/admin/preferences";
+        this.endpoint = "/api/preferences";
 
         // I need a space between the two buttons, not (hr)
         // This is the DOM Lisp expression for the preferences page
@@ -381,12 +382,20 @@ class TasksPage extends ListPage {
                               (td (hash "children"
                                 (list (button (hash "style" "background-color: red; border-color: red"
                                   "onclick" taskDeleteFunc "innerHTML" "Delete"))))))))`;
+
+        this.scanStateLabels = {
+            "completed": "Completed",
+            "executing": "Executing",
+            "failed": "Failed",
+            "malware_detected": "Malware Detected"
+        }
     }
 
     generateRowParameters(resp, elementID) {
         const rowParameters = {
             taskID: resp[elementID]["_id"],
-            taskState: resp[elementID]["state"],
+            // Replace the state with a human-readable label.
+            taskState: this.scanStateLabels[resp[elementID]["state"]],
             taskCreationTimeStr: resp[elementID]["creation_time_str"],
             taskDeleteFunc: () => currentPage.deleteElement(elementID)
         };

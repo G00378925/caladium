@@ -23,9 +23,9 @@ def main(argv):
     # Scan the file using ClamWin
     clamscan_result = os.popen(f"\"{clamscan}\" {file_name}").read()
     if "Infected files: 0" in clamscan_result:
-        caladium.send_message("Static: No threats found")
+        caladium.send_message("[+] Static analysis: No malware detected")
     else:
-        caladium.send_message("Static: Malware detected")
+        caladium.send_message("[-] Static analysis: Malware detected")
         caladium.send_state("malware_detected")
 
 if __name__ == "__main__":

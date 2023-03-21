@@ -23,6 +23,8 @@ class DirChangeListener:
         self.main_window = main_window
         self.update_scan_dir_label_func = update_scan_dir_label_func
 
+        self.update_scan_dir_label_func(self._get_scanning_dir())
+
     def _get_scanning_dir(self):
         return provisioning.get_config().get("scanning_directory", get_downloads_dir())
 
@@ -33,11 +35,14 @@ class DirChangeListener:
 
         # Continuously check the downloads directory for changes
         while True:
-            self.update_scan_dir_label_func(current_scan_directory := self._get_scanning_dir())
+            current_scan_directory = self._get_scanning_dir()
             latest_dir_state = os.listdir(current_scan_directory)
 
             # Check if the scanning directory has changed
             if current_scan_directory != scan_directory:
+                # Update the main frame label
+                self.update_scan_dir_label_func(current_scan_directory)
+
                 scan_directory = current_scan_directory
                 current_dir_state = latest_dir_state
                 continue

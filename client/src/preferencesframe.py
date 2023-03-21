@@ -4,7 +4,7 @@ import ctypes, os, tkinter.ttk, tkinter.filedialog
 
 import provisioning
 
-def uninstall_caladium():
+def __uninstall_caladium():
     uninstallation_code = """
     @echo off
     rem Waiting 3 seconds until Caladium is closed
@@ -68,8 +68,8 @@ class PreferencesFrame(tkinter.ttk.Frame):
             return
 
         if tkinter.messagebox.askyesno("Uninstall Caladium", "Are you sure you want to uninstall?"):
-            uninstall_caladium() # Uninstall Caladium
-            os.kill(os.getpid(), 3)
+            __uninstall_caladium() # Uninstall Caladium
+            os.kill(os.getpid(), 3) # Kill the process
 
     # Called upon the change scanning directory button being pressed
     def _change_scanning_directory(self):

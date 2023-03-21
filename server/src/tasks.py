@@ -19,56 +19,51 @@ tasks = flask.Blueprint(__name__, "tasks")
 
 def scan_file(scan_file_obj):
     task = database.create(TaskRecord, {"state": "Running", "updates": []})
-    scan_file_obj = json.loads(scan_file_obj)
+
+    def append_update(update_obj):
+        updates_list = task.get("updates").copy()
+
+        if type(update_obj) == str:
+            update_obj = {"type": "message", "text": update_obj}
+
+        updates_list += [update_obj]
+        task.set("updates", updates_list)
 
     # Check if there is any available workers
-    if len(free_workers := workers.get_free_workers()) == 0:
-        updates_list = task.get("updates").copy()
-        updates_list += [{"type": "message", "text": "No workers available currently"}]
-        task.set("updates", updates_list)
+    if len(list_of_workers := workers.get_records_route()) > 0:
+        try:
+            random_worker = random.choice([*list_of_workers.values()])
+            sandbox_socket = workers.establish_connection(random_worker["workerAddress"])
 
-        task.set("state", "complete")
+            scan_file_obj = json.loads(scan_file_obj)
+            scan_file_obj["patterns"] = patterns.get_patterns()
+            scan_file_obj["dynamic-analysis"] = preferences.preferences_dict["dynamic_analysis"]
+            sandbox_socket.send(json.dumps(scan_file_obj).encode())
 
-        # Send a message back to the client, indicating this
-        return flask.Response("No free workers to take job", status=200) # Return message back to client
-
-    # Try and initialise a job
-    try:
-        random_worker = random.choice(free_workers)
-        task.set("worker_id", random_worker["_id"])
-
-        sandbox_socket = workers.establish_connection(random_worker["workerAddress"])
-        scan_file_obj["patterns"] = patterns.get_patterns()
-        scan_file_obj["dynamic-analysis"] = preferences.preferences["dynamic_analysis"]
-        
-        sandbox_socket.send(json.dumps(scan_file_obj).encode())
-
-        # Try and recieve initial response
-        # Anything over 2 seconds is a failure
-        # sandbox_socket.settimeout(2)
-        updates_list = task.get("updates").copy()
-        updates_list += [workers.read_json_from_socket(sandbox_socket)]
-        task.set("updates", updates_list)
-        # sandbox_socket.settimeout(None)
-    except:
+            append_update(workers.read_json_from_socket(sandbox_socket))
+            task.set("state", "executing")
+        except:
+            append_update("[-] Failed to connect to worker")
+            task.set("state", "failed")
+    else:
+        append_update("[-] No workers available currently")
         task.set("state", "failed")
-        return flask.Response("", status=404) # Return 404 back to client
     
     def scan_file_thread(): # Continously recieve updates from the worker
         try:
-            while True:
-                updates_list = task.get("updates").copy()
-                updates_list += [workers.read_json_from_socket(sandbox_socket)]
-                task.set("updates", updates_list)
+            while task.get("state") == "executing":
+                append_update(workers.read_json_from_socket(sandbox_socket))
 
-                if updates_list[-1]["type"] == "state":
+                if (updates_list := task.get("updates").copy())[-1]["type"] == "state":
                     task.set("state", updates_list[-1]["state"])
                     if updates_list[-1]["state"] == "complete": break
         except: ...
         finally:
             sandbox_socket.close()
 
-    threading.Thread(target=scan_file_thread).start()
+    if task.get("state") == "executing":
+        threading.Thread(target=scan_file_thread).start()
+
     return str(task)
 
 @tasks.get("/api/tasks")

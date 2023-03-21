@@ -15,7 +15,8 @@ import base64, json, os, sys, tkinter
 import dirchangelistener, preferencesframe, provisioning, provisioningframe
 import quarantine, quarantineframe, scanwindow
 
-# Called when the "Scan File" button is pressed
+# Called when the "Scan file" button is pressed
+# This setups the scan window and starts the scan
 def scan_file(main_window, quarantine_obj, quarantine_frame, file_path=None):
     try:
         file_handle = open(file_path, "rb") if file_path else tkinter.filedialog.askopenfile("rb")
@@ -53,7 +54,7 @@ def setup_notebook(config, main_window):
     main_frame = tkinter.ttk.Frame()
     main_window_notebook.add(main_frame, text="Caladium")
 
-    # Scanning directory label
+    # Currently scanning directory label
     scanning_directory_label = tkinter.ttk.Label(main_frame)
     scanning_directory_label.pack()
     def update_scan_dir_label(scan_dir_path):
@@ -80,21 +81,19 @@ def setup_notebook(config, main_window):
             if tkinter.messagebox.askyesno("New file detected " + file_path, file_path):
                 scan_file(main_window, quarantine_obj, quarantine_frame, file_path)
 
-    dirchangelistener_obj = dirchangelistener.DirChangeListener(dirchangelistener_callback, main_window, update_scan_dir_label)
-    dirchangelistener_obj.start()
+    dirchangelistener.DirChangeListener(dirchangelistener_callback,
+                                        main_window, update_scan_dir_label).start()
 
 def main(argv):
     main_window = tkinter.Tk()
     main_window.minsize(640, 480) # Initially 640x480, this is adjustable
     main_window.title("Caladium")
 
-    # Called when user presses the close button
+    # Called when the user presses the close button
     def kill_client():
-        if tkinter.messagebox.askokcancel("Quit", "Do you want to kill the client?"):
+        if tkinter.messagebox.askokcancel("Kill Caladium", "Do you want to kill Caladium?"):
             main_window.destroy()
             os.kill(os.getpid(), 3) # Kill the process
-
-    main_window.protocol("WM_DELETE_WINDOW", kill_client)
 
     # If the computer isn't already provisioned, show the provisioning frame
     provisioning_frame = provisioningframe.ProvisioningFrame(main_window, setup_notebook, provisioning.get_caladium_appdata_dir())
@@ -102,6 +101,7 @@ def main(argv):
     # Optionally pass a IP address for automatic provisioning
     provisioning_frame.provision(argv[0] if len(argv) > 0 else None)
 
+    main_window.protocol("WM_DELETE_WINDOW", kill_client)
     main_window.mainloop() # Main loop of execution
 
 if __name__ == "__main__":

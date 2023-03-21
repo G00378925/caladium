@@ -14,7 +14,7 @@ def analysis_worker(syscall_queue, malicious_patterns):
         except: break
         for pattern in malicious_patterns:
             if pattern in syscall:
-                caladium.send_message(pattern + ", " + syscall)
+                caladium.send_message(f"[-] A malicious pattern has been detected: {pattern}")
                 caladium.send_state("malware_detected")
 
 def main(argv):

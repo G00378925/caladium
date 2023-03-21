@@ -15,6 +15,7 @@ class QuarantineFrame(tkinter.ttk.Frame):
         self.quarantine_index_dict = {}
         self.columnconfigure(0, weight=1)
         
+        # Adding Listbox to show quarantined files
         self.quarantine_list = tkinter.Listbox(self)
         self.update_quarantine_list()
         self.quarantine_list.grid(column=0, row=0, sticky="nsew", rowspan=1, columnspan=2)
