@@ -14,12 +14,16 @@ and their child processes.
 import os, sys
 
 def main(argv):
-    if len(argv) <= 2: return 1
+    if len(argv) <= 3: return 1
     
     # Load CSV from command line argument
     csv_file_location = argv[1]
+
+    # Executable name
+    exe_name = argv[2].split(os.path.sep)[-1]
+
     # Load PID numbers from command line arguments
-    arg_pid_list = [int(i) for i in argv[2:]]
+    arg_pid_list = [int(i) for i in argv[3:]]
     pid_list = []
 
     # Read CSV convert it to string, and split it into its syscalls
@@ -37,10 +41,11 @@ def main(argv):
             pid_list += [int(record[2])] # Add PIDs to list
 
         # Check if input PIDs are in the syscall
-        if int(record[2]) in pid_list:
+        if record[1] == exe_name or (int(record[2]) in pid_list):
             f_tmp.write('"{}"\n'.format(record_line))
             if record[3] == "Process Create":
                 pid_list += [int(record[6].split()[1][:-1])]
+
     f_tmp.close()
 
     # Replace old CSV with new filtered CSV

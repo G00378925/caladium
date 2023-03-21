@@ -92,13 +92,11 @@
             "/SaveAs" procmon-csv-file-location) " "))
 
         (send-message "Filtering system calls" out)
-        (system (string-join (append (list python-location "procmon_csv_filter.py" procmon-csv-file-location)
-            listpids-list) " "))
+        (system (string-join (append (list python-location "procmon_csv_filter.py"
+            procmon-csv-file-location executable-location) listpids-list) " "))
 
         (delete-file (string->path procmon-pml-file-location))
         procmon-csv-file-location))
-
-(define semaphore-obj (make-semaphore 1))
 
 ; Need to open TCP even if its being used by another process
 (define tcp-obj (tcp-listen port-number 8 #f "0.0.0.0"))
@@ -121,59 +119,79 @@
         (close-input-port python-out) (close-output-port python-in) (close-input-port python-err)
         subprocess-obj))
 
+(define scan-in-progress #f)
+
 ; Execute a file in a sandbox
 (define (analyse-file json-obj out)
     (begin
-        (semaphore-wait semaphore-obj)
+        (define dynamic-analysis-enabled (hash-ref json-obj 'dynamic-analysis))
+
         (send-message "Scan beginning" out)
         (send-progress 0 out)
+        (set! scan-in-progress #t)
 
+        ; Write file to disk
         (define file-location
             (string-append (path->string (make-temporary-directory)) "\\" (hash-ref json-obj 'file-name)))
         (display-to-file (base64-decode (string->bytes/utf-8 (hash-ref json-obj 'file-data))) (string->path file-location))
-        (define malicious-patterns-file-location (write-patterns-to-file (hash-ref json-obj 'patterns)))
 
-        (display (string-append "Analysing: " file-location "\n") (current-output-port))
+        ; Check if dynamic analysis is enabled
+        (if dynamic-analysis-enabled
+            (let ([malicious-patterns-file-location (write-patterns-to-file (hash-ref json-obj 'patterns))]
+                [procmon-csv-file-location (run-in-sandbox file-location out)])
+                (send-message "Beginning analysis" out)
+                (send-progress 25 out)
 
-        (define procmon-csv-file-location (run-in-sandbox file-location out))
+                ; Wait for the syscall analysis to complete
+                (subprocess-wait
+                    (analyse-syscalls procmon-csv-file-location malicious-patterns-file-location out))
 
-        (send-message "Beginning analysis" out)
-        (send-progress 90 out)
+                ; Clean up
+                (delete-file (string->path procmon-csv-file-location))
+                (delete-file (string->path malicious-patterns-file-location))
 
-        ; Run syscall analysis and static analysis in parallel
+                (send-message "Dynamic Analysis complete" out))
+            (send-message "Dynamic Analysis disabled, Skipping" out))
+
+        ; Run static analysis
+        (send-message "Beginning static analysis" out)
+        (send-progress 50 out)
+
         (define static-analysis-subprocess (static-analysis file-location out))
-        (define syscall-analysis-subprocess
-            (analyse-syscalls procmon-csv-file-location malicious-patterns-file-location out))
-
-        ; Wait for the analysis to complete
-        (subprocess-wait static-analysis-subprocess)
-        (subprocess-wait syscall-analysis-subprocess)
+        (subprocess-wait static-analysis-subprocess) ; Wait for the analysis to complete
         
         (send-message "Analysis complete" out)
         (send-progress 100 out)
         (send-state "complete" out)
         
-        (delete-file (string->path procmon-csv-file-location))
-        (delete-file (string->path malicious-patterns-file-location))
-        (semaphore-post semaphore-obj)))
+        ; Set scan-in-progress to false
+        (set! scan-in-progress #f)))
 
 ; Handle a ping request
 (define (ping out)
     (output-json "pong" out))
 
 (define (kill-sandbox)
-    (begin 
-        (tcp-close tcp-obj) (exit)))
+    (begin (tcp-close tcp-obj) (exit)))
 
 ; Handle a request
 (define (poll-for-request)
     (begin (define-values (in out) (tcp-accept tcp-obj))
         (thread poll-for-request)
         (define json-obj (read-json in))
-        (case (hash-ref json-obj 'command)
-            [("ping") (ping out)]
-            [("kill") (kill-sandbox)]
-            [("run") (analyse-file json-obj out)])
+
+        ; Check if a scan is already in progress
+        (if (not scan-in-progress)
+            (begin
+                (case (hash-ref json-obj 'command)
+                    [("ping") (ping out)]
+                    [("kill") (kill-sandbox)]
+                    [("run") (analyse-file json-obj out)]))
+            (begin
+                (send-message "Scan already in progress . . ." out)
+                (send-progress 100 out)
+                (send-state "complete" out)))
+
         (close-input-port in) (close-output-port out)))
 
 (display (string-append "Listening on port "

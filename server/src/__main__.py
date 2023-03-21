@@ -10,14 +10,7 @@ import hashlib, json, sys, time
 
 import flask, requests, uuid
 
-import clients, patterns, tasks, workers
-
-# Used to store server preferences
-preferences = {
-    "administrator_password": None, # Hash of the administrator password
-    "authorisation_tokens": [], # List of tokens that can be used to access the dashboard
-    "auto_provision": False # If true, the server will automatically provision new clients
-}
+import clients, patterns, preferences, tasks, workers
 
 # Setup flask app and other collections of API endpoints
 app = flask.Flask(__name__)
@@ -32,6 +25,7 @@ def root_page(index_path=None):
     with open("static/index.html") as index_html_handle:
         return index_html_handle.read()
 
+# Serve CSS files
 @app.route("/css/<path:css_file_path>")
 def serve_css_file(css_file_path):
     milligram_dist_location = "https://raw.githubusercontent.com/milligram/milligram/master/dist/"
@@ -41,6 +35,7 @@ def serve_css_file(css_file_path):
     }
 
     if css_file_path in css_file_dict:
+        # Fetch the file from the milligram repository
         milligram_dist_resp = requests.get(milligram_dist_location + css_file_path).text
         return flask.Response(milligram_dist_resp, headers={"Content-Type": css_file_dict[css_file_path]["content_type"]})
     else:
@@ -52,7 +47,7 @@ def serve_js_file(js_file_path):
 
 @app.post("/api/auto_provision")
 def auto_provision_route():
-    if preferences["auto_provision"]:
+    if globals()["preferences"]["auto_provision"]:
         return clients.create_clients_route()
     else:
         resp_obj = flask.Response()
@@ -65,19 +60,19 @@ def login_route():
     req_body_obj = json.loads(flask.request.get_data())
     username, password = req_body_obj["username"], req_body_obj["password"]
 
-    if username == "root" and preferences["administrator_password"] == hashlib.sha256(password.encode()).hexdigest():
+    if username == "root" and preferences.preferences["administrator_password"] == hashlib.sha256(password.encode()).hexdigest():
         token = str(uuid.uuid1())
-        preferences["authorisation_tokens"] += [token]
+        preferences.preferences["authorisation_tokens"] += [token]
         return {"valid": True, "Authorisation": token}
     else:
         return {"valid": False, "message": "Incorrect username or password"}
 
 def update_password(new_password):
-    preferences["administrator_password"] = hashlib.sha256(new_password.encode()).hexdigest()
+    preferences.preferences["administrator_password"] = hashlib.sha256(new_password.encode()).hexdigest()
 
 @app.get("/api/admin/preferences")
 def preferences_route():
-    return preferences
+    return preferences.preferences
 
 @app.put("/api/admin/preferences")
 def update_password_route():
@@ -88,7 +83,7 @@ def update_password_route():
             update_password(new_password)
     else:
         for preference_field in put_payload:
-            preferences[preference_field] = put_payload[preference_field]
+            preferences.preferences[preference_field] = put_payload[preference_field]
 
     return {}
 
@@ -117,17 +112,17 @@ def before_request():
     path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
 
     # Allows auto provisioning
-    if path == "/api/auto_provision" and preferences["auto_provision"]:
+    if path == "/api/auto_provision" and preferences.preferences["auto_provision"]:
         ...
     # Windows clients authentication
     elif path.startswith("/api/tasks") or path.startswith("/api/workers"):
-        if token not in preferences["authorisation_tokens"] and token not in clients.get_authorisation_tokens():
+        if token not in preferences.preferences["authorisation_tokens"] and token not in clients.get_authorisation_tokens():
             resp_obj.status_code = 403
             resp_obj.set_data("Invalid authorisation token")
             return resp_obj
     # Dashboard authentication
     elif path.startswith("/api") and not path.startswith("/api/login"):
-        if token not in preferences["authorisation_tokens"]:
+        if token not in preferences.preferences["authorisation_tokens"]:
             resp_obj.status_code = 403
             resp_obj.set_data("Invalid authorisation token")
             return resp_obj
@@ -147,8 +142,7 @@ def main(argv):
     # Add request/response handlers
     app.before_request(before_request)
     app.after_request(after_request)
-    app.run(host="0.0.0.0", port=port_number)
+    app.run(host="0.0.0.0", port=port_number, threaded=False, processes=1)
 
 if __name__ == "__main__":
     main(sys.argv)
-

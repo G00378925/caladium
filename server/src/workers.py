@@ -6,7 +6,7 @@
 #  Copyright © 2022 Declan Kelly. All rights reserved.
 #
 
-import json, socket, struct, uuid
+import json, socket, struct
 
 import flask
 

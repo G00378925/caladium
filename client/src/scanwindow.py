@@ -92,9 +92,10 @@ class ScanWindow:
         if self.scan_in_progress:
             self.stop_scan = True
 
-            try: provisioning.caladium_api(f"/api/tasks/kill/{self.task_id}", method="DELETE", timeout=1)
-            except: ... # Ignore exceptions when deleting a task
-            finally: self.window_handle.destroy()
+            #try: provisioning.caladium_api(f"/api/tasks/kill/{self.task_id}", method="DELETE", timeout=1)
+            #except: ... # Ignore exceptions when deleting a task
+            #finally: 
+            self.window_handle.destroy()
 
     def start(self, file_path, file_data):
         self.file_path = file_path

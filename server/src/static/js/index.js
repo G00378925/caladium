@@ -9,6 +9,7 @@
 // All other pages inherit from this class
 class Page {
     constructor() {
+        // Allow event handlers to access the current page
         globalThis.currentPage = this;
 
         // This is the navigation bar at the top of the page
@@ -33,6 +34,7 @@ class Page {
             const resp = await fetch(path, caladiumFetchParameters);
             return await resp.json();
         } catch (exception) {
+            // If the fetch fails, then log the user out
             currentPage.logout();
             return {};
         }
@@ -171,6 +173,7 @@ class PreferencesPage extends Page {
         super();
         this.endpoint = "/api/admin/preferences";
 
+        // I need a space between the two buttons, not (hr)
         // This is the DOM Lisp expression for the preferences page
         this.body = ` (div (hash "children"
                         (list
@@ -178,7 +181,9 @@ class PreferencesPage extends Page {
                           (input (hash "type" "password" "id" "newPassword" "placeholder" "New Password"))
                           (button (hash "onclick" changePasswordOnClick "innerHTML" "Update Password"))
                           (hr)
-                          (button (hash "onclick" toggleAutoProvision "innerHTML" autoProvisionButtonText)))))`;
+                          (button (hash "onclick" toggleAutoProvision "innerHTML" autoProvisionButtonText))
+                          (span (hash "innerHTML" "&nbsp;&nbsp;&nbsp;&nbsp;"))
+                          (button (hash "onclick" toggleDynamicAnalysis "innerHTML" dynamicAnalysisButtonText)))))`;
     }
 
     loadPage(updatePage=false) {
@@ -186,6 +191,7 @@ class PreferencesPage extends Page {
         .then(resp => {
             this.preferences = resp;
             this.autoProvisionButtonText = (resp["auto_provision"] ? "Disable" : "Enable") + " Auto Provision";
+            this.dynamicAnalysisButtonText = (resp["dynamic_analysis"] ? "Disable" : "Enable") + " Dynamic Analysis";
             super.loadPage();
         });
     }
@@ -202,6 +208,12 @@ class PreferencesPage extends Page {
     toggleAutoProvision() {
         // Toggle the auto provision preference
         currentPage.caladiumFetch("PUT", currentPage.endpoint, {"auto_provision": !currentPage.preferences["auto_provision"]})
+        .then(resp => {currentPage.loadPage(true);});
+    }
+
+    toggleDynamicAnalysis() {
+        // Toggle the dynamic analysis preference
+        currentPage.caladiumFetch("PUT", currentPage.endpoint, {"dynamic_analysis": !currentPage.preferences["dynamic_analysis"]})
         .then(resp => {currentPage.loadPage(true);});
     }
 }
