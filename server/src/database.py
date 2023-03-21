@@ -17,8 +17,11 @@ if not os.environ.get("COUCHDB_CONNECTION_STR", None):
 couchdb_server = pycouchdb.Server(os.environ["COUCHDB_CONNECTION_STR"])
 
 def get_database(database_name):
-    try: return couchdb_server.database(database_name)
-    except: return couchdb_server.create(database_name)
+    while True:
+        try: return couchdb_server.database(database_name)
+        except:
+            try: return couchdb_server.create(database_name)
+            except: continue
 
 def get_caladium_collection(database_name):
     all_elements = get_database(database_name).all(as_list=True)

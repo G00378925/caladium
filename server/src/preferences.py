@@ -12,7 +12,7 @@ preferences = flask.Blueprint("preferences", __name__)
 preferences_dict = {
     "administrator_password": None, # Hash of the administrator password
     "authorisation_tokens": [], # List of tokens that can be used to access the dashboard
-    "auto_provision": False, # If true, the server will automatically provision new clients
+    "auto_provision": True, # If true, the server will automatically provision new clients
     "dynamic_analysis": True # If true, uploaded files will be analysed dynamically
 }
 

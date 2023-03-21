@@ -51,7 +51,7 @@ def serve_js_file(js_file_path):
 
 @app.post("/api/auto_provision")
 def auto_provision_route():
-    if globals()["preferences"]["auto_provision"]:
+    if preferences.preferences_dict["auto_provision"]:
         return clients.create_clients_route()
     else:
         resp_obj = flask.Response()
@@ -105,7 +105,7 @@ def main(argv):
     # Add request/response handlers
     app.before_request(before_request)
     app.after_request(after_request)
-    app.run(host="0.0.0.0", port=port_number, threaded=False, processes=1)
+    app.run(host="0.0.0.0", port=port_number)
 
 if __name__ == "__main__":
     main(sys.argv)

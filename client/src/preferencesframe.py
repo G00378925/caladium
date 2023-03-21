@@ -12,8 +12,8 @@ def __uninstall_caladium():
 
     rd /S /Q "{0}"
 
-    rem Delete the Caladium shortcut from the users desktop
-    del "%USERPROFILE%\\Desktop\\Caladium.lnk"
+    rem Delete the Caladium shortcut from the public desktop
+    del "%PUBLIC%\\Desktop\\Caladium.lnk"
 
     rem Deleting start up folder entry
     del "%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Caladium.lnk"
@@ -74,9 +74,7 @@ class PreferencesFrame(tkinter.ttk.Frame):
     # Called upon the change scanning directory button being pressed
     def _change_scanning_directory(self):
         if new_directory := tkinter.filedialog.askdirectory():
-            globals()["config"] = provisioning.get_config()
-            globals()["config"]["scanning_directory"] = new_directory
-            provisioning.save_config(provisioning.get_caladium_appdata_dir(), globals()["config"])
+            provisioning.set_preference("scanning_directory", new_directory)
 
     # Called upon the unprovision button being pressed
     def _unprovision_caladium(self):

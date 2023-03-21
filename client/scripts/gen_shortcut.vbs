@@ -8,7 +8,7 @@ Function CreateCaladiumShortcut(lnkLocation)
     shortcut.Save()
 End Function
 
-' Create shortcut on the users desktop
-CreateCaladiumShortcut(WShell.SpecialFolders("Desktop") & "\Caladium.lnk")
+' Create shortcut on the public desktop
+CreateCaladiumShortcut(WShell.ExpandEnvironmentStrings("%Public%") & "\Desktop\Caladium.lnk")
 ' Create shortcut in the startup folder, so it starts on boot
 CreateCaladiumShortcut(WShell.ExpandEnvironmentStrings("%ProgramData%") & "\Microsoft\Windows\Start Menu\Programs\Startup\Caladium.lnk")

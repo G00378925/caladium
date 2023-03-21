@@ -15,31 +15,44 @@ def get_caladium_appdata_dir():
     elif sys.platform == "darwin": return "/tmp"
     else: return None
 
-def unprovision_caladium(caladium_appdata_dir):
+def unprovision_caladium(caladium_appdata_dir=get_caladium_appdata_dir()):
     if os.path.exists(caladium_appdata_dir + os.path.sep + "config.json"):
         os.remove(caladium_appdata_dir + os.path.sep + "config.json")
 
 def get_config():
+    global config # Cache the config, to avoid needless file reads
+    if "config" in globals(): return config
+
     return load_config(get_caladium_appdata_dir())
 
 def load_config(caladium_appdata_dir):
     config_json_location = caladium_appdata_dir + os.path.sep + "config.json"
 
-    # If the config file doesn't exist, return None
-    if not os.path.exists(config_json_location): return None
+    # If the config file doesn't exist, return empty dict
+    if not os.path.exists(config_json_location): return {}
 
     with open(config_json_location) as config_json_handle:
-        globals()["config"] = json.load(config_json_handle)
-        return globals()["config"]
+        global config # Persist and cache the config
+        return (config := json.load(config_json_handle))
 
 def save_config(caladium_appdata_dir, config):
+    if not os.path.exists(caladium_appdata_dir):
+        os.mkdir(caladium_appdata_dir)
+
     # Encode the config as JSON and save it to the config file
     with open(caladium_appdata_dir + os.path.sep + "config.json", "w") as f:
         f.write(json.dumps(config))
 
+def get_preference(pref_key):
+    return get_config().get(pref_key, "")
+
+def set_preference(pref_key, pref_value):
+    config = get_config() # Fetch current config
+    config[pref_key] = pref_value # Update the value
+    save_config(get_caladium_appdata_dir(), config)
+
 def caladium_api(resource_path, method="GET", data=None, timeout=None):
-    config = get_config()
-    req_headers = {"Authorisation": config.get("authorisation_token", "")}
+    req_headers = {"Authorisation": get_preference("authorisation_token")}
     req_obj = urllib.request.Request(f"http://{config['server_address']}{resource_path}", headers=req_headers, data=data, method=method)
     return urllib.request.urlopen(req_obj, timeout=timeout).read().decode("utf-8")
 

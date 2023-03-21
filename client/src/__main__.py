@@ -10,7 +10,7 @@
 import tkthread
 tkthread.patch() # Patch tkinter to allow async operations
 
-import base64, json, os, sys, tkinter
+import base64, json, os, re, sys, tkinter
 
 import dirchangelistener, preferencesframe, provisioning, provisioningframe
 import quarantine, quarantineframe, scanwindow
@@ -25,7 +25,7 @@ def scan_file(main_window, quarantine_obj, quarantine_frame, file_path=None):
         # Encode file data as base64 to be sent to server
         # As raw bytes cannot be stored in JSON
         file_path = file_handle.name
-        file_name = file_path.split('/')[-1]
+        file_name = re.split(r"[/\\]", file_path)[-1]
 
         file_data = base64.b64encode(file_handle.read()).decode("utf-8")
         file_data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
@@ -33,7 +33,7 @@ def scan_file(main_window, quarantine_obj, quarantine_frame, file_path=None):
 
         def malware_detected_callback(file_path):
             # Ask the user if they want to quarantine the file
-            if tkinter.messagebox.askyesno("Do you wish to quarantine?", "Malware detected in file " + file_name):
+            if tkinter.messagebox.askyesno("Do you wish to quarantine?", f"Malware detected in file {file_name}"):
                 quarantine_obj.quarantine_file(file_path)
                 quarantine_frame.update_quarantine_list()
 
@@ -43,8 +43,8 @@ def scan_file(main_window, quarantine_obj, quarantine_frame, file_path=None):
     except (FileNotFoundError):
         tkinter.messagebox.showerror("Error", "File not found")
 
-def setup_notebook(config, main_window):
-    quarantine_obj = quarantine.Quarantine(provisioning.get_caladium_appdata_dir() + os.path.sep + "Quarantine")
+def setup_notebook(main_window):
+    quarantine_obj = quarantine.Quarantine(f"{provisioning.get_caladium_appdata_dir()}{os.path.sep}Quarantine")
 
     # Each frame is stored as a tab in the main window
     main_window_notebook = tkinter.ttk.Notebook(main_window)

@@ -27,36 +27,31 @@ class ProvisioningFrame(tkinter.ttk.Frame):
 
     def provision(self, server_address):
         if server_address:
-            globals()["config"] = {"server_address": server_address}
-            provisioning.save_config(self.caladium_appdata_dir, globals()["config"])
+            provisioning.set_preference("server_address", server_address)
 
             # If auto-provisioning is enabled, request a token from the server
             try:
-                req_obj = json.loads(provisioning.caladium_api("/api/auto_provision", method="POST"))
-                globals()["config"]["authorisation_token"] = req_obj["_id"]
-
-                provisioning.save_config(self.caladium_appdata_dir, globals()["config"])
+                req_obj = json.loads(provisioning.caladium_api("/api/auto_provision", method="POST", timeout=5))
+                provisioning.set_preference("authorisation_token", req_obj["_id"])
             except:
                 tkinter.messagebox.showerror("Error", "Problem occurred during auto-provision")
-        else:
-            globals()["config"] = provisioning.load_config(self.caladium_appdata_dir)
 
-        # If the config file exists, test the connection to the server
-        if globals()["config"]:
+        # If the authorisation token is in the config, test the connection
+        config = provisioning.load_config(self.caladium_appdata_dir)
+        if "authorisation_token" in config:
             # If it doesn't work, delete it and ask the user to provision again
-            if provisioning.test_server_connection(globals()["config"]):
+            if provisioning.test_server_connection(provisioning.get_config()):
                 self.pack_forget()
-                self.provisioning_complete(globals()["config"], self.main_window)
+                self.provisioning_complete(self.main_window)
 
     def _provision_token(self):
         try:
             token_obj = json.loads(base64.b64decode(self.token_entry_box.get()).decode("utf-8"))
             provisioning.save_config(self.caladium_appdata_dir, token_obj)
 
-            globals()["config"] = provisioning.load_config(self.caladium_appdata_dir)
-            if provisioning.test_server_connection(globals()["config"]):
+            if provisioning.test_server_connection(provisioning.get_config()):
                 self.pack_forget()
-                self.provisioning_complete(globals()["config"], self.main_window)
+                self.provisioning_complete(self.main_window)
         except:
             tkinter.messagebox.showerror("Error", "Provision token is malformed.")
 
