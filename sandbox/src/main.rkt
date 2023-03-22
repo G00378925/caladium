@@ -67,6 +67,11 @@
 (define (send-update text value out)
     (begin (send-message text out) (send-progress value out)))
 
+(define (terminate-sandboxie)
+    (subprocess-and-close-ports sandboxie-start-location (list "/terminate_all")))
+(define (terminate-procmon)
+    (system (string-join (list procmon-location "/Terminate") " ")))
+
 (define (run-in-sandbox executable-location out)
     (begin
         (define procmon-pml-file-location
@@ -84,9 +89,17 @@
 
         (sleep 10) ; Pause for a bit, to avoid racing
         (define listpids-list (listpids-in-sandbox))
+
+        ; Terminate process if it runs for too long
+        (define (sandbox-timeout)
+            (begin
+                (sleep 20) (terminate-sandboxie)))
+        (thread sandbox-timeout)
+
         (subprocess-wait sandboxed-subprocess)
 
-        (system (string-join (list procmon-location "/Terminate") " "))
+        ; Terminate procmon and wait for it to close
+        (terminate-procmon)
         (subprocess-wait procmon-subprocess)
 
         (system (string-join (list procmon-location "/OpenLog" procmon-pml-file-location
@@ -125,6 +138,16 @@
 ; Execute a file in a sandbox
 (define (analyse-file json-obj out)
     (begin
+        ; Timeout if a scan is taking too long
+        (define (analysis-timeout-kill)
+            (begin
+                (sleep 60) ; Wait for 60 seconds
+                (if scan-in-progress
+                    (begin
+                        (terminate-sandboxie) (terminate-procmon)
+                        (set! scan-in-progress #f)) (void))))
+        (thread analysis-timeout-kill) ; Start timeout thread
+
         (define dynamic-analysis-enabled (hash-ref json-obj 'dynamic-analysis))
 
         (send-update (string-append "[*] Beginning analysis of \""
@@ -159,7 +182,7 @@
         (subprocess-wait static-analysis-subprocess) ; Wait for the analysis to complete
         
         (send-update "[+] Static analysis complete" 100 out)
-        (send-state "complete" out)
+        (send-state "clean" out)
         
         ; Set scan-in-progress to false
         (set! scan-in-progress #f)))
@@ -199,4 +222,3 @@
 (define (wait-for-threads)
     (begin (sleep) (wait-for-threads)))
 (wait-for-threads)
-

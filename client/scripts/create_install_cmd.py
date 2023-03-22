@@ -4,7 +4,8 @@
 def main():
     caladium_server_address = "20.166.76.162" # This is the default IP for the caladium instance
 
-    # Read in a custom IP or press enter to use default
+    # Read in a custom IP or press enter to use the default
+    print("Press enter to use the default IP")
     if len(input_address := input(caladium_server_address + "> ")) != 0:
         caladium_server_address = input_address
 

@@ -19,7 +19,7 @@ rd /s /q "%ProgramFiles%\Caladium" 2>nul
 rem Create the directory if it doesn't exist
 mkdir "%ProgramFiles%\Caladium" 2>nul
 
-rem Copy all in the current directory to the installation directory
+rem Copy all the files in current directory to the installation directory
 tar -xzvf caladium.tar.gz -C "%ProgramFiles%\Caladium"
 
 rem Create a shortcut on the desktop

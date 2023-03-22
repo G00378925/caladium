@@ -29,6 +29,8 @@ def scan_file(scan_file_obj):
         updates_list += [update_obj]
         task.set("updates", updates_list)
 
+        task.set("state", "executing")
+
     # Check if there is any available workers
     if len(list_of_workers := workers.get_records_route()) > 0:
         try:
@@ -41,7 +43,6 @@ def scan_file(scan_file_obj):
             sandbox_socket.send(json.dumps(scan_file_obj).encode())
 
             append_update(workers.read_json_from_socket(sandbox_socket))
-            task.set("state", "executing")
         except:
             append_update("[-] Failed to connect to worker")
             task.set("state", "failed")
@@ -56,7 +57,7 @@ def scan_file(scan_file_obj):
 
                 if (updates_list := task.get("updates").copy())[-1]["type"] == "state":
                     task.set("state", updates_list[-1]["state"])
-                    if updates_list[-1]["state"] == "complete": break
+                    if updates_list[-1]["state"] == "clean": break
         except: ...
         finally:
             sandbox_socket.close()

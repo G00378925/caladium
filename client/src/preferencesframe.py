@@ -5,6 +5,7 @@ import ctypes, os, tkinter.ttk, tkinter.filedialog
 import provisioning
 
 def __uninstall_caladium():
+    # This is the batch code to uninstall caladium
     uninstallation_code = """
     @echo off
     rem Waiting 3 seconds until Caladium is closed
@@ -81,4 +82,3 @@ class PreferencesFrame(tkinter.ttk.Frame):
         provisioning.unprovision_caladium(provisioning.get_caladium_appdata_dir())
         self.main_window.destroy()
         os.kill(os.getpid(), 3)
-

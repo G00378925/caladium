@@ -25,13 +25,16 @@ class DirChangeListener:
 
         self.update_scan_dir_label_func(self._get_scanning_dir())
 
+    # Fetch the scanning directory from the config
     def _get_scanning_dir(self):
         return provisioning.get_config().get("scanning_directory", get_downloads_dir())
     
+    # Fetch the files in the directory being scanned
     def _get_dir_state(self, dir_path):
         try:
             return os.listdir(dir_path)
         except:
+            # If there is a problem reading the directory, unprovision Caladium
             provisioning.unprovision_caladium()
             sys.exit(0)
 
@@ -57,9 +60,12 @@ class DirChangeListener:
             # Check for new files
             for file_item in latest_dir_state:
                 if file_item not in current_dir_state:
+                    # Prompt user the scan new file
                     self.callback_func(scan_directory + os.path.sep + file_item)
 
+            # Set the new state of the directory
             current_dir_state = latest_dir_state
 
+            # Give tkinter some time to update the UI
             self.main_window.update()
             self.main_window.after(100)

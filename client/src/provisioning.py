@@ -51,6 +51,7 @@ def set_preference(pref_key, pref_value):
     config[pref_key] = pref_value # Update the value
     save_config(get_caladium_appdata_dir(), config)
 
+# Used to make API requests, all requests contain an authorisation token
 def caladium_api(resource_path, method="GET", data=None, timeout=None):
     req_headers = {"Authorisation": get_preference("authorisation_token")}
     req_obj = urllib.request.Request(f"http://{config['server_address']}{resource_path}", headers=req_headers, data=data, method=method)

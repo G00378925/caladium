@@ -16,6 +16,8 @@ class Quarantine:
 
         for i in range(1, len(self.index_json_location.split(os.path.sep))):
             dir_path = os.path.sep.join(self.index_json_location.split(os.path.sep)[:i])
+
+            # If the dir, doesn't exist, better make it
             if len(dir_path) != 0 and not os.path.isdir(dir_path): os.mkdir(dir_path)
 
         # Load the index from disk
@@ -25,6 +27,7 @@ class Quarantine:
         else:
             self.index = []
 
+    # Persists the index to disk
     def _save_index_to_disk(self):
         with open(self.index_json_location, "w") as index_json_handle:
             json.dump(self.index, index_json_handle)

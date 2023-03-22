@@ -31,11 +31,12 @@ class ScanWindow:
         self.progress_bar = tkinter.ttk.Progressbar(self.window_handle)
         self.progress_bar.pack()
 
-        self.current_log_text = str()
+        self.current_log_text = str() # Logbox is empty at start
         self.stop_scan = False # Used to stop the scan thread
         self.scan_in_progress = False
 
     def _display_update(self, update_obj):
+        # Handles messages from analysis worker
         match (update_obj["state"] if update_obj["type"] == "state" else update_obj["type"]):
             case "message":
                 self.scrolled_text["state"] = "normal" # Allow text to be edited
@@ -47,6 +48,7 @@ class ScanWindow:
 
                 self.scrolled_text["state"] = "disabled" # Disable editing
             case "progress":
+                # Update the progress bar
                 self.progress_bar["value"] = update_obj["value"]
             case "complete":
                 tkinter.messagebox.showinfo("Scan complete", "The scan has completed.")
@@ -57,6 +59,7 @@ class ScanWindow:
                 malware_callback(self.file_path)
                 self._stop_scan() # No need to continue scanning
 
+    # Small abstraction over tkinter's messagebox
     def _show_error(self, error_message):
         tkinter.messagebox.showerror("Error", error_message, parent=self.window_handle)
 
@@ -73,6 +76,7 @@ class ScanWindow:
 
         message_count = 0 # Amount of messages received
 
+        # Loop, until its no longer scanning
         while not self.stop_scan:
             try:
                 resp_obj = json.loads(provisioning.caladium_api(f"/api/tasks/{self.task_id}"))
@@ -98,5 +102,6 @@ class ScanWindow:
     def start(self, file_path, file_data):
         self.file_path = file_path
 
+        # tkthread, to allow the UI to not lock up
         @tkthread.main(self.main_window)
         def start_thread(): self._scan_file(file_data)

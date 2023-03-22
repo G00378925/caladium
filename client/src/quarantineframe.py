@@ -35,10 +35,11 @@ class QuarantineFrame(tkinter.ttk.Frame):
 
     # Executed upon the quarantine button being pressed
     def _quarantine_file(self):
+        # Prompt the user to select a file
         file_handle = tkinter.filedialog.askopenfile("rb")
         if not file_handle: return
         file_location = file_handle.name
-        file_handle.close()
+        file_handle.close() # A file handle wasn't needed
 
         self.quarantine_obj.quarantine_file(file_location)
         self.update_quarantine_list()
@@ -61,6 +62,8 @@ class QuarantineFrame(tkinter.ttk.Frame):
         index = 0
         for file_record in self.quarantine_obj.get_file_list():
             self.quarantine_index_dict[index] = file_record
+
+            # Add each to the listbox
             self.quarantine_list.insert(index, file_record["file_location"])
             index += 1
 

@@ -44,8 +44,10 @@ class ProvisioningFrame(tkinter.ttk.Frame):
                 self.pack_forget()
                 self.provisioning_complete(self.main_window)
 
+    # Provision token in the entry box
     def _provision_token(self):
         try:
+            # Decode the token and persist it
             token_obj = json.loads(base64.b64decode(self.token_entry_box.get()).decode("utf-8"))
             provisioning.save_config(self.caladium_appdata_dir, token_obj)
 

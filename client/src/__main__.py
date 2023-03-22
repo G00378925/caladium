@@ -22,18 +22,20 @@ def scan_file(main_window, quarantine_obj, quarantine_frame, file_path=None):
         file_handle = open(file_path, "rb") if file_path else tkinter.filedialog.askopenfile("rb")
         if not hasattr(file_handle, "name"): return
 
-        # Encode file data as base64 to be sent to server
-        # As raw bytes cannot be stored in JSON
+        # Extract the file name from the file path
         file_path = file_handle.name
         file_name = re.split(r"[/\\]", file_path)[-1]
 
+        # Encode file data as base64 to be sent to server
+        # As raw bytes cannot be stored in JSON
         file_data = base64.b64encode(file_handle.read()).decode("utf-8")
         file_data = json.dumps({"command": "run", "file-name": file_name, "file-data": file_data}).encode()
         file_handle.close()
 
         def malware_detected_callback(file_path):
             # Ask the user if they want to quarantine the file
-            if tkinter.messagebox.askyesno("Do you wish to quarantine?", f"Malware detected in file {file_name}"):
+            if tkinter.messagebox.askyesno(f"Malware detected in file {file_name}",
+                                           "Do you wish to quarantine?"):
                 quarantine_obj.quarantine_file(file_path)
                 quarantine_frame.update_quarantine_list()
 
@@ -44,6 +46,7 @@ def scan_file(main_window, quarantine_obj, quarantine_frame, file_path=None):
         tkinter.messagebox.showerror("Error", "File not found")
 
 def setup_notebook(main_window):
+    # Setup the quarantine obj
     quarantine_obj = quarantine.Quarantine(f"{provisioning.get_caladium_appdata_dir()}{os.path.sep}Quarantine")
 
     # Each frame is stored as a tab in the main window
@@ -95,13 +98,14 @@ def main(argv):
             main_window.destroy()
             os.kill(os.getpid(), 3) # Kill the process
 
+    main_window.protocol("WM_DELETE_WINDOW", kill_client) # Add handler above
+
     # If the computer isn't already provisioned, show the provisioning frame
     provisioning_frame = provisioningframe.ProvisioningFrame(main_window, setup_notebook, provisioning.get_caladium_appdata_dir())
     provisioning_frame.pack(fill=tkinter.BOTH)
     # Optionally pass a IP address for automatic provisioning
     provisioning_frame.provision(argv[0] if len(argv) > 0 else None)
 
-    main_window.protocol("WM_DELETE_WINDOW", kill_client)
     main_window.mainloop() # Main loop of execution
 
 if __name__ == "__main__":

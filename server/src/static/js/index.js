@@ -384,6 +384,7 @@ class TasksPage extends ListPage {
                                   "onclick" taskDeleteFunc "innerHTML" "Delete"))))))))`;
 
         this.scanStateLabels = {
+            "clean": "Clean",
             "completed": "Completed",
             "executing": "Executing",
             "failed": "Failed",

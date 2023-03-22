@@ -12,6 +12,7 @@ import flask
 
 import database
 
+# List of client authorisation tokens
 authorisation_tokens = []
 
 class ClientRecord(database.DatabaseRecord):
@@ -37,6 +38,7 @@ def get_records_route():
             "authorisation_token": client_id,
             "server_address": flask.request.headers["Host"]
         }
+        # Generate JSON provisioning profile
         clients[client_id]["token"] = base64.b64encode(json.dumps(token_obj).encode()).decode("utf-8")
     return clients
 
@@ -55,6 +57,7 @@ def delete_all_clients_route():
 @clients.delete("/api/clients/<client_id>")
 def delete_client_route(client_id):
     if client := database.get(ClientRecord, client_id):
+        authorisation_tokens.remove(client_id) # Remove the client's auth token
         client.delete()
     return {}
 

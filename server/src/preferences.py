@@ -4,7 +4,7 @@ import json, hashlib, time
 
 import flask
 
-import clients, patterns, workers
+import clients, patterns, tasks, workers
 
 preferences = flask.Blueprint("preferences", __name__)
 
@@ -55,5 +55,19 @@ def statistics_route():
                 [*filter(lambda subdata: subdata["title"] == month, data)][0]["value"] += 1
 
         statistics += [endpoint_statistics]
+
+    all_tasks = tasks.get_records_route()
+
+    # Calculate the values for the pie chart
+    clean_count = len([*filter(lambda task: task["state"] == "clean", all_tasks.values())])
+    malicious_count = len([*filter(lambda task: task["state"] == "malware_detected", all_tasks.values())])
+    indeterminate_count = len(all_tasks) - clean_count - malicious_count
+
+    # Add the statistics for the tasks
+    statistics += [{"plot_name": "tasks-canvas", "plot_type": "piechart", "data": [
+        {"colour": "green", "title": "Clean", "value": clean_count},
+        {"colour": "red", "title": "Malicious", "value": malicious_count},
+        {"colour": "blue", "title": "Indeterminate", "value": indeterminate_count}
+    ]}]
 
     return statistics
