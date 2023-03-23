@@ -6,14 +6,10 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import unittest
-
-import requests
-
 import setup
 
 class ClientsTestCase(setup.EndPointTestCase):
     def setUp(self):
-        example_record = {"token": "token"}
+        example_record = {}
         super().setUp("/api/clients", example_record)
 

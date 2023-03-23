@@ -339,7 +339,7 @@ class PatternsPage extends ListPage {
     addPatternOnClick() {
         const patternString = document.getElementById("patternString").value;
         if (patternString) {
-            currentPage.caladiumFetch("POST", currentPage.endpoint, {patternString: patternString})
+            currentPage.caladiumFetch("POST", currentPage.endpoint, {"pattern_string": patternString})
             .then(resp => {
                 currentPage.loadPage(true);
             });
@@ -348,7 +348,7 @@ class PatternsPage extends ListPage {
 
     generateRowParameters(resp, elementID) {
         const rowParameters = {
-            patternString: resp[elementID]["patternString"],
+            patternString: resp[elementID]["pattern_string"],
             patternDeleteFunc: () => currentPage.deleteElement(elementID)
         };
         return rowParameters;
@@ -442,7 +442,7 @@ class WorkersPage extends ListPage {
     addWorkerOnClick() {
         const workerAddress = document.getElementById("workerAddress").value;
         if (workerAddress) {
-            currentPage.caladiumFetch("POST", currentPage.endpoint, {workerAddress: workerAddress})
+            currentPage.caladiumFetch("POST", currentPage.endpoint, {"worker_address": workerAddress})
             .then(resp => {
                 currentPage.loadPage(true);
             });
@@ -451,7 +451,7 @@ class WorkersPage extends ListPage {
 
     generateRowParameters(resp, elementID) {
         const rowParameters = {
-            workerAddress: resp[elementID]["workerAddress"],
+            workerAddress: resp[elementID]["worker_address"],
             workerPingFunc: () => currentPage.pingWorker(elementID),
             workerKillFunc: () => currentPage.killWorker(elementID),
             workerDeleteFunc: () => currentPage.deleteElement(elementID)

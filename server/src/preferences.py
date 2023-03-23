@@ -47,7 +47,8 @@ def statistics_route():
         endpoints_records = endpoint.get_records_route()
 
         for record in endpoints_records.values():
-            data, month = endpoint_statistics["data"], time.strftime("%b", time.localtime(record["creation_time"]))
+            data = endpoint_statistics["data"]
+            month = time.strftime("%b", time.localtime(record["creation_time"]))
 
             if month not in [subdata["title"] for subdata in data]:
                 data += [{"colour": "green", "title": month, "value": 1}]

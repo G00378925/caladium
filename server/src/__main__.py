@@ -40,7 +40,8 @@ def serve_css_file(css_file_path):
     if css_file_path in css_file_dict:
         # Fetch the file from the milligram repository
         milligram_dist_resp = requests.get(milligram_dist_location + css_file_path).text
-        return flask.Response(milligram_dist_resp, headers={"Content-Type": css_file_dict[css_file_path]["content_type"]})
+        return flask.Response(milligram_dist_resp,
+                              headers={"Content-Type": css_file_dict[css_file_path]["content_type"]})
     else:
         return str()
 
@@ -64,7 +65,8 @@ def login_route():
     req_body_obj = json.loads(flask.request.get_data())
     username, password = req_body_obj["username"], req_body_obj["password"]
 
-    if username == "root" and preferences.preferences_dict["administrator_password"] == hashlib.sha256(password.encode()).hexdigest():
+    if username == "root" and preferences.preferences_dict["administrator_password"] == \
+        hashlib.sha256(password.encode()).hexdigest():
         token = str(uuid.uuid1())
         preferences.preferences_dict["authorisation_tokens"] += [token]
         return {"valid": True, "Authorisation": token}
@@ -73,14 +75,16 @@ def login_route():
 
 # Execute before every request, used to check if the user is authorised to access the requested endpoint
 def before_request():
-    path, resp_obj, token = flask.request.path, flask.Response(), flask.request.headers.get("Authorisation", None)
+    path, resp_obj = flask.request.path, flask.Response()
+    token = flask.request.headers.get("Authorisation", None)
 
     # Allows auto provisioning
     if path == "/api/auto_provision" and preferences.preferences_dict["auto_provision"]:
         ...
     # Windows clients authentication
     elif path.startswith("/api/tasks") or path.startswith("/api/workers"):
-        if token not in preferences.preferences_dict["authorisation_tokens"] and token not in clients.get_authorisation_tokens():
+        if token not in preferences.preferences_dict["authorisation_tokens"] and token \
+            not in clients.get_authorisation_tokens():
             resp_obj.status_code = 403
             resp_obj.set_data("Invalid authorisation token")
             return resp_obj

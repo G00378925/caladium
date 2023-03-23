@@ -6,14 +6,10 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import unittest
-
-import requests
-
 import setup
 
 class PatternsTestCase(setup.EndPointTestCase):
     def setUp(self):
-        example_record = {}
+        example_record = {"pattern_string": ""}
         super().setUp("/api/patterns", example_record)
 

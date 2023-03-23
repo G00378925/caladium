@@ -6,14 +6,10 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import unittest
-
-import requests
-
 import setup
 
 class WorkersTestCase(setup.EndPointTestCase):
     def setUp(self):
-        example_record = {}
+        example_record = {"worker_address": "127.0.0.1"}
         super().setUp("/api/workers", example_record)
 

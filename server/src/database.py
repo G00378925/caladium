@@ -55,7 +55,8 @@ class DatabaseRecord:
         return json.dumps(self.fields)
 
 def get(record_class, record_id):
-    if items := get_database(record_class.database_name).get(record_id).items(): return record_class(items)
+    if items := get_database(record_class.database_name).get(record_id).items():
+        return record_class(items)
     else: return None
 
 def create(record_class, record_dict):

@@ -35,7 +35,7 @@ def scan_file(scan_file_obj):
     if len(list_of_workers := workers.get_records_route()) > 0:
         try:
             random_worker = random.choice([*list_of_workers.values()])
-            sandbox_socket = workers.establish_connection(random_worker["workerAddress"])
+            sandbox_socket = workers.establish_connection(random_worker["worker_address"])
 
             scan_file_obj = json.loads(scan_file_obj)
             scan_file_obj["patterns"] = patterns.get_patterns()

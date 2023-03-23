@@ -9,14 +9,17 @@
 // Generate DOM from Lisp expression
 function generateDOM(expressionStr, parameters) {
     // Helper functions
-    const isNumber = (ch) => (ch.charCodeAt(0) >= '0'.charCodeAt(0) && ch.charCodeAt(0) <= '9'.charCodeAt(0)) || ch == '.';
+    const isNumber = (ch) => (ch.charCodeAt(0) >= '0'.charCodeAt(0) &&
+        ch.charCodeAt(0) <= '9'.charCodeAt(0)) || ch == '.';
     const isWhitespace = (ch) => ch.trim().length == 0;
 
     let i = 0;
     while (i < expressionStr.length && isWhitespace(expressionStr[i])) i++;
     if (expressionStr[i++] != '(') return null;
 
+    // Lexed expression
     let expressionList = [];
+
     // Parse expression
     while (i < expressionStr.length) {
         // Skip whitespace
@@ -25,7 +28,7 @@ function generateDOM(expressionStr, parameters) {
         // Parse expression
         if (expressionStr[i] == ')') {
             break;
-        } else if (expressionStr[i] == '(') {
+        } else if (expressionStr[i] == '(') { // Parse sub-expression
             expressionList.push(generateDOM(expressionStr.substring(i++), parameters));
             let nestingDepth = 1;
 
@@ -34,6 +37,7 @@ function generateDOM(expressionStr, parameters) {
                 else if (expressionStr[i] == ')') nestingDepth--;
             }
             i++;
+        // Check if next character is a number
         } else if (isNumber(expressionStr[i])) {
             let newNumber = expressionStr[i++];
 
@@ -42,6 +46,7 @@ function generateDOM(expressionStr, parameters) {
 
             if (newNumber.includes('.')) expressionList.push(parseFloat(newNumber));
             else expressionList.push(parseInt(newNumber));
+        // Check if next char is beginning of string
         } else if (expressionStr[i] == '"') {
             let newString = expressionStr[++i];
             i++;

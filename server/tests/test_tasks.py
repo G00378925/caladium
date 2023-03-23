@@ -6,14 +6,10 @@
 #  Copyright © 2023 Declan Kelly. All rights reserved.
 #
 
-import unittest
-
-import requests
-
 import setup
 
 class TasksTestCase(setup.EndPointTestCase):
     def setUp(self):
-        example_record = {}
+        example_record = {"state": "complete"}
         super().setUp("/api/tasks", example_record)
 

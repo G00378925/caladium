@@ -23,6 +23,7 @@ function _getChartAttributes(canvasID, data) {
         return maxValue;
     }
 
+    // Return chart attributes
     return {
         "context": context,
         "elementCount": data.length,
@@ -35,12 +36,12 @@ function _getChartAttributes(canvasID, data) {
 
 // Render text
 function _renderText(context, text, x, y, font) {
-        context.beginPath();
-        context.font = `20px ${font}`;
-        context.fillStyle = "black";
-        context.fillText(text, x, y);
-        context.fill();
-        context.closePath();
+    context.beginPath();
+    context.font = `20px ${font}`;
+    context.fillStyle = "black";
+    context.fillText(text, x, y);
+    context.fill();
+    context.closePath();
 }
 
 // Draw bar chart
@@ -56,6 +57,7 @@ function acesulfameBarchart(canvasID, data, font="Arial") {
         const barX = (barWidth / 2) + (barWidth * (i * 2));
         const barY = barHeight - (barHeight * (data[i].value / attributes.maxValue));
 
+        // Draw the bar
         context.beginPath();
         context.fillStyle = data[i].colour;
         context.rect(barX, barY, barWidth, barHeight - barY);
@@ -66,6 +68,8 @@ function acesulfameBarchart(canvasID, data, font="Arial") {
         context.closePath();
 
         const textXDelta = (barWidth / 2) - (data[i].title.length * 5);
+
+        // Render text legend
         _renderText(context, data[i].title, barX + textXDelta, (attributes.height * 0.95), font);
     }
 }
@@ -87,6 +91,7 @@ function acesulfamePiechart(canvasID, data, font="Arial") {
         context.moveTo(piePositionX, piePositionY);
 
         context.fillStyle = slice.colour;
+        // Render each slice of the pie
         context.arc(piePositionX, piePositionY, pieRadius, currentRadians, currentRadians + sliceRadians);
         context.fill();
 
@@ -108,7 +113,9 @@ function acesulfamePiechart(canvasID, data, font="Arial") {
         context.stroke();
         context.closePath();
 
-        _renderText(context, data[i].title, textBeginX + (squareSize * 1.5), (squareSize * i) + squareSize, font);
+        // Render text legend
+        _renderText(context, data[i].title, textBeginX + (squareSize * 1.5),
+          (squareSize * i) + squareSize, font);
     }
 }
 

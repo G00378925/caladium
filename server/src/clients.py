@@ -26,7 +26,8 @@ def get_authorisation_tokens():
 
 def update_authorisation_tokens():
     global authorisation_tokens
-    authorisation_tokens = [database.get(ClientRecord, client_id).get("_id") for client_id in database.get_caladium_collection("clients")]
+    authorisation_tokens = [database.get(ClientRecord, client_id).get("_id")
+                            for client_id in database.get_caladium_collection("clients")]
 
 update_authorisation_tokens()
 

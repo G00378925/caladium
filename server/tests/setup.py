@@ -49,4 +49,3 @@ class EndPointTestCase(unittest.TestCase):
             self.create_new_record(self.example_record)
 
         self.assertEqual(len(self.get_all_records()), record_count + 5)
-
