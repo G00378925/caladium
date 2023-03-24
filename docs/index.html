@@ -99,7 +99,7 @@
 
         const formParameters = JSON.stringify({"question": question, "conversation_id": conversationID});
         const httpParameters = {"method": "POST", "body": formParameters, "headers": {"Content-Type": "application/json"}};
-        fetch("http://20.166.76.162:3389/api/ask_question", httpParameters)
+        fetch("https://declankelly.xyz:3389/api/ask_question", httpParameters)
         .then(resp => resp.json())
         .then(resp => {
             addCaladiumBotMessage(resp.answer);

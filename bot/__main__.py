@@ -60,7 +60,7 @@ def after_request(response_obj):
 
 def main(argv):
     app.after_request(after_request) # Add response handlers
-    app.run(host="0.0.0.0", port=3389)
+    app.run(host="0.0.0.0", port=3389, ssl_context=("crt.pem", "key.pem"))
 
 if __name__ == "__main__":
     main(sys.argv)
