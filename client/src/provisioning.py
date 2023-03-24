@@ -35,13 +35,14 @@ def load_config(caladium_appdata_dir):
         global config # Persist and cache the config
         return (config := json.load(config_json_handle))
 
-def save_config(caladium_appdata_dir, config):
+def save_config(caladium_appdata_dir, _config):
     if not os.path.exists(caladium_appdata_dir):
         os.mkdir(caladium_appdata_dir)
 
     # Encode the config as JSON and save it to the config file
     with open(caladium_appdata_dir + os.path.sep + "config.json", "w") as f:
-        f.write(json.dumps(config))
+        global config # Add it to the global config
+        f.write(json.dumps(config := _config))
 
 def get_preference(pref_key):
     return get_config().get(pref_key, "")

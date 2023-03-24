@@ -4,7 +4,7 @@ import ctypes, os, tkinter.ttk, tkinter.filedialog
 
 import provisioning
 
-def __uninstall_caladium():
+def uninstall_caladium__():
     # This is the batch code to uninstall caladium
     uninstallation_code = """
     @echo off
@@ -44,13 +44,13 @@ class PreferencesFrame(tkinter.ttk.Frame):
 
         # Add the widgets to the list above
         self.preference_items[0][1] = tkinter.ttk.Button(self, command=lambda: self._uninstall_caladium())
-        self.preference_items[0][1]["text"] = "Uninstall Caladium"
+        self.preference_items[0][1]["text"] = self.preference_items[0][0]
 
         self.preference_items[1][1] = tkinter.ttk.Button(self, command=lambda: self._change_scanning_directory())
-        self.preference_items[1][1]["text"] = "Change Scanning Directory"
+        self.preference_items[1][1]["text"] = self.preference_items[1][0]
 
         self.preference_items[2][1] = tkinter.ttk.Button(self, command=lambda: self._unprovision_caladium())
-        self.preference_items[2][1]["text"] = "Unprovision Caladium"
+        self.preference_items[2][1]["text"] = self.preference_items[2][0]
 
         # Add the widgets and their label descriptions to the frame
         for i, item in enumerate(self.preference_items):
@@ -69,8 +69,8 @@ class PreferencesFrame(tkinter.ttk.Frame):
             return
 
         if tkinter.messagebox.askyesno("Uninstall Caladium", "Are you sure you want to uninstall?"):
-            __uninstall_caladium() # Uninstall Caladium
-            os.kill(os.getpid(), 3) # Kill the process
+            uninstall_caladium__() # Uninstall Caladium
+            self._unprovision_caladium()
 
     # Called upon the change scanning directory button being pressed
     def _change_scanning_directory(self):
