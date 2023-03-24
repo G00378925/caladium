@@ -39,10 +39,12 @@ Don't forget to check my [promotional page which can be found here](https://g003
 ## Screencast Demonstration
 
 <div align="center">
-    <a href="https://www.youtube.com/watch?v=l4bDVq-nP-0">
-        <img src="https://img.youtube.com/vi/l4bDVq-nP-0/0.jpg" alt="Screencast">
+    <a href="https://www.youtube.com/watch?v=aYbQChGvz88">
+        <img src="https://img.youtube.com/vi/aYbQChGvz88/0.jpg" alt="Screencast">
     </a>
 </div>
+
+**_Click on the video to open it in YouTube._**
 
 ## Features of the Platform
 - Client
