@@ -10,6 +10,5 @@ import setup
 
 class TasksTestCase(setup.EndPointTestCase):
     def setUp(self):
-        example_record = {"state": "complete"}
+        example_record = {"state": "testing"}
         super().setUp("/api/tasks", example_record)
-

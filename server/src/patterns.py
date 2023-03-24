@@ -21,21 +21,25 @@ def get_patterns():
     return [database.get(PatternRecord, pattern_id).get("pattern_string")
             for pattern_id in database.get_caladium_collection("patterns")]
 
+# Get all patterns
 @patterns.get("/api/patterns")
 def get_records_route():
     return database.get_caladium_collection("patterns")
 
+# Create a new pattern
 @patterns.post("/api/patterns")
 def create_patterns_route():
     new_document = json.loads(flask.request.data.decode("utf-8"))
     return str(database.create(PatternRecord, new_document))
 
+# Delete all patterns
 @patterns.delete("/api/patterns")
 def delete_all_patterns_route():
     for pattern_id in database.get_caladium_collection("patterns"):
         database.get(PatternRecord, pattern_id).delete()
     return {}
 
+# Delete a specific pattern
 @patterns.delete("/api/patterns/<pattern_id>")
 def delete_pattern_route(pattern_id):
     if pattern := database.get(PatternRecord, pattern_id):

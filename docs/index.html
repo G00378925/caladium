@@ -33,24 +33,103 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
+    <!-- https://blog.webnersolutions.com/add-floating-buttons-with-simple-html-and-css/ -->
+    <style>
+    #caladiumBotDiv {
+        width: 60%;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+    #caladiumBotDiv > div {
+        text-align: left;
+    }
+    </style>
+
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
     function downloadCaladium() {
         fetch("https://api.github.com/repos/g00378925/caladium/tags")
-        .then(githubResponse => {
-            return githubResponse.json();
-        })
+        .then(githubResponse => {return githubResponse.json();})
         .then(githubJSON => {
             const latestTag = githubJSON[0]["name"];
             window.location = `https://github.com/G00378925/caladium/releases/download/${latestTag}/caladium-setup.exe`;
         });
+    }
+
+    let questionBeingAsked = true, conversationID = undefined;
+
+    // Add text to the output box
+    function addTextToOutput(outputText) {
+        document.getElementById("caladiumBotOutput").innerHTML += outputText;
+    }
+    // Functions to enable/disable the send button
+    function enableSendButton() {
+        questionBeingAsked = false;
+        document.getElementById("caladiumBotSendButton").disabled = false;
+    }
+    function disableSendButton() {
+        questionBeingAsked = true;
+        document.getElementById("caladiumBotSendButton").disabled = true;
+    }
+
+    function addCaladiumBotMessageEffect(caladiumBotMsg) {
+        if (caladiumBotMsg.length == 0) {
+            enableSendButton();
+            addTextToOutput("<br>");
+            return;
+        }
+
+        addTextToOutput(caladiumBotMsg[0]);
+        setTimeout(addCaladiumBotMessageEffect, Math.random() * 100, caladiumBotMsg.substr(1));
+    }
+
+    function addCaladiumBotMessage(caladiumBotMsg) {
+        addTextToOutput("<strong>CaladiumBot</strong>: ");
+        addCaladiumBotMessageEffect(caladiumBotMsg);
+    }
+
+    function askCaladiumBot() {
+        const question = document.getElementById("caladiumBotInput").value.trim();
+        document.getElementById("caladiumBotInput").value = new String();
+        if (question.length == 0 || questionBeingAsked) return;
+
+        disableSendButton();
+        addTextToOutput(`<strong>You</strong>: ${question}<br>`);
+
+        const formParameters = JSON.stringify({"question": question, "conversation_id": conversationID});
+        const httpParameters = {"method": "POST", "body": formParameters, "headers": {"Content-Type": "application/json"}};
+        fetch("http://20.166.76.162:3389/api/ask_question", httpParameters)
+        .then(resp => resp.json())
+        .then(resp => {
+            addCaladiumBotMessage(resp.answer);
+            conversationID = resp.conversation_id;
+        })
+        .catch(err => {
+            addCaladiumBotMessage("It seems, I'm having problems contacting the server.");
+        });
+    }
+
+    function displayCaladiumBot() {
+        // Scroll to the top and make sure input box is clear
+        window.scrollTo(0, 0);
+        document.getElementById("caladiumBotInput").value = new String();
+
+        // Disable button and unhide div
+        document.getElementById("caladiumBotStartButton").disabled = true;
+        document.getElementById("caladiumBotDiv").style.display = "block";
+
+        const initialMessage = `
+        Hello, I am CaladiumBot, I am powered by GPT-3.5. I am here to answer your questions about Caladium!`.trim();
+        disableSendButton();
+        addCaladiumBotMessage(initialMessage);
     }
     </script>
 </head>
 <body>
     <script>AOS.init();</script>
     
-    <center>
+    <div style="text-align: center">
         <div data-aos="fade-up">
             <h1><a href="https://github.com/G00378925/caladium">Caladium</a></h1>
 
@@ -62,12 +141,23 @@
             <br><br>
 
             <button onclick="javascript:downloadCaladium()">Download</button>
+            <button onclick="displayCaladiumBot()" id="caladiumBotStartButton">Chat with CaladiumBot</button>
         </div>
+
+        <div style="display: none;" id="caladiumBotDiv">
+            <div style="text-align: left; width: 100%; text-indent: 0; margin: 0;">
+                <p id="caladiumBotOutput"></p>
+                <input id="caladiumBotInput" placeholder="Tell me about Caladium?"></input>
+                <button id="caladiumBotSendButton" onclick="askCaladiumBot()">Send</button>
+            </div>
+        </div>
+
+        <br>
 
         <div data-aos="flip-up" data-aos-delay="1000">
             <img src="https://www.enchanted.media/wp-content/uploads/edd/2022/04/HD-SMPTE-Color-Bars.png" width="50%">
         </div>
-    </center>
+    </div>
 
     <br><br><br><br><br><br>
 

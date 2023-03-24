@@ -24,13 +24,14 @@ def get_authorisation_tokens():
     global authorisation_tokens
     return authorisation_tokens
 
+# Generate a new list of authorisation tokens
 def update_authorisation_tokens():
     global authorisation_tokens
     authorisation_tokens = [database.get(ClientRecord, client_id).get("_id")
                             for client_id in database.get_caladium_collection("clients")]
+update_authorisation_tokens() # Generate tokens on server start
 
-update_authorisation_tokens()
-
+# Get all clients
 @clients.get("/api/clients")
 def get_records_route():
     clients = database.get_caladium_collection("clients")
@@ -43,18 +44,21 @@ def get_records_route():
         clients[client_id]["token"] = base64.b64encode(json.dumps(token_obj).encode()).decode("utf-8")
     return clients
 
+# Create a new client
 @clients.post("/api/clients")
 def create_clients_route():
     resp_str = str(database.create(ClientRecord, {}))
     update_authorisation_tokens()
     return resp_str
 
+# Delete all clients
 @clients.delete("/api/clients")
 def delete_all_clients_route():
     for client_id in database.get_caladium_collection("clients"):
         database.get(ClientRecord, client_id).delete()
     return {}
 
+# Delete a specific client
 @clients.delete("/api/clients/<client_id>")
 def delete_client_route(client_id):
     if client := database.get(ClientRecord, client_id):

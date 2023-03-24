@@ -52,32 +52,38 @@ class WorkerRecord(database.DatabaseRecord):
 
 workers = flask.Blueprint(__name__, "workers")
 
+# Get all workers
 @workers.get("/api/workers")
 def get_records_route():
     return database.get_caladium_collection("workers")
 
+# Create a new worker
 @workers.post("/api/workers")
 def create_workers_route():
     new_document = json.loads(flask.request.data.decode("utf-8"))
     return str(database.create(WorkerRecord, new_document))
 
+# Delete all workers
 @workers.delete("/api/workers")
 def delete_all_workers_route():
     for worker_id in database.get_caladium_collection("workers"):
         database.get(WorkerRecord, worker_id).delete()
     return {}
 
+# Delete a specific worker
 @workers.delete("/api/workers/<worker_id>")
 def delete_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):
         worker.delete()
     return {}
 
+# Ping a worker
 @workers.get("/api/workers/ping/<worker_id>")
 def ping_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):
         return worker.ping()
-    
+
+# Kill a worker
 @workers.post("/api/workers/kill/<worker_id>")
 def kill_workers_route(worker_id):
     if worker := database.get(WorkerRecord, worker_id):

@@ -4,10 +4,9 @@
 [![Python badge](https://img.shields.io/badge/language-python3-blue)](https://github.com/G00378925/caladium/search?l=python)
 [![JavaScript badge](https://img.shields.io/badge/language-javascript-yellow)](https://github.com/G00378925/caladium/search?l=javascript)
 [![Racket badge](https://img.shields.io/badge/language-racket-red)](https://github.com/G00378925/caladium/search?l=racket)
-<br>
 
 Caladium is my [fourth-year applied software project](https://www.gmit.ie/applied-project-and-minor-dissertation),
-the title of my dissertation is "**Malware detection using dynamic heuristic analysis**".<br>
+the title of my dissertation is "**Malware detection using dynamic heuristic analysis**".
 [It can be found here](dissertation/dissertation.pdf)
 
 The project aims to detect malicious files by identifying patterns in them.
@@ -35,6 +34,7 @@ Technicians can set up analysis computers and add them to the platform using the
 
 If you are looking to setup the platform yourself, instructions can be found under the **Building** header below.
 Don't forget to check my [promotional page which can be found here](https://g00378925.github.io/caladium/).
+**_Make sure to ask CaladiumBot some questions about the platform, it is powered by GPT 3.5!_**
 
 ## Screencast Demonstration
 
@@ -44,7 +44,6 @@ Don't forget to check my [promotional page which can be found here](https://g003
     </a>
 </div>
 
-<!-- --><!-- --><!-- --><!-- -->
 ## Features of the Platform
 - Client
     + An installer file is created as part of the client's build process,
@@ -57,7 +56,7 @@ Don't forget to check my [promotional page which can be found here](https://g003
     + The quarantine is a secure storage space for potentially malicious files,
     which can be accessed in the **Quarantine** section.
     Users can view a list of files present in the quarantine and choose to add or restore files.
-    + The files stored in the quarantine are encrypted with an XOR cipher to prevent unauthorized access.
+    + The files stored in the quarantine are encrypted with an XOR cipher to prevent accidental execution of malware.
     + Users can change the scanning directory, which defaults to the `Downloads` directory.
     Users also have the option to unprovision from the platform, which will require them to re-authenticate with the server.
 
@@ -73,44 +72,43 @@ Don't forget to check my [promotional page which can be found here](https://g003
     which automatically generates authentication tokens upon installation. This feature can be disabled for security reasons.
     + On the **Workers** page, administrators can add workers by IP address.
     The **Patterns** page is where administrators can input patterns to be identified during dynamic analysis.
-<!-- --><!-- --><!-- --><!-- -->
 
 - Server
-    + All communication through the RESTful APIs, requires authorisation,
-    an `Authorisation` token must be present in all requests.
-    + Data to be persisted is stored on CouchDB, this includes records for the
-    `clients`, `patterns`, `tasks` and `workers` tables.
-    + When the code to committed to the GitHub repository an action is executed,
-    running tests found in `server/tests`, this is useful to determine if new code introduced
-    causes problems with the API endpoints, and checks if records can be stored and retrieved.
+    + Communication through RESTful APIs requires authorisation with an `Authorisation` token in all requests.
+    + CouchDB stores persistent data, including records for the `clients`, `patterns`, `tasks` and `workers` tables.
+    + Flask is used to construct collections of RESTful APIs for the tables listed above.
+    A server thread is created to receive real-time feedback from the sandbox analysis when a new scan task is created.
+    + An action is executed when new code is committed to the GitHub repository, running tests found in `server/tests`.
+    This is useful to identify any new code that causes problems with the API endpoints, and checks if records can be saved and retrieved.
+    [Learn more here](server/README.md).
 
-<!-- --><!-- --><!-- --><!-- -->
 - Sandbox Analysis
     + The analysis service receives a file to be scanned along with its name,
     and additional parameters such as whether to skip dynamic analysis and a list of patterns to look for when scanning the syscalls.
     + An instance of Procmon is launched, and the file is executed within a Sandboxie instance.
     The analysis service waits for the file to finish executing, and if it takes too long to close, it is automatically terminated.
-    The syscalls made by the file are collected, and the analysis service checks them in parallel against the provided patterns.
+    The syscalls made by the process are collected, and the analysis service checks them in parallel against the provided patterns.
     + During the scanning process, the analysis service sends log messages back to the client,
     along with a percentage of completion and a status string that indicates the current state.
     Possible states include `executing` and `malware_detected`.
     + After the scan is completed, the analysis service automatically cleans up any files that were created
     during the analysis and prepares itself for another scan.
-<!-- --><!-- --><!-- --><!-- -->
 
 ## Architecture
 <div align="center"><img src="/dissertation/images/architecture.png" width="500px"></img></div>
 
 - On the left you can find the client side this is everything that isn't running on a server,
-the single-page application is on the left because it runs in the user's browser.
-    + Clients communicate with the server using a RESTful API.
+  the single-page application is on the left because it runs in the user's browser.
+    + Clients (GUI application and dashboard) communicate with the server using a RESTful API.
     + The browser dashboard is written in JavaScript and doesn't require any external frameworks.
+    + The Windows GUI application uses the Tkinter Python library for the GUI,
+    and the tkthread library for threads that won't block the Tkinter thread of execution.
 
 - The center is server-side, this contains the central flask server and the CouchDB database instance.
-The server will broker communication between the client and the analysis service.
+  The server will broker communication between the client and the analysis service.
 
 - On the right you will find the sandbox analysis service(s),
-these are the computers that are set up to run the sandbox analysis.
+  these are the computers that are set up to run the sandbox analysis.
     + The real-time feedback to passed back to the server using TCP.
 
 ## Building
@@ -118,7 +116,7 @@ First retrieve the latest build of Caladium, you can do that with this command:
 `git clone https://github.com/G00378925/caladium.git`.
 
 Python is a requirement for all the projects, you can
-[download and install, the latest version for you system here](https://www.python.org/downloads/)
+[download and install, the latest version for your system here](https://www.python.org/downloads/).
 
 <!-- --><!-- --><!--        --><!-- --><!-- -->
 <!-- --><!-- --><!--        --><!-- --><!-- -->
@@ -153,7 +151,6 @@ Make sure to swap out `python3` with `python` if executing on Windows.
 ```batch
 cd server/src
 
-rem This will install dependencies
 python3 -m pip install flask requests
 python3 __main__.py
 ```
@@ -161,7 +158,7 @@ The address of the instance will be printed to the terminal.
 
 #### Using Docker
 Instead of having to setup an environment manually, you can use the supplied Dockerfile
-to setup a reproductable environment, replace the `0.0.0.0:5984` in the commands below like above.
+to setup a reproducible environment, replace the `0.0.0.0:5984` in the commands below like above.
 
 Make sure you have Docker installed on your system, and type the following into your terminal.
 
@@ -180,7 +177,7 @@ To setup the analysis service on a computer, you must first [install Racket](htt
 Create a `SysinternalsSuite` directory at the root of your drive, this is usually `C:\SysinternalsSuite`.
 Place `Procmon64.exe` in there, you can [download it here](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon).
 
-ClamAV is required for the stack analysis, I am using a distribution of ClamAV called ClamWin,
+ClamAV is required for the static analysis, I am using a distribution of ClamAV called ClamWin,
 [which can downloaded here](https://clamwin.com/content/view/18/46/), ClamWin will automatically download the latest malware definitions.
 
 Run a new Command Prompt as administrator, and run `cd sandbox && start_sandbox.cmd`.
