@@ -210,7 +210,7 @@
             (begin
                 (send-message "Scan already in progress . . ." out)
                 (send-progress 100 out)
-                (send-state "complete" out)))
+                (send-state "failed" out)))
 
         (close-input-port in) (close-output-port out)))
 

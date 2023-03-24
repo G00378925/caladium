@@ -27,6 +27,11 @@ def root_page(index_path=None):
     with open("static/index.html") as index_html_handle:
         return index_html_handle.read()
 
+# Serve robots.txt
+@app.route("/robots.txt")
+def robots_txt():
+    return "User-agent: *\nDisallow: /\n"
+
 # Serve CSS files
 @app.route("/css/<path:css_file_path>")
 def serve_css_file(css_file_path):

@@ -13,6 +13,7 @@ def analysis_worker(syscall_queue, malicious_patterns):
         try: syscall = syscall_queue.get(timeout=1)
         except: break
         for pattern in malicious_patterns:
+            # Check for a pattern match
             if pattern in syscall:
                 caladium.send_message(f"[-] A malicious pattern has been detected: {pattern}")
                 caladium.send_state("malware_detected")
@@ -21,13 +22,13 @@ def main(argv):
     if len(argv) != 2: return
     syscall_file_location, malicious_pattern_file_location = argv
 
-    with open(syscall_file_location) as syscall_file:
+    with open(syscall_file_location, encoding="utf-8") as syscall_file:
         syscalls = syscall_file.readlines()
 
-    with open(malicious_pattern_file_location) as pattern_file:
+    with open(malicious_pattern_file_location, encoding="utf-8") as pattern_file:
         malicious_patterns = set(pattern_file.readlines())
 
-    worker_count = 40
+    worker_count = 40 # Number of worker threads
     syscall_queue = (multiprocessing.Manager()).Queue()
 
     # Put all syscalls into the queue

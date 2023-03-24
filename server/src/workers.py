@@ -31,7 +31,7 @@ class WorkerRecord(database.DatabaseRecord):
     database_name = "workers"
 
     def _send_command(self, command):
-        sandbox_socket = establish_connection(self.get("workerAddress"))
+        sandbox_socket = establish_connection(self.get("worker_address"))
         sandbox_socket.send(json.dumps({"command": command}).encode())
         command_resp_json = read_json_from_socket(sandbox_socket)
         sandbox_socket.close()
