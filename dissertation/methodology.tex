@@ -3,29 +3,137 @@
 % You need to discuss both your software development methodology and your research methodology.
 
 This chapter will be discussing the methodology I used whilst developing my project
+and the research I did to help me develop my project.
 
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{Research}
 When I figured out what I wanted to do my project on (that being malware detection),
-I had to research technologies that would aid with this, so I began researching tools that I would use to log the system calls on Windows,
-I initially was thinking of writing the logging software myself, but I then concluded that this would take too much time and I would end up not fulfilling my initial objectives of creating an entire platform, so then I found a piece of software called "Process Monitor" that could do this.
+I had to research technologies that would aid with this,
+so I began researching tools that I would use to log the system calls on Windows,
+I initially was thinking of writing the logging software myself,
+but I then concluded that this would take too much time and
+I would end up not fulfilling my initial objectives of creating an entire platform,
+so then I found a piece of software called "Process Monitor" that could do this.
 
-In the beginning, I decided to break the project into three parts, the client, server, and sandbox.
+In the beginning, I decided to break the project into three parts,
+the client, server, and sandbox.
 
-I used test-driven approach (TDD) to develop the server endpoints.
-I used the "unittest" python library to write unit tests for the server endpoints.
+\subsection{Malware detection}
+I researched ways of identifying malware based on its behaviour,
+I found out about a tool called Process Monitor, which allows you to log all
+the system calls on a system.
 
-I used the tests as a specification for the server endpoints.
-If the tests failed I wasn't implementing the endpoints correctly
+You can tell Process Monitor to output a log file, with all the system calls.
 
-I decided I wanted to break up all the tasks into user stories, I was initially going to use Jira but I then found out that GitHub supported the kanban board, this was
+I found out early on that it didn't allow you to filter only a
+specific process and its children, so I created a Python script, to filter processes
+containing the name of the executable file being run in the sandbox.
+
+\subsection{Client Installer}
+Users need to be able to install the client on their computers,
+so I researched tools that could generate an installer for Windows.
+
+\subsection{Database}
+I needed to be able to persist data for the server,
+I decided early on I didn't want to use SQL due to the
+difficulty having to write the queries and I had already used MongoDB in a previous project.
+I opted for CouchDB
+
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{Development}
+
+Text editors and git
+
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{Agile Methodology}
+When I began the project, I didn't fully understand everything I needed to do,
+so I opted for an agile methodology.
+
+Agile allows developers to adapt to changing requirements,
+and allows for more flexibility in the development process.
+
+Developers can then run a suite of tests on their code,
+and if it passes all the tests, it can be deployed to production.
+
+% Agile / incremental and iterative approach to development.
+Kanban Board
+I decided I wanted to break up all the tasks into user stories,
+I was initially going to use Jira but I then found out that
+GitHub supported the kanban board, this was
 Throughout the development, I identified tasks that needed to be done.
 
 I created three columns in the kanban board, they being "Todo", "In Progress" and "Done".
 
-When I identified tasks to be done I placed them in the "Todo" column, and the tasks I was currently working on I had in the "In Progress"
+When I identified tasks to be done I placed them in the "Todo" column,
+and the tasks I was currently working on I had in the "In Progress"
 
 I moved the story to the In Progress column when I started working on it.
 When I finished working on the story, I moved it to the Done column.
 
-Git was used for version control.
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{Time Management}
+Finding time to work on the project was a challenge,
+I had other modules to work on as well as my dissertation.
+
+Most of my work was done during the weekends,
+when I thought of features to add I would add them to the kanban board.
+
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{Version Control}
+Git was used for version control, I used GitHub to host the repository.
+I created a directory for each sub-project, the client, the server, and the sandbox.
+
+When writing the dissertation I used Overleaf,
+and pushed the changes to the GitHub repository into the \texttt{dissertation} directory.
 
 
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{Software Testing}
+% What about validation and testing?
+I used test-driven approach (TDD) to develop the server endpoints.
+I used the "unittest" Python library to write unit tests for the server endpoints.
+
+I used the tests as a specification for the server endpoints.
+If the tests failed I wasn't implementing the endpoints correctly.
+
+I could run the tests and it would verify if I had broken any of the endpoints.
+
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{Continuous Integration and Deployment}
+When I pushed code to the GitHub repository,
+I wanted a suite of tests to be run automatically.
+
+So I made a GitHub action that can be found at
+\texttt{.github/workflows/run\_tests.yml}.
+It then runs the tests found in the \texttt{server/tests} directory.
+
+The server was deployed to Microsoft Azure,
+the reproducible environment was created using Docker.

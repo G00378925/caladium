@@ -5,46 +5,109 @@
 
 % https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4413008
 
+This chapter will discuss my reasoning for selecting the technologies I used
+in my platform, and how they help me achieve my objectives.
 
+\section{JSON}
+In my platform, there will be multiple computers that receive and transmit data.
+There needs to be an agreed-upon format between these computers in which the data is encoded.
+The format must support dictionaries and lists to express data structures.
 
-\section{Flask}
-Flask is a micro web framework written in Python.
-It is classified as a micro-framework because it does not require particular tools or libraries.
-This allowed me to create the HTTP endpoints for the RESTful API without having to worry about the underlying HTTP server.
+I have decided to use JSON for this because the browser has
+native support for encoding and decoding JSON,
+Python supports it through the JSON module, and Racket also supports it.
 
-\section{Python}
+JSON stands for JavaScript Object Notation,
+a widely-used format for transmitting and storing data.
+
+It provides a standardized way of serializing complex data structures or collections,
+making it easy to transfer data between different systems.
+JSON can be used to represent a wide range of data types,
+including lists, dictionaries, and primitive types such as numbers and strings. \cite{ECMA-404}
+
+Below I will give an example of JSON being used in the browser to encode a dictionary:
+
+\begin{lstlisting}[language=Java]
+const myData = {"1": 2, 3: 4.0}
+console.log(JSON.stringify(myData));
+\end{lstlisting}
+
+And this is an example of it being used in Python:
+
+\begin{lstlisting}[language=Python]
+import json
+
+my_data = {"1": 2, 3: 4.0}
+print(json.dumps(my_data))
+\end{lstlisting}
+
+\subsection{Python}
 Python is an interpreted, high-level, general-purpose programming language.
 I chose to use Python because I wanted to use the same language for the client and server.
 When I serialised data in the client I could use the same deserialisation function on the server.
 
-Python is also a very simple language and is interpreted, this allowed me to quickly test code, without having to compile it everytime.
+Python is also a very simple language and is interpreted, this allowed me to quickly test code, without having to compile it every time.
+
+\section{Technology in the Client}
+As stated in the objectives, there will be a native GUI application,
+this will be a Windows application and will not run in the browser,
+the language was chosen to create the client in Python,
+so I am using Python-specific libraries to achieve this.
+
+\subsection{Pyinstaller}
+Pyinstaller is a module for python that allows you to bundle your Python code with a Python interpreter, allowing it to be run on any computer that doesn't have python installed.
+This allows your software to be self-contained and portable, users don't have to install python on their computer to install your software.
 
 \subsection{Tkinter}
 Tkinter is the standard GUI library for Python,
 It is also cross-platform, allowing the client to run on Windows, Linux and macOS.
-It is stable and mature with a plethora of documentation to be found on the internet.
+It is stable and mature, with a plethora of documentation to be found on the internet.
 
-\section{Docker}
+\subsection{tkthread}
+
+\subsection{Dashboard}
+\subsubsection{JavaScript}
+
+\section{Technology in the Server}
+\subsection{Flask}
+I needed a way for the dashboard and the client to be able to communicate with the server
+I decided to use Flask to create the HTTP endpoints.
+
+Flask is a micro web framework written in Python.
+It is classified as a micro-framework because it does not require particular tools or libraries.
+This allowed me to create the HTTP endpoints for the RESTful API without having to worry about the underlying HTTP server.
+
+\subsection{Docker}
 To create a reproducible environment I decided to use Docker.
 Docker is a containerization platform that allows you to create containers that can be run on any machine.
 Docker is a platform that allows you to create containers that can be run on any machine.
+
+All the instructions required to set up the environment are found in the Docker file, in my project this includes instructions to install libraries from pip
+
 The Dockerfile I am using in my project can be found here: \texttt{server/Dockerfile}
 
-\section{CouchDB}
+\subsection{CouchDB}
 CouchDB is a document-oriented NoSQL database.
+An important feature of any platform for many users is the ability to be able to persist data.
 
-\section{Sandboxie}
+I went with CouchDB because the simplistic nature of a document database is appealing,
+allowing me to spend more time on more complex features
+
+\section{Technology in the Analysis Side}
+\subsection{Sandboxie}
 Sandboxie is a sandboxing program that allows you to run untrusted programs in a sandboxed environment.
 
-\section{Process Monitor}
+The platform needs to be able to capture the behaviour of real malware,
+without fear of it causing damage to the system it is running on.
+
+\subsection{Process Monitor}
 Process Monitor is a system monitoring program that allows you to log system calls.
 I needed a way of finding out what the malware is doing, so I decided to use Process Monitor to log system calls.
 I originally was thinking of using a driver to log system calls, but I decided to use Process Monitor instead to avoid reinventing the wheel.
 
-\section{Racket}
-Racket is a functional programming language.
+\subsection{Racket}
+Racket is a functional programming language. I decided to program the main part of the analysis in racket because I've used a lot of Python in other components and wanted to use a different programming language.
 
-\section{Pyinstaller}
-Pyinstaller is a module for python that allows you to create a single executable file from a python script.
-This allows your software to be self-contained and portable, users don't have to install python on their computer to install your software.
+\subsection{ClamAV}
+
 

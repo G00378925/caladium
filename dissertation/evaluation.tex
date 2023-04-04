@@ -1,10 +1,18 @@
 \chapter{System Evaluation}
 % Evaluate your project against the objectives set out in the introduction.
-% This chapter should present results if applicable and discuss the strengths and weaknesses of your system.
-% This is a clear opportunity for you to demonstrate your critical thinking in relation to the project. 
+% This chapter should present results if applicable
+% and discuss the strengths and weaknesses of your system.
+% This is a clear opportunity for you to demonstrate your
+% critical thinking in relation to the project.
+
+In this chapter, I will be evaluating my project against the object I set out in the introduction.
+I will be also discussing good areas and places that don't work as well as they should.
+
+\section{Dynamic Analysis}
 
 \section{Static Analysis}
-The main goal of the project was to develop a platform capable of detecting malicious software based on its behaviour.
+The main goal of the project was to develop a platform capable
+of detecting malicious software based on its behaviour.
 This was done by executing the software in a sandboxed environment and logging the system calls.
 And then comparing the system calls to a list of malicious patterns.
 When I searched for databases on the internet of known malicious patterns,
@@ -13,6 +21,11 @@ I didn't find many results, so I opted to include static analysis as well as a f
 As static analysis is a tried and true method of detecting malware,
 there is a plethora of definitions for malicious patterns.
 
+\section{User Experience}
+
+\section{Stability}
+Weird behaviour
+
 \section{Scalling}
 The server is capable of handling multiple clients, but there is only one instance of the server running.
 This means in the event of the server crashing, clients will not be able to scan files.
@@ -20,9 +33,36 @@ This means in the event of the server crashing, clients will not be able to scan
 The platform can handle multiple scans at the same time, as multiple workers are supported.
 
 \section{Time Complexity}
-When a file was scanned 
+When a file is executed by the worker it produces a log of all the
+system calls it produces, a list of patterns is passed to the worker in order to be checked against the system calls if there is a match then the file can be deemed malicious.
+
+This is a sample of the code from \texttt{sandbox/src/syscall\_analysis.py}
+it has a O($n$ * $m$) time complexity, $n$ being the size of the syscalls
+and $m$ being the size of the patterns\_list.
+\begin{lstlisting}
+def analysis_worker(syscall_queue, malicious_patterns):
+  while True:
+    # Fetch a syscall from the queue
+    try: syscall = syscall_queue.get(timeout=1)
+    except: break
+    for pattern in malicious_patterns:
+      # Check for a pattern match
+      if pattern in syscall:
+        # Detection . . .
+\end{lstlisting}
+
+As you can see above, if the malicious\_patterns list grows significantly this would quickly become a bottleneck, so the solution I found is doing the check-ing parallel, each of the system calls would be added to a queue, and a worker would fetch a syscall and then run it against all the patterns.
+
+% % % % % % % % % % % % % % % % % % % %
+
+\section{RESTful APIs}
+
+% % % % % % % % % % % % % % % % % % % %
 
 \section{Security}
+As stated in the introductory chapter, the platform needs to be secure,
+it would be rather hypocritical to ignore security in a platform targeted at identifying malware
+
 To get into the dashboard you must log in with a username and password.
 The password is hashed using the SHA-256 algorithm.
 If the server is compromised, the admin's password won't be readable.
@@ -30,29 +70,39 @@ If the server is compromised, the admin's password won't be readable.
 When you log in you are given a session token which is stored in the browser's local storage.
 All RESTful API calls require the session token to be sent with the request.
 
-\section{Working with Tables}
-Table \ref{table:HexToBin} can be referenced with the label given to the table, i.e. \textbf{\textbackslash{}ref\{table:HexToBin\}}. Note that \LaTeX will place the table wherever it deems fit. Don't bother trying to change where a table or figure is placed until your document is ready for final layout.
+% https://owasp.org/www-community/attacks/xss/
+\subsection{Cross Site Scripting (XSS)}
+Cross-site scripting is a type of attack \cite{XSS}, where attacks can inject code into other users' browser sessions, a field may show data to the screen, and attacks input data containing HTML, which doesn't get sanitised, In my project I modified my code after finding this security bug, to convert HTML to entity tags. 
 
-\begin{table}
-    \begin{tabular}{p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}}
-        \hline
-        \multicolumn{6}{|c|}{Hexadecimal to Binary} \\
-        \hline
-        Hex & Binary 2 & Hex & Binary & Hex & Binary\\
-        \hline
-        \hline
-        1 & 00000001 & B & 00001011 & 15 & 00010101 \\
-        2 & 00000010 & C & 00001100 & 16 & 00010110 \\
-        3 & 00000011 & D & 00001101 & 17 & 00010111 \\
-        4 & 00000100 & E & 00001110 & 18 & 00011000 \\
-        5 & 00000101 & F & 00001111 & 19 & 00011001 \\
-        6 & 00000110 & 10 & 00010000 & 1A & 00011010 \\
-        7 & 00000111 & 11 & 00010001 & 1B & 00011011 \\
-        8 & 00001000 & 12 & 00010010 & 1C & 00011100 \\
-        9 & 00001001 & 13 & 00010011 & 1D & 00011101 \\
-        A & 00001010 & 14 & 00010100 & 1E & 00011110 \\
-        \hline
-    \end{tabular}
-    \caption{Conversion from Hexadecimal to Binary}
-    \label{table:HexToBin}
-\end{table}
+%
+% \section{Working with Tables}
+% Table \ref{table:HexToBin} can be referenced with the label given to the table, i.e. \textbf{\textbackslash{}ref\{table:HexToBin\}}. Note that \LaTeX will place the table wherever it deems fit. Don't bother trying to change where a table or figure is placed until your document is ready for the final layout.
+
+% % % % % % % % % % % % % % % % % % % %
+
+\section {Design Principles}
+I set out an objective to have the code in my project to adhere to good design principles
+
+%\begin{table}
+%    \begin{tabular}{p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}}
+%        \hline
+%        \multicolumn{6}{|c|}{Hexadecimal to Binary} \\
+%        \hline
+%        Hex & Binary 2 & Hex & Binary & Hex & Binary\\
+%        \hline
+%        \hline
+%        1 & 00000001 & B & 00001011 & 15 & 00010101 \\
+%        2 & 00000010 & C & 00001100 & 16 & 00010110 \\
+%        3 & 00000011 & D & 00001101 & 17 & 00010111 \\
+%        4 & 00000100 & E & 00001110 & 18 & 00011000 \\
+%        5 & 00000101 & F & 00001111 & 19 & 00011001 \\
+%        6 & 00000110 & 10 & 00010000 & 1A & 00011010 \\
+%        7 & 00000111 & 11 & 00010001 & 1B & 00011011 \\
+%        8 & 00001000 & 12 & 00010010 & 1C & 00011100 \\
+%        9 & 00001001 & 13 & 00010011 & 1D & 00011101 \\
+%        A & 00001010 & 14 & 00010100 & 1E & 00011110 \\
+%        \hline
+%    \end{tabular}
+%    \caption{Conversion from Hexadecimal to Binary}
+%    \label{table:HexToBin}
+%\end{table}
