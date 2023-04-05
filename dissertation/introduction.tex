@@ -6,33 +6,38 @@
 % Why should a reader care or be interested?
 
 \section{Abstract}
-The word malware is derived from the words "malicious" and "software".
+The word malware is a portmanteau of the words "malicious" and "software".
 It is used to describe software that can perform harmful actions.
 These actions include the destruction of data,
-the exfiltration of sensitive information from a computer or
+the exfiltration (extracting data from a computer over a network)
+of sensitive information from a computer or
 holding it for ransom (meaning it encrypts files with a key and holds the key for ransom).
-Any of these actions can have significant consequences for the victim.
-Malware is a constant threat to organizations and individuals,
-as malware authors are getting more and more sophisticated,
-they've begun using new techniques that avoid detection from traditional anti-malware solutions.
+Any one of these can have significant consequences for the victim.
+Malware is a never-ending threat to organisations and individuals,
+malware authors are getting more and more sophisticated,
+and they have begun to use new techniques to avoid detection
+from traditional anti-malware solutions.
 
 For the Applied Project and Minor Dissertation module,
-I have been tasked with creating a significant software project.
-I have decided to create a platform that can detect malware based on its behaviour,
+I was tasked with creating a significant software project.
+I decided to create a platform that can detect malware based on its behaviour,
 using dynamic heuristic analysis, which involves executing files
-in a sandboxed environment, and observing what the file does during its execution,
-then comparing its behaviour to known malicious actions.
-Its behaviour means how the software interacts with the operating system,
-examples of this include reading and writing files.
-A sandbox is a method of isolating potentially harmful processes on your computer,
-limiting the resources it can access this being sensitive files for example.
+in a sandboxed environment and observing what the file does during its execution,
+then comparing that behaviour to known malicious actions.
+When I say behaviour I refer to how the
+software interacts with the operating system.
+Examples of this include reading and writing files.
+A sandbox is a way of isolating potentially harmful processes on your computer,
+limiting the resources it can access,
+sensitive files are an example of something you don't want malware accessing.
 
 It's easy to bypass traditional anti-malware scanning techniques,
 such as static analysis (this is looking for known patterns of strings or bytes in a file),
 Avoiding detection from the static analysis can be done using tools such as UPX.
-UPX has the ability to compress executable files,
-hiding artefacts which would be used to identify malware. \cite{upx}
-Disguising behaviour during execution is a lot harder than simply hiding artefacts in a file.
+UPX has the ability to compress executable files, \cite{upx}
+hiding artefacts that would be used to identify malware.
+Disguising behaviour during execution is a lot harder
+than simply hiding artefacts in a file.
 That's why this method is much more effective at detecting malware.
 
 This project will be targeting Microsoft Windows 10/11,
@@ -47,7 +52,7 @@ and adding malicious patterns to the database.
 
 The novel aspect of this project is the use of dynamic heuristic analysis,
 this is an unconventional approach to malware detection,
-and at times can be much more effective than static analysis.
+and, at times, can be much more effective than static analysis.
 This project will bundle everything together into a single platform,
 allowing users without prior knowledge of the field to use it.
 As soon as the installer is finished installing,
@@ -55,16 +60,10 @@ the user can upload files to be scanned immediately.
 
 The platform is designed to be used by corporations,
 it can be installed on all the computers on the network.
-When a user downloads a file they will be prompted to upload it to the platform for analysis.
-The user will see a real-time analysis of the file,
-if the file is deemed malicious the user will be prompted to quarantine the file.
-
-
-% % % % % % % % % % % % % % % % % % % % % % % %
-% % % % % % % % % % % % % % % % % % % % % % % %
-% % % % % % % % % % % % % % % % % % % % % % % %
-% % % % % % % % % % % % % % % % % % % % % % % %
-
+When a user downloads a file, they will be prompted to
+upload it to the platform for analysis.
+The user will see a real-time analysis of the file.
+If the file is deemed malicious, the user will be prompted to quarantine it.
 
 \section{Project Overview}
 There will be three main sub-projects included in the platform,
@@ -72,33 +71,34 @@ these being the client, server and sandbox.
 The dashboard is closely integrated with the server,
 and although it is found in the server project,
 it is actually running on the client side during execution.
-
 The client is a native graphical user interface (GUI) application,
 designed for Microsoft Windows 10/11.
-
 To utilize the platform, users must install the client on their computer(s),
-once installed it will automatically launch upon system boot.
+once installed, it will automatically launch upon system boot.
 
-When a user downloads a file (such as downloading a file using their web browser),
+When a user downloads a file
+(such as by downloading a file using their web browser),
 they will be prompted to upload it to be scanned.
 The scanning process provides real-time updates on the status of the file,
-including a log box displaying the currently executing task and a progress bar for scan progress.
+including a log box displaying the currently executed task
+and as well as a progress bar for scan progress.
+The client also has a quarantine feature,
+this is used to safeguard malicious files in a secure location,
+and includes an option for users to restore files to their original location.
 
-The client also incorporates a quarantine feature, safeguarding malicious files in a secure location,
-with an option for users to restore files to their original location.
-
-The server project is responsible for establishing communication between the client and the sandbox,
-while also offering an administrator dashboard for carrying out administrative tasks.
-
-The administrator will be able to view statistics by looking at piecharts
+The server project is responsible for establishing communication
+between the client and the sandbox,
+while also offering an administrator dashboard
+for carrying out administrative tasks.
+The administrator will be able to view statistics by looking at pie charts.
 seeing the ratio of malicious to clean scans,
-and remove workers, provision new clients and add malicious patterns.
+and remove workers, provisioning new clients and adding malicious patterns.
 
 The sandbox is responsible for running malware in a secure environment,
 executing files, and recording system call(s) for further analysis.
-
 It will also use static analysis as a fallback,
-the static analysis differs from my approach, being that it doesn't actually scan the file
+the static analysis differs from my approach,
+in that, it doesn't actually scan the file dynamically
 and just looks for patterns of text and bytes in the file.
 
 % Set out the objectives of the project clearly.
@@ -109,99 +109,109 @@ and just looks for patterns of text and bytes in the file.
 The objectives of this project are to:
 \begin{itemize}
 \item Develop a robust and reliable software platform capable of detecting
-      malicious software based on its behaviour and quarantining it when necessary.
+      malicious software based on its behaviour and quarantining if malicious.
 \item Ensure the platform's stability and maintainability by producing clean,
       readable and maintainable code.
 \item Create a native GUI application for Microsoft Windows 10/11
-      that provides users with a simple and efficient means to
-      scan files and monitor the scanning process.
+      that provides users with a simple and easy-to-use,
+      way to scan files and monitor the scanning process.
 \item Build a user-friendly dashboard for administrators to manage
       the platform's administrative tasks effectively.
-\item Establish a server project that facilitates communication between
+\item Establish a server to facilitate communication between
       clients and the sandbox using RESTful APIs.
 \item Create a secure platform that leverages state-of-the-art security
-      measures to safeguard against unauthorized access.
+      measures to prevent unauthorised access to the platform.
 \item Produce code that adheres to good design principles,
-      enabling easier maintenance and modification.
+      allowing easier maintenance and modification.
 \end{itemize}
 
 \section{Sub-projects}
 \subsection{Client}
-The source code for the client can be accessed in the \texttt{client/src} directory,
-implemented in Python language, utilizing the Tkinter library to create the graphical user interface,
+The source code for the client can be accessed in
+the \texttt{client/src} directory, it is implemented in Python,
+utilizing the Tkinter library to create the graphical user interface,
 and using a threading library called "tkthread",
-to allow the application to do other tasks, without locking up the application.
-
-The client application comprises three sections: "Main Page" (Caladium), "Quarantine" and "Preferences."
-
-The "Main Page" features a text box displaying the current directory being scanned,
+to allow the application to do other tasks,
+without locking up the application's GUI.
+The client application comprises three sections:
+"Main Page" (Caladium), "Quarantine" and "Preferences."
+The "Main Page" features a text label displaying
+the current directory being scanned,
 along with a manual scanning button.
-
 Since the execution of Python code requires Python to be installed,
 PyInstaller is used to bundle all necessary components to run on any computer.
 
-The problem is, that PyInstaller does not generate a single executable file,
-but rather outputs a directory of files.
-
-I am using the "iexpress" tool included in Windows can
-create an installer that produces a single executable file.
-It will be installed in the \texttt{Program Files} directory of the user's computer.
-
-The "Preferences" page offers an "Uninstall" button,
-providing users with the option to remove the client application.
+Unfortunately, PyInstaller does not generate a single executable file,
+but it instead outputs a directory of files.
+I am using the "iexpress" tool included in Windows to
+create an installer that outputs a single executable file.
+When executed it will install the Caladium client
+into the \texttt{Program Files} directory of the user's computer.
+The "Preferences" page in the client, offers an "Uninstall" button,
+offering users the option to remove the client application from their computer.
 
 \subsection{Dashboard}
-The code of the dashboard will be found in the \texttt{server/src/static} directory.
+The code of the dashboard can be found in the \texttt{server/src/static} directory.
 \footnote{The dashboard may appear as if it is part of the server
 but it is actually on the client side, as it runs on the user's computer.}
 
-Administrators will be able to login into the dashboard and perform administrative tasks.
-They will also have the ability to change their password and new workers to the system.
-The dashboard will be written in JavaScript, it will be a single-page application.
-
-Upon opening the dashboard you will be presented with a login page,
-prompting you to enter a username and password, the default for these is "root" and "root".
-The password is changeable using the preferences menu.
-
+Administrators will be able to login into the dashboard
+and perform administrative tasks.
+They will also have the ability to change their
+password and add new workers to the system.
+The dashboard is written in JavaScript and is a single-page application.
+When you first navigate to the dashboard you will be presented with a login page,
+prompting you to enter your username and password,
+the default for these is "root" and "root".
+The password can be changed in the preferences menu.
 The dashboard will feature four different types of list pages,
-they are clients, patterns, tasks and worker pages.
+they are \textbf{clients}, \textbf{patterns},
+\textbf{tasks} and \textbf{worker} page.
 
 \subsection{Server}
-The code of the server will be found in the \texttt{server} directory.
-The server will be responsible for bridging communications between the client and the sandbox.
-The server will also be written in Python 3, using the Flask micro-framework for handling HTTP requests.
-
-Data will be persisted using CouchDB since the server is using
-python will be using the pycouchdb library to communicate with the
-CouchDB instance.
-
-This includes provisioning clients and adding new detection patterns for the dynamic analysis
+The code for the server can be found in the \texttt{server/src} directory.
+The server is responsible for bridging communications between the client and the sandbox.
+It is also written in Python like the client,
+using the Flask micro-framework for handling HTTP requests from clients.
+Data will be persisted using CouchDB, since the server is using Python,
+it will be using the pycouchdb library to interface with the CouchDB instance.
+Data to be stored on the CouchDB instance will include records for
+each of the list pages in the dashboard listed above.
 
 \subsection{Sandbox}
-The code of the sandbox can be found in the \texttt{sandbox/src} directory.
-The main part is written in Racket (a functional programming language),
-
-Since this platform is targeting malware that is designed
-to run on Microsoft Windows, the sandbox must run on Microsoft Windows.
+The code for the sandbox can be found in the \texttt{sandbox/src} directory.
+The main part of it is written in Racket (a functional programming language),
+Since this platform is targeting malware that is designed to
+run on Microsoft Windows, the sandbox must run on Microsoft Windows.
 
 It makes use of Sandboxie to isolate the malware from the host system,
-a tool called Process Monitor to log system calls.
-
-It will also use ClamAV to do static analysis as a fallback, in the case of the dynamic analysis failing.
+and a tool called Process Monitor to log the system calls.
+It will also use ClamAV to perform static analysis as a fallback,
+in the case of the dynamic analysis failing to detect malware.
 
 \subsection{Bot \& Docs}
 The platform also features a promotional page,
-which supplies new users with an overview of the project with a download button
-and screenshots of the platform with descriptions.
-When you click the download button it queries the GitHub API to fetch the latest
-GitHub release for the client.
+which gives new users an overview of the project.
+They are presented with a download button,
+as well as screenshots and descriptions of
+the various components featured in the platform.
+When you click the download button,
+it queries the GitHub API to fetch the latest
+GitHub release tag for the client.
 
-There is also a chatbot called CaladiumBot source code can be found in the 
-\texttt{bot} directory, it makes use of GPT 3.5 model. \cite{openai}
+The promotional page can be found here:
+\href{https://g00378925.github.io/caladium/}{https://g00378925.github.io/caladium/}
+
+There is also a chatbot called CaladiumBot, source code can be found in the
+\texttt{bot} directory, it makes use of OpenAI's GPT 3.5 model. \cite{openai}
 The bot can answer questions about the platform,
-it has 
+before talking to you it has been given a copy of the \texttt{README.md},
+and using that, it can then answer your questions.
+To chat with this bot, navigate to the promotional page and press the
+"Chat with CaladiumBot" button.
 
-% Briefly list each chapter / section and provide a brief description of what each section contains.
+% Briefly list each chapter / section and provide
+% a brief description of what each section contains.
 % – List the resource URL (GitHub address) for the project and provide
 % a brief list and description of the main elements at the URL.
 
@@ -215,8 +225,18 @@ it has
   and the various design patterns I adopted.
   \item The "System Evaluation" will be me evaluating the system,
   talking through its good parts and potential areas for improvement.
-  \item I conclude with the "Conclusion" chapter.
+  \item Finally I conclude with the "Conclusion" chapter.
 \end{itemize}
 
+\section{GitHub URL}
 The GitHub repository for the project can be found at the URL: \\
 \href{https://github.com/G00378925/caladium}{https://github.com/G00378925/caladium}
+
+Upon visiting this link,
+you will be presented with the README,
+giving a description of the project.
+
+At the bottom of the README,
+you will find instructions for building each component.
+In each of the directories, you will find each sub-project,
+all listed above.
