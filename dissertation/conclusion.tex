@@ -10,9 +10,12 @@ so they need to be isolated from the system they are running on.
 
 Users have the ability to download a client, 
 
-The client software communicates with the server using a RESTful API, which the dashboard also uses
+The client software communicates with the server using a
+RESTful API, which the dashboard also uses
 
 In the objectives, I stated I wanted to create a secure platform, as shown in the evaluation chapter, I showed that the administrator's password is hashed, and in the event of the dashboard being compromised, the plain text password would not be known.
 
-Administrators can input data into various fields patterns for example, but I found my dashboard wasn't sanitising the inputs, so a malicious user could input raw HTML and my dashboard would display raw HTML which is referred to as XSS.
-
+Administrators can input data into various fields patterns for example,
+but I found my dashboard wasn't sanitising the inputs,
+so a malicious user could input raw HTML and my dashboard would
+display raw HTML which is referred to as XSS.

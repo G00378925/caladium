@@ -31,6 +31,7 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage[titletoc]{appendix}
+\usepackage{afterpage}
 
 %------------------------------------------------------------------------------------------------------
 %	The following are the RGB values for the official ATU colours.
@@ -56,9 +57,6 @@
 \newcommand{\reporttype}{Minor Dissertation} %Report  type (Project Plan / Final Report)
 \newcommand{\supervisorname}{Daniel Cregg} %Report  type (Project Plan / Final Report)
 \newdateformat{monthyeardate}{\monthname[\THEMONTH], \THEYEAR}
-
-
-
 
 
 %------------------------------------------------------------------------------------------------------	
@@ -111,10 +109,12 @@
 \normalsize
 \textbf{Department of Computer Science \& Applied Physics,\\School of Science \& Computing,\\Atlantic Technological University (ATU), Galway.}\\
 \end{titlepage}
-\newpage
-\tableofcontents
+
 \listoffigures
 \listoftables
+\newpage
+\tableofcontents
+
 \pagenumbering{arabic} 
 
 %----------------------------------------------------------------------------------------

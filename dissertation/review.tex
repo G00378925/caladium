@@ -1,8 +1,8 @@
+% 13:52 06/04/2023
 \chapter{Technology Review}
 % This chapter is the literature review part of the dissertation
 % and should be tightly coupled to the context and objective from the introduction.
 % A thorough Technology Review proves that you researched what you were doing!
-
 % https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4413008
 
 This chapter provides a technical review of the technologies used in the platform.
@@ -17,9 +17,14 @@ and widely accepted standards like JSON for transmitting data over networks.
 Lastly, it shows how the use of tooling like Docker
 can help with the creation of reproducible environments.
 
+First I will show the technologies that are general to all the sub-projects,
+and what I used to create the chatbot for the promotional page.
+Then I will list the technologies that are used in each specific sub-project.
+
 \section{JSON}
 In my platform, there will be multiple computers that receive and transmit data.
-There needs to be an agreed-upon format between these computers in which the data is encoded.
+There needs to be an agreed-upon format between these
+computers in which the data is encoded.
 The format must support dictionaries and lists to express data structures.
 
 I have decided to use JSON for this because the browser has
@@ -50,12 +55,23 @@ my_data = {"1": 2, 3: 4.0}
 print(json.dumps(my_data))
 \end{lstlisting}
 
-\subsection{Python}
+\section{Python}
 Python is an interpreted, high-level, general-purpose programming language.
 I chose to use Python because I wanted to use the same language for the client and server.
-When I serialised data in the client I could use the same deserialisation function on the server.
+When I serialised data in the client I could use the same
+deserialisation function on the server.
 
-Python is also a very simple language and is interpreted, this allowed me to quickly test code, without having to compile it every time.
+Python is also a very simple language and is interpreted,
+this allowed me to quickly test code, without having to compile it every time.
+
+Python comes with a package manager called \texttt{pip},
+which is accessible on all operating systems,
+this allows me to easily install dependencies required by the server.
+
+\section{GPT-3.5}
+
+\begin{lstlisting}[language=Python]
+\end{lstlisting}
 
 \section{Technology in the Client Side}
 As stated in the objectives, there will be a native GUI application,
@@ -63,17 +79,37 @@ this will be a Windows application and will not run in the browser,
 the language was chosen to create the client in Python,
 so I am using Python-specific libraries to achieve this.
 
-\subsection{Pyinstaller}
-Pyinstaller is a module for Python that allows you to bundle your Python code with a Python interpreter, allowing it to be run on any computer that doesn't have Python installed.
-This allows your software to be self-contained and portable, users don't have to install Python on their computer to install your software.
+\subsection{PyInstaller}
+A common reason why more people don't opt to use Python over a
+native language such as C/C++ is the fact you require Python,
+to run the code, some users that would like to use the software might 
+want to be able to install your software without having to install Python.
+
+Pyinstaller is a module for Python that allows you to bundle your
+Python code with a Python interpreter, allowing it to be run on any
+a computer that doesn't have Python installed.
+This allows your software to be self-contained and portable,
+users don't have to install Python on their computer to install your software.
 
 \subsection{Tkinter}
 Tkinter is the standard GUI library for Python,
 It is also cross-platform, allowing the client to run on Windows, Linux and macOS.
 It is stable and mature, with a plethora of documentation to be found on the internet.
 
+Tkinter makes it very easy to create a GUI, allowing developers to quickly prototype code
+I will give an example below,
+of creating a simple GUI window.
+
+\begin{lstlisting}[language=Python]
+import tkinter
+
+main_window = tkinter.Tk()
+main_window.mainloop()
+\end{lstlisting}
+
 \subsection{tkthread}
-In Tkinter applications, there exists a infinite \textbf{mainloop}
+In Tkinter applications, there exists an infinite \textbf{mainloop}
+(as seen in the example above)
 that runs until the user closes the application.
 
 Whenever a user clicks a button,
@@ -89,51 +125,157 @@ While a naive solution might involve threading,
 this approach demands thread synchronization and can lead to race conditions
 and ghost threads, leading to even more problems that it fixes.
 
-Instead, Tkthread provides a more elegant solution.
+Instead, tkthread provides a more elegant solution.
 
-\subsection{Dashboard}
-
-
-\subsubsection{JavaScript}
+\subsection{JavaScript}
+In the dashboard, I used JavaScript to add dynamicity to it,
+it is used to fetch data from the server using the RESTful API endpoints
 
 \section{Technology in the Server}
+The server is the main component of the platform,
+bridging communication between the client and the sandbox instances, 
+and providing RESTful APIs for the client to interact with it.
+
+The server needs to be able to persist data from administrators, 
+which is stored in CouchDB. Since the server is written in Python,
+it requires the pymongodb library to communicate with the DB instance.
+
+Additionally, I have created a \texttt{Dockerfile} for Docker
+that enables people to easily replicate the required
+environment for running the server.
+
 \subsection{Flask}
-I needed a way for the dashboard and the client to be able to communicate with the server
+I needed a way for the dashboard and the client to be
+able to communicate with the server
 I decided to use Flask to create the HTTP endpoints.
 
 Flask is a micro web framework written in Python.
-It is classified as a micro-framework because it does not require particular tools or libraries.
-This allowed me to create the HTTP endpoints for the RESTful API without having to worry about the underlying HTTP server.
+It is classified as a micro-framework because it does
+not require particular tools or libraries.
+This allowed me to create the HTTP endpoints for the RESTful API without
+having to worry about the underlying HTTP server.
 
-\subsection{Docker}
-To create a reproducible environment I decided to use Docker.
-Docker is a containerization platform that allows you to create containers that can be run on any machine.
-Docker is a platform that allows you to create containers that can be run on any machine.
+Below you will find some example code to create a Flask server,
+with a GET endpoint that returns "\texttt{Index Page}" on request.
 
-All the instructions required to set up the environment are found in the Docker file, in my project this includes instructions to install libraries from the pip
+\begin{lstlisting}[language=Python]
+import flask
 
-The Dockerfile I am using in my project can be found here: \texttt{server/Dockerfile}
+app = flask.Flask(__name__)
+
+app.get("/")
+def root_page(): return "Index Page"
+
+app.run()
+\end{lstlisting}
 
 \subsection{CouchDB}
 CouchDB is a document-oriented NoSQL database.
 An important feature of any platform for many users is the
 ability to be able to persist data.
 
-I went with CouchDB because the simplistic nature of a document database is appealing,
-allowing me to spend more time on more complex features
+In my case, I was using CouchDB to store the records for the
+\textbf{clients}, \textbf{patterns}, \textbf{tasks} and \textbf{workers} tables.
 
-% % % % % % % % % %
+I find NoSQL quite convenient compared to SQL databases,
+because I don't have to write out the queries,
+and NoSQL allows you to easily append JSON objects to the tables.
+
+I went with CouchDB because the simplistic nature of a document database is appealing,
+allowing me to spend more time on more complex features.
+
+CouchDB provides an HTTP/JSON API, allowing any programming language
+with an HTTP library to interface with the DB instance.
+
+\subsection{pycouchdb}
+Python alone isn't able to communicate with the CouchDB instance,
+and requires a library in this case it's \textbf{pycouchdb}.
+
+\subsection{Docker}
+Docker is a tool used by developers to create reproducible environments.
+Meaning you can run your software on different computers,
+and it would have the exact same stuff installed.
+
+Most open-source projects come with a \texttt{Dockerfile} this provides
+users interested in setting up the project on their own computer,
+with the same environment, the developers used.
+
+The \texttt{Dockerfile} contains instructions for the Docker daemon,
+this is a program that must be installed on a computer you wish to use Docker on.
+You must then build containers using this file,
+you can have multiple containers on one machine,
+this is equivalent to having different computers with different Linux distributions.
+
+You must then run these containers, and this will execute the code of the project.
+These containers are isolated from the main system, and cannot edit files on the host system.
+I am using Docker to make it easy to test my project on different machines,
+allowing me to delete them easily,
+and not have to actually install the dependencies on my main host system.
+
+The \texttt{Dockerfile} I am using in my project can be found here:
+\texttt{server/Dockerfile}
+
+The Dockerfile begins by instructing the daemon,
+to install the Linux Debian bullseye version.
+Then refresh the apt-get package manager,
+and install Python and the Python pip package manager.
+Installs the required Python modules,
+and copy the server files into the \texttt{/caladium} directory.
+
+Then when you execute the container,
+it runs the \texttt{\_\_main\_\_.py} on port 8080.
+
+\begin{lstlisting}
+FROM debian:bullseye
+
+RUN apt-get update -y
+RUN apt-get install python3 python3-pip -y
+
+RUN python3 -m pip install flask pycouchdb requests
+
+WORKDIR /caladium
+
+COPY src/ /caladium
+
+ENTRYPOINT ["python3"]
+CMD ["__main__.py", "8080"]
+\end{lstlisting}
 
 \section{Technology in the Analysis Side}
-In this section I will be discussing the technology that facilitates the scanning of the files and the racket programming language I used to create the main part of the scanning side.
+In this section, I will be discussing the technology that
+facilitates the scanning of files and the Racket programming language
+I used to create the main part of the scanning side.
 
 \subsection{Sandboxie}
-Sandboxie is a sandboxing program that allows you to run untrusted programs in a sandboxed environment.
+Sandboxie is a tool for Microsoft Windows designed for sandboxing,
+it provides a secure environment to run potentially malicious software.
 
-The platform needs to be able to capture the behaviour of real malware,
-without fear of it causing damage to the system it is running on.
+Typical Windows applications, for example, your browsers like Chrome or Firefox,
+never actually have direct access to your system's hard drive.
+Instead, they have to go through the operating system, specifically the kernel,
+to gain access. If the requesting applications lack the required permissions
+the operating system can reject the request.
 
-% % % % % % % % % %
+Sandboxie works by intercepting the system calls made by these applications
+it then identifies the application that made the request,
+if the process is currently running under Sandboxie,
+it will fake a response, making the application think it was successful,
+allowing us to observe its behaviour to its full extent.
+
+The main purpose of using Sandboxie is to provide any
+easy to use isolation software for users, to run software
+without worrying about it harming the system.
+
+Sandboxie provides plenty of documentation on how to use the software on its website,
+and the utilities that come with the software come with command-line parameters,
+allowing to interface with it programmatically.
+
+Below you will find an example command of how to run the Windows
+\textbf{notepad} in a sandbox:
+
+\begin{lstlisting}
+"%ProgramFiles%\Sandboxie\Start.exe" notepad.exe
+\end{lstlisting}
 
 \subsection{Process Monitor}
 Process Monitor is a system monitoring program that allows you to log system calls.
@@ -141,23 +283,23 @@ It was created by Microsoft to serve as an advanced monitoring tool giving power
 the ability to see what exactly every process on their machine is doing,
 it produces a log, of all the actions performed and the name of the process that did it.
 
-
-I needed a way of finding out what the malware is doing, so I decided to use Process Monitor to log system calls.
-I originally was thinking of using a driver to log system calls, but I decided to use Process Monitor instead to avoid reinventing the wheel.
-
-% % % % % % % % % %
+I needed a way of finding out what the malware is doing,
+so I decided to use Process Monitor to log system calls.
+I originally was thinking of using a driver to log system calls,
+but I decided to use Process Monitor instead to avoid reinventing the wheel.
 
 \subsection{Racket}
-Racket is a functional programming language. I decided to program the main part of the analysis in racket because I've used a lot of Python in other components and wanted to use a different programming language.
+Racket is a functional programming language.
+I decided to program the main part of the analysis in Racket
+because I've used a lot of Python in other components and
+wanted to use a different programming language.
 
 Functional programming languages encourage immutability,
 this means once variables are set a value, then they can't be updated.
 If you want to update a variable then you must create a new one with
 the changes.
 
-Racket comes with a plethora of documentation which can found on its website.
-
-% % % % % % % % % %
+Racket comes with a plethora of documentation which can be found on its website.
 
 \subsection{ClamAV}
 ClamAV is an open-source anti-malware solution that
@@ -167,9 +309,10 @@ This is the software I'm using to perform my static analysis.
 Most anti-malware software are paid and/or closed source,
 but ClamAV is the exception, on its website you can find a rich set of documentation,
 
-In my case was concerned with the \textbf{clamscan} command, and its parameters.
-Most anti-malware solution don't provide low level access to their software
+My case was concerned with the \textbf{clamscan} command, and its parameters.
+Most anti-malware solutions don't provide low-level access to their software
 requiring you to use their menuing because that's who their target audience is.
 
-ClamAV is targeted at power users, giving them the ability to modify the source code,
+ClamAV is targeted at power users,
+giving them the ability to modify the source code,
 and adding their own malware definitions.

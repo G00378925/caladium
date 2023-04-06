@@ -7,7 +7,8 @@
 In this chapter, I will be discussing how when about designing my project
 and the design principles I used throughout.
 
-Below you can see a system architecture diagram \textbf{\textbackslash{}ref\{image:sysArchitecture\}} of the system.
+Below you can see a system architecture diagram
+\textbf{\textbackslash{}ref\{image:sysArchitecture\}} of the system.
 
 \begin{figure}[h!]
     \includegraphics[width=0.9\textwidth]{images/architecture.png}
@@ -24,11 +25,15 @@ Python files with the $frame.py$ suffix contain Tkinter frame classes.
 The dashboard is a single-page web application (SPA) it is fully written in JavaScript.
 This means when you navigate to another page in the dashboard it doesn't have to pull it from the server, just fetch the data specific to that page, then render it dynamically using JavaScript.
 
-Upon loading a new page, the contents of the page are dynamically generated using DOM Lisp expressions.
+Upon loading a new page, the contents of the page are
+dynamically generated using DOM Lisp expressions.
 The URL of the page is then updated using the History API.
 
-In the \textbf{server/static/js/index.js} I have a dictionary called \textbf{routes} containing a list of all the routes and their corresponding page classes and their URL.
-When the page is loaded, the URL is checked against the dictionary and the corresponding page class is loaded.
+In the \textbf{server/static/js/index.js} I have a dictionary called
+\textbf{routes} containing a list of all the routes and their corresponding
+page classes and their URL.
+When the page is loaded, the URL is checked against the dictionary
+and the corresponding page class is loaded.
 
 And doesn't make use of any external libraries.
 I made this decision early because I wanted to keep the project as self-contained as possible.
@@ -36,20 +41,23 @@ I made this decision early because I wanted to keep the project as self-containe
 % # % # % IN PROGRESS % # % # %
 \subsection {Page Class Hierarchy}
 
-The dashboard is object-oriented, all of the main code can be found in the \textbf{server/static/js/index.js} file.
-This contains code for communicating with the server endpoints and classes for each page.
-
-All pages inherit the \textbf{Page} class, as they share common functionality which upholds the DRY principle.
-
-
-Each page class must implement the \textbf{loadPage} method, which is called when the page is loaded.
-This can be used for fetching data from the backend.
-
 \begin{figure}[h!]
     \includegraphics[width=0.9\textwidth]{images/dashboard_hierarchy.drawio}
     \caption{Page Class Hierarchy Diagram}
     \label{image:sysArchitecture}
 \end{figure}
+
+The dashboard is object-oriented,
+all of the main code can be found in the \textbf{server/static/js/index.js} file.
+This contains code for communicating with the server endpoints and classes for each page.
+
+All pages inherit the \textbf{Page} class,
+as they share common functionality which upholds the DRY principle.
+
+
+Each page class must implement the \textbf{loadPage} method,
+which is called when the page is loaded.
+This can be used for fetching data from the backend.
 
 % # % # % IN PROGRESS % # % # %
 
@@ -58,8 +66,10 @@ This can be used for fetching data from the backend.
 In a single-page application (SPA), all page content is dynamically generated without
 need to pull HTML from a server when navigating between pages.
 
-Initially, I considered embedding raw HTML within JavaScript code, but found it to be inelegant.
-As a solution, I created a domain-specific language (DSL) to represent the Document Object Model (DOM) as Lisp expressions.
+Initially, I considered embedding raw HTML within JavaScript code,
+but found it to be inelegant.
+As a solution, I created a domain-specific language (DSL)
+to represent the Document Object Model (DOM) as Lisp expressions.
 
 My approach involved storing these Lisp expressions as strings within each page class,
 and including parameters which could be replaced with their actual values during page loading.
@@ -69,7 +79,8 @@ This DSL approach simplifies the creation and maintenance of code by providing a
 making the syntax for creating DOM elements more readable and understandable.
 
 I developed a library, that can be found at \textbf{server/src/static/js/pantothenic.js},
-which includes the \textbf{generateDOM} function that takes a DOM Lisp expression and parameters,
+which includes the \textbf{generateDOM} function that takes a
+DOM Lisp expression and parameters,
 and returns a DOM object.
 
 The DOM is a tree of nested components that represents web applications within a browser.
@@ -78,11 +89,13 @@ I have created a more elegant solution to generating dynamic
 content within a single-page application.
 
 Below you will find an example of a DOM Lisp expression.
-This is taken from the \textbf{Preferences} class in the \textbf{server/src/static/js/index.js} file.
+This is taken from the \textbf{Preferences} class in the
+\textbf{server/src/static/js/index.js} file.
 It is a list of components for the HTML page,
 including an input box for a new password for the admin user
 and a button that toggles auto-provisioning of new users.
-When the user clicks the button, it calls the \textbf{toggleAutoProvision} method within the class.
+When the user clicks the button, it calls the
+\textbf{toggleAutoProvision} method within the class.
 
 \lstset{basicstyle=\fontsize{10}{12}\ttfamily}
 \begin{lstlisting}
@@ -102,10 +115,13 @@ this.body = ` (div (hash "children"
 \section{Server Side}
 
 \subsection{Server Endpoints}
-The server uses the flask micro-framework to provide the RESTful API.
-I decided to categorise the API into five sections: clients, databases, patterns, tasks and workers.
-Flask supports a feature called blueprints, which allows you to split your web application into multiple components.
-I used a blueprint for each of the five sections of the API, and each blueprint is stored in a separate file.
+The server uses the Flask micro-framework to provide the RESTful API.
+I decided to categorise the API into five sections:
+clients, databases, patterns, tasks and workers.
+Flask supports a feature called blueprints,
+which allows you to split your web application into multiple components.
+I used a blueprint for each of the five sections of the API,
+and each blueprint is stored in a separate file.
 
 This is an example of a blueprint taken from the worker's blueprint.
 \begin{lstlisting}[language=python]
@@ -149,13 +165,12 @@ Each of the endpoints is RESTful the HTTP method name signifies the type operati
 
 Note: The code block above might not render properly as a table due to the limitations of this text-based format.
 
-
 \section{Analysis Side}
 
 \subsection{Communication with Server Side}
 When a client asks the server to analyze a file,
 the server needs to assign the job to one of its worker instances.
-To keep track of what the workers are doing, the server needs a way to communicate with them in real time.
+To keep track of what the workers are doing, the server needs a way to communicate with them in real-time.
 I chose to use TCP for this purpose, which is a communication method that allows data to be sent and received between devices.
 
 The main program for analyzing the file is written in Racket,
@@ -166,17 +181,3 @@ The server had no way of knowing how much data was being sent,
 so I looked for a solution and found a helpful answer on Stack Overflow \cite{chqrlie:2022}
 The solution was to include the length of the incoming data at the beginning of the packet
 so that the server would know how much data to expect.
-
-
-%\section{Working with Images}
-%You can embed an image in a \LaTeX document using the technique shown below.
-%System diagrams and images with a small number of colours (100s, not 1000s)
-%should be stored in PNG format. Although \LaTeX doesn't care where you place your images,
-%it is good practice to place them in a single sensible directory and apply some sort of hierarchy to them,
-%e.g. the path images/chapter 1 might contain all of the images for Chapter 1 of your dissertation.
-
-%Image  can be referenced with the label given to the image,
-%\\ i.e. \textbf{\textbackslash{}ref\{image:sysArchitecture\}}.
-%Note that \LaTeX will place the image wherever it deems fit.
-%Don't bother trying to change where a table or figure is placed until
-%your document is ready for the final layout.
