@@ -6,24 +6,77 @@
 
 In this chapter, I will be discussing how when about designing my project
 and the design principles I used throughout.
-
-Below you can see a system architecture diagram
-\textbf{\textbackslash{}ref\{image:sysArchitecture\}} of the system.
+I will provide diagrams and screenshots of various components,
+and show implementation snippets of code.
 
 \begin{figure}[h!]
-    \includegraphics[width=0.9\textwidth]{images/architecture.png}
+    \includegraphics[width=0.9\textwidth]{images/diagrams/architecture}
     \caption{System Architecture Diagram}
     \label{image:sysArchitecture}
 \end{figure}
 
-\section{Design and Structure}
+Below you can see a system architecture diagram when in execution the platform can be broken down into three parts the client, server and sandbox side.
 
-\section{Client}
-Python files with the $frame.py$ suffix contain Tkinter frame classes.
+\section{Windows GUI Application}
+Python files with the \texttt{frame.py} suffix contain Tkinter frame classes,
+and each of these files contains only one class that inherits the Tkinter frame class.
+
+\subsection{User Interface}
+The client post-provisioning features a Tkinter \texttt{Notebook},
+with 3 sub-frames, Main Page ("Caladium"), Quarantine and Preferences.
+You can navigate through these by clicking on each label on the window.
+The \texttt{Notebook} Tkinter widget allows you to
+group frames together allowing navigation between them.
+
+The Main Page in the frame features a button to manually scan a file,
+and a label indicating the current scanning directory.
+
+
+\subsubsection{Quarantine Page}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../docs/client.png}
+    \caption{Quarantine Page Screenshot}
+    \label{image:quarantinePageScreenshot}
+\end{figure}
+
+\subsubsection{Preferences Page}
+
+\subsubsection{Scanning Frame}
+
+\subsection{Quarantine}
+When files are added to the quarantine they are encrypted with an XOR cipher to avoid accidental execution of malware, in the event of the user accidentally stumbling upon the location of the quarantine.
+
+\subsection{Directory Scanning}
+The client has the ability to identify newly downloaded files,
+this is implemented in \texttt{client/src/dirchangelistener.py}.
+This functionality is achieved by scanning for new files in a directory.
+
+The implementation contains a class called \texttt{DirChangeListener}
+an instance of this class will be made and passed a callback function that
+will be called when a new file appears in the directory.
+
+A \textbf{tkthread} thread is spawned which loops
+and checks for new files on every iteration.
+The current directory state is obtained using
+\texttt{os.listdir(dir\_name)} and compared to the last state.
+To prevent the application from locking up,
+the Tkinter GUI is given some time to render on each iteration.
+This will be explained in more detail below.
+
+\subsection{Thread Model}
 
 \section{Server Dashboard}
 The dashboard is a single-page web application (SPA) it is fully written in JavaScript.
 This means when you navigate to another page in the dashboard it doesn't have to pull it from the server, just fetch the data specific to that page, then render it dynamically using JavaScript.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../docs/dashboard.png}
+    \caption{Dashboard Index Screenshot}
+    \label{image:dashboardScreenshot}
+\end{figure}
 
 Upon loading a new page, the contents of the page are
 dynamically generated using DOM Lisp expressions.
@@ -38,11 +91,10 @@ and the corresponding page class is loaded.
 And doesn't make use of any external libraries.
 I made this decision early because I wanted to keep the project as self-contained as possible.
 
-% # % # % IN PROGRESS % # % # %
 \subsection {Page Class Hierarchy}
 
 \begin{figure}[h!]
-    \includegraphics[width=0.9\textwidth]{images/dashboard_hierarchy.drawio}
+    \includegraphics[width=0.9\textwidth]{images/diagrams/dashboard_hierarchy.drawio}
     \caption{Page Class Hierarchy Diagram}
     \label{image:sysArchitecture}
 \end{figure}
@@ -54,14 +106,10 @@ This contains code for communicating with the server endpoints and classes for e
 All pages inherit the \textbf{Page} class,
 as they share common functionality which upholds the DRY principle.
 
-
 Each page class must implement the \textbf{loadPage} method,
 which is called when the page is loaded.
 This can be used for fetching data from the backend.
 
-% # % # % IN PROGRESS % # % # %
-
-%%%%%%% DONE %%%%%%%
 \subsection{DOM Lisp Expressions}
 In a single-page application (SPA), all page content is dynamically generated without
 need to pull HTML from a server when navigating between pages.
@@ -93,11 +141,10 @@ This is taken from the \textbf{Preferences} class in the
 \textbf{server/src/static/js/index.js} file.
 It is a list of components for the HTML page,
 including an input box for a new password for the admin user
-and a button that toggles auto-provisioning of new users.
+and a button that toggles the auto-provisioning of new users.
 When the user clicks the button, it calls the
 \textbf{toggleAutoProvision} method within the class.
 
-\lstset{basicstyle=\fontsize{10}{12}\ttfamily}
 \begin{lstlisting}
 this.body = ` (div (hash "children"
                 (list
@@ -110,7 +157,6 @@ this.body = ` (div (hash "children"
                     (button (hash "onclick" toggleAutoProvision
                         "innerHTML" autoProvisionButtonText)))))`;
 \end{lstlisting}
-%%%%%%% DONE %%%%%%%
 
 \section{Server Side}
 
@@ -142,6 +188,8 @@ def get_records_route():
 
 Each of the endpoints is RESTful the HTTP method name signifies the type operation to be performed on that resource, the table below will show each method and a description of each.
 
+Each
+
 \begin{table}
     \centering
     \begin{tabular}{|p{2cm}|p{6cm}|}
@@ -163,21 +211,59 @@ Each of the endpoints is RESTful the HTTP method name signifies the type operati
     \label{table:httpmethods}
 \end{table}
 
-Note: The code block above might not render properly as a table due to the limitations of this text-based format.
+\subsection{Authentication}
 
 \section{Analysis Side}
+The main file of the analysis side can be found in \texttt{sandbox/src/main.rkt},
+it is written in the Racket language, when it begins it will open a TCP port ready to accept incoming requests
 
 \subsection{Communication with Server Side}
 When a client asks the server to analyze a file,
 the server needs to assign the job to one of its worker instances.
-To keep track of what the workers are doing, the server needs a way to communicate with them in real-time.
-I chose to use TCP for this purpose, which is a communication method that allows data to be sent and received between devices.
+To keep track of what the workers are doing,
+the server needs a way to communicate with them in real time.
+I chose to use TCP for this purpose,
+a communication method that allows data to be sent and received between devices.
 
 The main program for analyzing the file is written in Racket,
 which has built-in support for TCP. The server is written entirely in Python,
 which also supports TCP using the sockets library.
 However, I encountered a problem when trying to receive information from the workers.
 The server had no way of knowing how much data was being sent,
-so I looked for a solution and found a helpful answer on Stack Overflow \cite{chqrlie:2022}
-The solution was to include the length of the incoming data at the beginning of the packet
+so I looked for a solution and found a
+helpful answer on Stack Overflow \cite{chqrlie:2022}
+The solution was to include the length of the incoming
+data at the beginning of the packet
 so that the server would know how much data to expect.
+
+\section{Scanning Process}
+When a file is passed to the analysis worker from the server,
+the scanning process begins as seen in diagram \ref{image:scanningProcess}.
+Malicious patterns are also passed to the worker.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/diagrams/scan_process}
+    \caption{Scanning Process Diagram}
+    \label{image:scanningProcess}
+\end{figure}
+
+The first part of the process is dynamic analysis.
+It begins by spawning a Process Monitor,
+then the target file is executed in Sandboxie.
+While this is happening,
+Process Monitor is logging the system calls performed by the target file.
+Once the process is finished or a certain amount of time elapses (timeout),
+the process monitor is killed. This will return a list of system calls in CSV format.
+
+We must iterate through all these system calls to see if we
+get a match with one of the patterns that were passed to the worker.
+If there isn't a match, we will continue to the next stage of the process,
+the static analysis.
+
+This is done with ClamAV, which will be passed to the
+\texttt{clamscan.exe} as a parameter.
+We will check the output of this to see if it's malicious. If none detect anything,
+the scan will end and the file can be deemed clean.
+Each state of the process gives updates back to the server along with
+text messages that will be presented to the client.

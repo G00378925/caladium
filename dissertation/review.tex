@@ -69,8 +69,43 @@ which is accessible on all operating systems,
 this allows me to easily install dependencies required by the server.
 
 \section{GPT-3.5}
+In recent months, the popularity of large language models has exploded,
+primarily due to the advent of ChatGPT.
+
+OpenAI, the creator of GPT, provides an API to their GPT-3.5 model.
+This model has been trained on a large corpus of text from the internet
+and can make predictions based on inputs to the model.
+
+Currently, this technology represents the state of the art in
+artificial intelligence and OpenAI's API make it freely available to anyone.
+
+To promote the platform, I have created a promotional page on
+my GitHub pages and added a bot (CaladiumBot) that can answer questions about it.
+I fetch the latest version of the \texttt{README.md} file for
+this project, feed it into the OpenAI model as an initial prompt,
+and then use it to answer users' questions about the platform.
+
+OpenAI provides a module for Python,
+below you will find a minimal example of how I'm using it.
+The full implementation can be found in \texttt{/bot/\_\_main\_\_}.
 
 \begin{lstlisting}[language=Python]
+import openai # Set OpenAI API key as environmental variable
+openai.api_key = os.environ.get("OPENAI_API_KEY", None)
+
+initial_prompt = """
+You are CaladiumBot, you will answer questions
+about the README listed below:
+"""
+# Append the README here
+
+prompt = [{"role": "system", "content": initial_prompt}]
+question = input("Your question: ")
+prompt += [{"role": "user", "content": question}]
+
+# This will output the GPT response to the command-line
+print(openai.ChatCompletion.create(model="gpt-3.5-turbo", \
+        messages=prompt).choices[0].message.content)
 \end{lstlisting}
 
 \section{Technology in the Client Side}
@@ -129,7 +164,53 @@ Instead, tkthread provides a more elegant solution.
 
 \subsection{JavaScript}
 In the dashboard, I used JavaScript to add dynamicity to it,
-it is used to fetch data from the server using the RESTful API endpoints
+it is used to fetch data from the server using the RESTful API endpoints.
+
+I wanted to take full advantage of all the new JavaScript features that were brought in
+recent years these include the ability to have classes and the new fetch function as an alternative to setting up the XMLHttpRequest object.
+
+The 6th edition of the ECMAScript standard \cite{ES6} (JavaScript standard) 
+introduced the class keyword for creating classes,
+before this developers had to create classes through prototypes.
+\begin{lstlisting}[language=Java]
+class Page {
+    int x;
+
+    constructor(newX) {
+        this.x = x;
+    }
+
+    getX() {
+        return this.x;
+    }
+
+    setX(newX) {
+        this.x = newX;
+    }
+}
+\end{lstlisting}
+
+Here is the legacy syntax, as can be seen, it is quite verbose,
+and it isn't encapsulated in the class like above.
+
+\begin{lstlisting}[language=Java]
+function Page(newX) {
+    this.x = newX;
+}
+
+Page.prototype.getX = function() {
+    return this.x
+}
+
+Page.prototype.setX = function(newX) {
+    this.x = newX;
+}
+\end{lstlisting}
+
+Another addition of the ECMAScript 2015 is the \texttt{fetch} function,
+prior to this, you'd have to use the \texttt{XHttpRequest} object,
+this is important in Caladium, because it allows the dashboard to request data from the server through the RESTful APIs.
+
 
 \section{Technology in the Server}
 The server is the main component of the platform,
@@ -168,6 +249,8 @@ def root_page(): return "Index Page"
 
 app.run()
 \end{lstlisting}
+
+\subsection{Representational State Transfer}
 
 \subsection{CouchDB}
 CouchDB is a document-oriented NoSQL database.
@@ -240,6 +323,8 @@ COPY src/ /caladium
 ENTRYPOINT ["python3"]
 CMD ["__main__.py", "8080"]
 \end{lstlisting}
+
+\section{CouchDB}
 
 \section{Technology in the Analysis Side}
 In this section, I will be discussing the technology that

@@ -30,9 +30,9 @@ Technicians can set up analysis computers and add them to the platform using the
 
 - `server/src` contains the Flask server and the dashboard SPA can be found in `server/src/static/js`.
 
-- `sandbox/src` contains the code to setup the sandbox and syscall analysis.
+- `sandbox/src` contains the code to set up the sandbox and syscall analysis.
 
-If you are looking to setup the platform yourself, instructions can be found under the **Building** header below.
+If you are looking to set up the platform yourself, instructions can be found under the **Building** header below.
 Don't forget to check my [promotional page which can be found here](https://g00378925.github.io/caladium/).
 **_Make sure to ask CaladiumBot some questions about the platform, it is powered by GPT 3.5!_**
 
@@ -51,14 +51,14 @@ Don't forget to check my [promotional page which can be found here](https://g003
     + An installer file is created as part of the client's build process,
     which can be downloaded and installed by users. They can also choose to uninstall it from the preferences menu.
     + Upon starting, the client is listening for changes in the `Downloads` directory,
-    it will detect new files downloaded by the user and prompt them to scan it.
+    it will detect new files downloaded by the user and prompt them to scan them.
     + During the scan process, the server will randomly assign a worker to handle the analysis.
     Users will receive real-time feedback with a progress bar and text.
     If the file is identified as malicious, the user will be prompted to quarantine it.
     + The quarantine is a secure storage space for potentially malicious files,
     which can be accessed in the **Quarantine** section.
     Users can view a list of files present in the quarantine and choose to add or restore files.
-    + The files stored in the quarantine are encrypted with an XOR cipher to prevent accidental execution of malware.
+    + The files stored in the quarantine are encrypted with an XOR cipher to prevent the accidental execution of malware.
     + Users can change the scanning directory, which defaults to the `Downloads` directory.
     Users also have the option to unprovision from the platform, which will require them to re-authenticate with the server.
 
@@ -97,7 +97,7 @@ Don't forget to check my [promotional page which can be found here](https://g003
     during the analysis and prepares itself for another scan.
 
 ## Architecture
-<div align="center"><img src="/dissertation/images/architecture.png" width="500px"></img></div>
+<div align="center"><img src="/dissertation/images/diagrams/architecture.png" width="500px"></img></div>
 
 - On the left you can find the client side this is everything that isn't running on a server,
   the single-page application is on the left because it runs in the user's browser.
@@ -106,7 +106,7 @@ Don't forget to check my [promotional page which can be found here](https://g003
     + The Windows GUI application uses the Tkinter Python library for the GUI,
     and the tkthread library for threads that won't block the Tkinter thread of execution.
 
-- The center is server-side, this contains the central flask server and the CouchDB database instance.
+- The centre is server-side, this contains the central flask server and the CouchDB database instance.
   The server will broker communication between the client and the analysis service.
 
 - On the right you will find the sandbox analysis service(s),
@@ -114,10 +114,10 @@ Don't forget to check my [promotional page which can be found here](https://g003
     + The real-time feedback to passed back to the server using TCP.
 
 ## Building
-First retrieve the latest build of Caladium, you can do that with this command:
+First, retrieve the latest build of Caladium, you can do that with this command:
 `git clone https://github.com/G00378925/caladium.git`.
 
-Python is a requirement for all the projects, you can
+Python is a requirement for all projects, you can
 [download and install, the latest version for your system here](https://www.python.org/downloads/).
 
 <!-- --><!-- --><!--        --><!-- --><!-- -->
@@ -142,7 +142,8 @@ This will result in a `caladium-setup.exe` in the `dist` directory, this is the 
 <!-- --><!-- --><!--        --><!-- --><!-- -->
 <!-- --><!-- --><!--        --><!-- --><!-- -->
 ### Server
-To build and run the server, enter the following commands into your terminal, these should work on Linux, macOS and Windows.
+To build and run the server, enter the following commands into your terminal,
+these should work on Linux, macOS and Windows.
 
 You need the address of your CouchDB instance this needs to be put in the environmental variable `COUCHDB_CONNECTION_STR`.
 If on Windows use `set COUCHDB_CONNECTION_STR=admin:root@0.0.0.0:5984`,
@@ -156,11 +157,11 @@ cd server/src
 python3 -m pip install flask requests
 python3 __main__.py
 ```
-The address of the instance will be printed to the terminal.
+The address of the instance will be printed on the terminal.
 
 #### Using Docker
-Instead of having to setup an environment manually, you can use the supplied Dockerfile
-to setup a reproducible environment, replace the `0.0.0.0:5984` in the commands below like above.
+Instead of having to set up an environment manually, you can use the supplied Dockerfile
+to set up a reproducible environment, replace the `0.0.0.0:5984` in the commands below like above.
 
 Make sure you have Docker installed on your system, and type the following into your terminal.
 
@@ -175,16 +176,26 @@ sudo docker run -e COUCHDB_CONNECTION_STR="http://admin:root@0.0.0.0:5984" -p 80
 <!-- --><!-- --><!--                  --><!-- --><!-- -->
 <!-- --><!-- --><!--                  --><!-- --><!-- -->
 ### Sandbox Analysis
-To setup the analysis service on a computer, you must first [install Racket](https://download.racket-lang.org/).
+To set up the analysis service on a computer, you must first
+[install Racket](https://download.racket-lang.org/) and
+[Sandboxie](https://sandboxie-plus.com/).
 Create a `SysinternalsSuite` directory at the root of your drive, this is usually `C:\SysinternalsSuite`.
-Place `Procmon64.exe` in there, you can [download it here](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon).
+Place `Procmon64.exe` in there, you can
+[download it here](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon).
+
+Alternatively, you can use these commands to download Procmon to that location.
+```shell
+mkdir /l %SystemDrive%\SysinternalsSuite 2>null
+curl https://live.sysinternals.com/Procmon64.exe --output %SystemDrive%\SysinternalsSuite\Procmon64.exe
+```
 
 ClamAV is required for the static analysis, I am using a distribution of ClamAV called ClamWin,
-[which can downloaded here](https://clamwin.com/content/view/18/46/), ClamWin will automatically download the latest malware definitions.
+[which can be downloaded here](https://clamwin.com/content/view/18/46/),
+ClamWin will automatically download the latest malware definitions.
 
 Run a new Command Prompt as administrator, and run `cd sandbox && start_sandbox.cmd`.
 The analysis service will now poll for tasks, in the case of it crashing it will automatically restart.
-Note the IP address and port of the service, in the format `0.0.0.0:8080` and add it to the adminstrator dashboard.
+Note the IP address and port of the service, in the format `0.0.0.0:8080` and add it to the administrator dashboard.
 
 ## Credits
 - ClamAV - [https://clamwin.com/](https://clamwin.com/)
