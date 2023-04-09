@@ -58,7 +58,7 @@ allowing users without prior knowledge of the field to use it.
 As soon as the installer is finished installing,
 the user can upload files to be scanned immediately.
 
-The platform is designed to be used by corporations,
+The platform is designed to be used by enterprises,
 it can be installed on all the computers on the network.
 When a user downloads a file, they will be prompted to
 upload it to the platform for analysis.
@@ -73,7 +73,7 @@ and although it is found in the server project,
 it is actually running on the client side during execution.
 The client is a native graphical user interface (GUI) application,
 designed for Microsoft Windows 10/11.
-To utilize the platform, users must install the client on their computer(s),
+To utilise the platform, users must install the client on their computer(s),
 once installed, it will automatically launch upon system boot.
 
 When a user downloads a file
@@ -90,16 +90,17 @@ The server project is responsible for establishing communication
 between the client and the sandbox,
 while also offering an administrator dashboard
 for carrying out administrative tasks.
-The administrator will be able to view statistics by looking at pie charts.
-seeing the ratio of malicious to clean scans,
-and remove workers, provisioning new clients and adding malicious patterns.
+The administrator will be able to view statistics by looking at charts
+and see the ratio of malicious to clean scans using the pie chart.
+They can also remove workers, provision new clients and add malicious patterns.
 
 The sandbox is responsible for running malware in a secure environment,
-executing files, and recording system call(s) for further analysis.
+and recording system call(s) for further analysis.
 It will also use static analysis as a fallback,
 the static analysis differs from my approach,
 in that, it doesn't actually scan the file dynamically
-and just looks for patterns of text and bytes in the file.
+it just looks for known patterns of text and bytes in the file
+and compares them to a list of definitions it periodically downloads.
 
 % Set out the objectives of the project clearly.
 % – You will have to address each of these in the evaluation / conclusion.
@@ -114,36 +115,38 @@ The objectives of this project are to:
       readable and maintainable code.
 \item Create a native GUI application for Microsoft Windows 10/11
       that provides users with a simple and easy-to-use,
-      way to scan files and monitor the scanning process.
+      way to scan files and monitor the scanning progress.
 \item Build a user-friendly dashboard for administrators to manage
       the platform's administrative tasks effectively.
 \item Establish a server to facilitate communication between
-      clients and the sandbox using RESTful APIs.
+      clients and the sandbox analysis instances using RESTful APIs.
 \item Create a secure platform that leverages state-of-the-art security
       measures to prevent unauthorised access to the platform.
 \item Produce code that adheres to good design principles,
-      allowing easier maintenance and modification.
+      allowing easy maintenance and modification.
 \end{itemize}
 
 \section{Sub-projects}
 \subsection{Client}
-The source code for the client can be accessed in
+The source code for the client can be found in
 the \texttt{client/src} directory, it is implemented in Python,
-utilizing the Tkinter library to create the graphical user interface,
+utilising the Tkinter library to create the graphical user interface,
 and using a threading library called "tkthread",
 to allow the application to do other tasks,
 without locking up the application's GUI.
+
 The client application comprises three sections:
-"Main Page" (Caladium), "Quarantine" and "Preferences."
+"Main Page" (Caladium), "Quarantine" and "Preferences".
 The "Main Page" features a text label displaying
 the current directory being scanned,
 along with a manual scanning button.
 Since the execution of Python code requires Python to be installed,
-PyInstaller is used to bundle all necessary components to run on any computer.
+PyInstaller is used to bundle together all the
+necessary components to run the application on any computer.
 
 Unfortunately, PyInstaller does not generate a single executable file,
 but it instead outputs a directory of files.
-I am using the "iexpress" tool included in Windows to
+I am using the "iexpress.exe" tool included in Windows to
 create an installer that outputs a single executable file.
 When executed it will install the Caladium client
 into the \texttt{Program Files} directory of the user's computer.
@@ -170,15 +173,16 @@ they are \textbf{clients}, \textbf{patterns},
 
 \subsection{Server}
 The code for the server can be found in the \texttt{server/src} directory.
-The server is responsible for bridging communications between the client and the sandbox.
+The server is responsible for bridging communications between
+the clients and the sandbox analysis instances.
 It is also written in Python like the client,
 using the Flask micro-framework for handling HTTP requests from clients.
-Data will be persisted using CouchDB, since the server is using Python,
+Data will be persisted using CouchDB, since the server is written in Python,
 it will be using the pycouchdb library to interface with the CouchDB instance.
 Data to be stored on the CouchDB instance will include records for
 each of the list pages in the dashboard listed above.
 
-\subsection{Sandbox}
+\subsection{Sandbox Analysis}
 The code for the sandbox can be found in the \texttt{sandbox/src} directory.
 The main part of it is written in Racket (a functional programming language),
 Since this platform is targeting malware that is designed to
@@ -220,16 +224,17 @@ To chat with this bot, navigate to the promotional page and press the
   \item The "Methodology" chapter will cover the way I developed the project,
   including my use of the Kanban board and using Git for source control.
   \item "Technology Review" contains a run down on my initial research on selecting
-  technologies for the project, and comparing the alternatives.
+  technologies for the project and my rationale for choosing them.
   \item "System Design" will explain how I structured the platform,
   and the various design patterns I adopted.
-  \item The "System Evaluation" will be me evaluating the system,
-  talking through its good parts and potential areas for improvement.
+  \item The "System Evaluation" will be an evaluation of how well
+  the project met the objectives set in this chapter.
   \item Finally I conclude with the "Conclusion" chapter.
 \end{itemize}
 
 \section{GitHub URL}
-The GitHub repository for the project can be found at the URL: \\
+The GitHub repository for the project can be found at the URL
+(You can also find it in Appendix A):\\
 \href{https://github.com/G00378925/caladium}{https://github.com/G00378925/caladium}
 
 Upon visiting this link,
@@ -238,5 +243,5 @@ giving a description of the project.
 
 At the bottom of the README,
 you will find instructions for building each component.
-In each of the directories, you will find each sub-project,
-all listed above.
+In each of the directories,
+you will find each sub-project that was listed above.

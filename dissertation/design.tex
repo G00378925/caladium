@@ -1,29 +1,45 @@
+% 14:27 09/04/2023
 \chapter{System Design}
 % Provide a detailed explanation of the overall system architecture
 % \cite{lin1991divergence}, i.e. the HOW of the project.
 % Use UML, system architecture diagrams, screenshots, code snippets 
 % and algorithms to illustrate your design.
 
-In this chapter, I will be discussing how when about designing my project
-and the design principles I used throughout.
-I will provide diagrams and screenshots of various components,
-and show implementation snippets of code.
+This chapter features a discussion of how the project was designed
+and the design principles used throughout.
+Diagrams and screenshots of the various components will be provided
+and show implementation snippets of code will be included.
 
 \begin{figure}[h!]
-    \includegraphics[width=0.9\textwidth]{images/diagrams/architecture}
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/diagrams/architecture}
     \caption{System Architecture Diagram}
     \label{image:sysArchitecture}
 \end{figure}
 
-Below you can see a system architecture diagram when in execution the platform can be broken down into three parts the client, server and sandbox side.
+The system architecture diagram shown above provides
+a top-down view of the platform during execution.
+
+It can be divided into three sections,
+each with the ability to run on different computers.
+
+On the left side, there is the client,
+which includes the GUI application and the dashboard
+that runs in the administrator's browser.
+In the middle, there is the server. On the right side,
+there are instances of sandbox analysis workers.
+Multiple instances of these workers can be created.
 
 \section{Windows GUI Application}
+The GUI application runs on a user's computer it runs on the client side
+
 Python files with the \texttt{frame.py} suffix contain Tkinter frame classes,
 and each of these files contains only one class that inherits the Tkinter frame class.
 
 \subsection{User Interface}
 The client post-provisioning features a Tkinter \texttt{Notebook},
-with 3 sub-frames, Main Page ("Caladium"), Quarantine and Preferences.
+with 3 sub-frames, \textbf{Main Page ("Caladium")},
+\textbf{Quarantine} and \textbf{Preferences}.
 You can navigate through these by clicking on each label on the window.
 The \texttt{Notebook} Tkinter widget allows you to
 group frames together allowing navigation between them.
@@ -31,19 +47,29 @@ group frames together allowing navigation between them.
 The Main Page in the frame features a button to manually scan a file,
 and a label indicating the current scanning directory.
 
-
 \subsubsection{Quarantine Page}
+The code for the quarantine page can be found in \texttt{client/src/quarantineframe.py}.
+
+The quarantine displays all the files currently in quarantine, it shows the original page of each file, with the ability the restore each file, by clicking the entry on the list box and then pressing the restore button.
+
+To add files to the quarantine users can press the quarantine button, and then select the file in the file picker.
+
+To allow users to pick files from their computers, \\
+I'm using \texttt{tkinter.filedialog.askopenfile("rb")},
+which returns a handle to a file when picked.
 
 \begin{figure}[h!]
     \centering
+    \label{image:quarantinePageScreenshot}
     \includegraphics[width=0.75\textwidth]{../docs/client.png}
     \caption{Quarantine Page Screenshot}
-    \label{image:quarantinePageScreenshot}
 \end{figure}
 
 \subsubsection{Preferences Page}
+The preferences page contains buttons, allowing users to adjust settings 
 
 \subsubsection{Scanning Frame}
+When the scanning process begins this window will open, it will have a text box containing real-time feedback from the server, and at the bottom will have a progress bar.
 
 \subsection{Quarantine}
 When files are added to the quarantine they are encrypted with an XOR cipher to avoid accidental execution of malware, in the event of the user accidentally stumbling upon the location of the quarantine.
@@ -68,8 +94,12 @@ This will be explained in more detail below.
 \subsection{Thread Model}
 
 \section{Server Dashboard}
-The dashboard is a single-page web application (SPA) it is fully written in JavaScript.
-This means when you navigate to another page in the dashboard it doesn't have to pull it from the server, just fetch the data specific to that page, then render it dynamically using JavaScript.
+The dashboard is a single-page web application (SPA)
+it is fully written in JavaScript.
+This means when you navigate to another page in the dashboard
+it doesn't have to pull it from the server,
+just fetch the data specific to that page,
+then render it dynamically using JavaScript.
 
 \begin{figure}[h!]
     \centering
@@ -89,7 +119,8 @@ When the page is loaded, the URL is checked against the dictionary
 and the corresponding page class is loaded.
 
 And doesn't make use of any external libraries.
-I made this decision early because I wanted to keep the project as self-contained as possible.
+I made this decision early because I wanted to keep the
+project as self-contained as possible.
 
 \subsection {Page Class Hierarchy}
 
@@ -100,8 +131,10 @@ I made this decision early because I wanted to keep the project as self-containe
 \end{figure}
 
 The dashboard is object-oriented,
-all of the main code can be found in the \textbf{server/static/js/index.js} file.
-This contains code for communicating with the server endpoints and classes for each page.
+all of the main code can be found in
+the \textbf{server/static/js/index.js} file.
+This contains code for communicating with
+the server endpoints and classes for each page.
 
 All pages inherit the \textbf{Page} class,
 as they share common functionality which upholds the DRY principle.
@@ -111,7 +144,8 @@ which is called when the page is loaded.
 This can be used for fetching data from the backend.
 
 \subsection{DOM Lisp Expressions}
-In a single-page application (SPA), all page content is dynamically generated without
+In a single-page application (SPA), all page content
+is dynamically generated without
 need to pull HTML from a server when navigating between pages.
 
 Initially, I considered embedding raw HTML within JavaScript code,
@@ -133,7 +167,7 @@ and returns a DOM object.
 
 The DOM is a tree of nested components that represents web applications within a browser.
 By using Lisp expressions as a DSL to represent DOMs,
-I have created a more elegant solution to generating dynamic
+I have created a more elegant solution for generating dynamic
 content within a single-page application.
 
 Below you will find an example of a DOM Lisp expression.
@@ -196,19 +230,19 @@ Each
         \hline
         \multicolumn{2}{|c|}{HTTP Methods and Descriptions} \\
         \hline
-        Method & Description\\
+        Method & Description \\
         \hline
-        GET & Fetches data from a server\\
+        GET & Fetches data from a server \\
         \hline
-        POST & Creates new data on the server\\
+        POST & Creates new data on the server \\
         \hline
-        PUT & Update existing data on the server\\
+        PUT & Update existing data on the server \\
         \hline
-        DELETE & Delete a record by ID\\
+        DELETE & Delete a record by ID \\
         \hline
     \end{tabular}
     \caption{HTTP Methods and Descriptions}
-    \label{table:httpmethods}
+    \label{table:httpMethods}
 \end{table}
 
 \subsection{Authentication}
@@ -267,3 +301,10 @@ We will check the output of this to see if it's malicious. If none detect anythi
 the scan will end and the file can be deemed clean.
 Each state of the process gives updates back to the server along with
 text messages that will be presented to the client.
+
+\section{Promotional Page}
+In addition to the projects above the platform features a promotional page hosted on GitHub Pages.
+
+It contains two buttons on the top of the page, the first downloads the latest build of the Caladium client from the GitHub releases.
+
+The second button is "Chat with CaladiumBot", this is a chatbot that is powered by GPT-3.5.

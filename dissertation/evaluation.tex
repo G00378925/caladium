@@ -5,9 +5,10 @@
 % This is a clear opportunity for you to demonstrate your
 % critical thinking in relation to the project.
 
-In this chapter, I will be evaluating my project against the
-objectives I set out in the introduction.
-I will be also discussing good areas and places that don't work as well as they should.
+In this chapter, the project will be evaluated against the
+objectives set out in the introduction.
+There will also be a discussion on the good areas and places
+that don't work as well as they should.
 
 \section{Detecting Malware}
 \subsection{Dynamic Analysis}
@@ -56,6 +57,10 @@ As static analysis is a tried and true method of detecting malware,
 there is a plethora of definitions for malicious patterns.
 
 \section{User Experience}
+A rich interface is provided to users and administrators through the
+client and the dashboard.
+
+Users have the ability to modify the current scanning directory.
 
 \section{Stability}
 Weird behaviour
@@ -118,23 +123,27 @@ so the solution I found is doing the check-ing parallel,
 each of the system calls would be added to a queue,
 and a worker would fetch a syscall and then run it against all the patterns.
 
-% % % % % % % % % % % % % % % % % % % %
-
 \section{RESTful APIs}
+Clients are able to communicate with the server through RESTful APIs,
 
-% % % % % % % % % % % % % % % % % % % %
 
 \section{Security}
 As stated in the introductory chapter, the platform needs to be secure,
 it would be rather hypocritical to ignore security in a
 platform targeted at identifying malware
 
+\subsection{Authentication}
 To get into the dashboard you must log in with a username and password.
 The password is hashed using the SHA-256 algorithm.
 If the server is compromised, the admin's password won't be readable.
 
 When you log in you are given a session token which is stored in the browser's local storage.
 All RESTful API calls require the session token to be sent with the request.
+
+In the \texttt{\_\_main\_\_.py}, you can find a function
+called \texttt{before\_request},
+this gets called before every request, it checks the path being requested
+and if the requestee as the correct token to access the resource.
 
 % https://owasp.org/www-community/attacks/xss/
 \subsection{Cross Site Scripting (XSS)}
@@ -147,3 +156,6 @@ after finding this security bug, to convert HTML to entity tags.
 \section {Design Principles}
 I set out an objective to have the code in my project
 adhere to good design principles
+
+Throughout the development I tried to go by the DRY
+(Do not Repeat Yourself) principle as much as possible.

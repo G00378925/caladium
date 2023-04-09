@@ -4,19 +4,44 @@
 % Remind the reader about the overall rationale and goals of the project.
 % Highlight your findings from the System Evaluation chapter.
 
+\section{Brief Summary}
 The goal of this project was to develop a software platform capable of
 detecting malicious software based on its behaviour.
 To do this files needed to be executed, these files are potentially malicious
 so they need to be isolated from the system they are running on.
+This was done with Sandboxie, and the actions/system calls would need to be logged,
+this was done with Process Monitor.
 
-Users have the ability to download a client, 
+Users will be able to download and install a client to their computer,
+the client will be a GUI Windows Application
+when the user downloads a new file it will see it and prompt the user to scan it.
+It will send the file to the server, the client will display the real-time progress of the scan,
+if found malicious the user will be prompted the quarantine the file.
 
 The client software communicates with the server using a
 RESTful API, which the dashboard also uses
 
 In the objectives, I stated I wanted to create a secure platform, as shown in the evaluation chapter, I showed that the administrator's password is hashed, and in the event of the dashboard being compromised, the plain text password would not be known.
 
+\section{Findings}
+\subsection{Format Agnosticity}
+One of the more interesting applications of the dynamic scanning
+feature is its format-agnostic capability.
+This means that it can scan any file, regardless of whether it is an executable file.
+
+For instance, you can scan an image file to
+see how it affects the Image Viewer in Windows.
+It is possible to exploit any security vulnerability in the process.
+
+Moreover, the dynamic scanning feature can scan other programming languages.
+For instance, if Java is installed, you can scan a Java JAR
+and observe the syscalls that Java would perform.
+
+\subsection{Cross Site Scripting (XSS)}
 Administrators can input data into various fields patterns for example,
 but I found my dashboard wasn't sanitising the inputs,
 so a malicious user could input raw HTML and my dashboard would
 display raw HTML which is referred to as XSS.
+
+\section{Conclusion}
+Overall the project has been a success all objectives have been achieved.

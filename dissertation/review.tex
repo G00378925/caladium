@@ -7,8 +7,8 @@
 
 This chapter provides a technical review of the technologies used in the platform.
 
-Detailing my reasoning behind selecting these specific technologies
-and how they contribute to accomplishing my objectives.
+Detailing the reasoning behind selecting these specific technologies
+and how they contribute to accomplishing the objectives laid out in the introduction.
 
 Also covering technologies specifically related to malware detection,
 these include Sandboxie and Process Monitor,
@@ -17,17 +17,17 @@ and widely accepted standards like JSON for transmitting data over networks.
 Lastly, it shows how the use of tooling like Docker
 can help with the creation of reproducible environments.
 
-First I will show the technologies that are general to all the sub-projects,
-and what I used to create the chatbot for the promotional page.
-Then I will list the technologies that are used in each specific sub-project.
+First, the technologies that are general to all the sub-projects will be shown,
+and what was used to create the chatbot for the promotional page.
+Then the technologies that were used in each sub-project.
 
 \section{JSON}
-In my platform, there will be multiple computers that receive and transmit data.
+In the platform, there will be multiple computers that receive and transmit data.
 There needs to be an agreed-upon format between these
 computers in which the data is encoded.
 The format must support dictionaries and lists to express data structures.
 
-I have decided to use JSON for this because the browser has
+JSON has been chosen for this because the browser has
 native support for encoding and decoding JSON,
 Python supports it through the JSON module, and Racket also supports it.
 
@@ -39,14 +39,14 @@ making it easy to transfer data between different systems.
 JSON can be used to represent a wide range of data types,
 including lists, dictionaries, and primitive types such as numbers and strings. \cite{ECMA-404}
 
-Below I will give an example of JSON being used in the browser to encode a dictionary:
+Below you will find an example of JSON being used in the browser to encode a dictionary:
 
 \begin{lstlisting}[language=Java]
 const myData = {"1": 2, 3: 4.0}
 console.log(JSON.stringify(myData));
 \end{lstlisting}
 
-And this is an example of it being used in Python:
+And this is an example of it being used in Python, using the \texttt{json} module.
 
 \begin{lstlisting}[language=Python]
 import json
@@ -163,8 +163,9 @@ and ghost threads, leading to even more problems that it fixes.
 Instead, tkthread provides a more elegant solution.
 
 \subsection{JavaScript}
-In the dashboard, I used JavaScript to add dynamicity to it,
-it is used to fetch data from the server using the RESTful API endpoints.
+JavaScript was used in the dashboard to add dynamicity,
+it is used to fetch data from the server using the RESTful API endpoints
+and display it to the screen.
 
 I wanted to take full advantage of all the new JavaScript features that were brought in
 recent years these include the ability to have classes and the new fetch function as an alternative to setting up the XMLHttpRequest object.
@@ -208,9 +209,21 @@ Page.prototype.setX = function(newX) {
 \end{lstlisting}
 
 Another addition of the ECMAScript 2015 is the \texttt{fetch} function,
-prior to this, you'd have to use the \texttt{XHttpRequest} object,
-this is important in Caladium, because it allows the dashboard to request data from the server through the RESTful APIs.
+prior to this, you'd have to use the \texttt{XMLHttpRequest} object,
+this is important in Caladium because it allows the dashboard to
+request data from the server through the RESTful APIs.
 
+I'm using the \texttt{fetch} function to request data from the server,
+It is much simpler than using the legacy XMLHttpRequest API.
+
+\begin{lstlisting}[language=Java]
+const caladiumFetchParameters = {
+    method: method, headers: {"Authorisation": localStorage["Authorisation"]},
+    body: body ? JSON.stringify(body) : undefined
+};
+const resp = await fetch(path, caladiumFetchParameters);
+return await resp.json();
+\end{lstlisting}
 
 \section{Technology in the Server}
 The server is the main component of the platform,
