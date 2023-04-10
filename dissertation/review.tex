@@ -14,10 +14,11 @@ Also covering technologies specifically related to malware detection,
 these include Sandboxie and Process Monitor,
 and widely accepted standards like JSON for transmitting data over networks.
 
-Lastly, it shows how the use of tooling like Docker
+For the server section, it shows how the use of tooling like Docker
 can help with the creation of reproducible environments.
 
-First, the technologies that are general to all the sub-projects will be shown,
+First, there will be a discussion on the technologies that are general
+to all the sub-projects,
 and what was used to create the chatbot for the promotional page.
 Then the technologies that were used in each sub-project.
 
@@ -29,20 +30,26 @@ The format must support dictionaries and lists to express data structures.
 
 JSON has been chosen for this because the browser has
 native support for encoding and decoding JSON,
-Python supports it through the JSON module, and Racket also supports it.
+Python supports it through the \texttt{json} module,
+and Racket also has it in its standard library.
 
 JSON stands for JavaScript Object Notation,
 a widely-used format for transmitting and storing data.
 
-It provides a standardized way of serializing complex data structures or collections,
+It provides a standardised way of serialising complex data structures or collections,
 making it easy to transfer data between different systems.
 JSON can be used to represent a wide range of data types,
 including lists, dictionaries, and primitive types such as numbers and strings. \cite{ECMA-404}
 
+The standard document for JSON referenced above
+provides developers with a specification to easily
+implement JSON encoding and decoding in their language.
+Also, its simplicity has made it popular amongst developers.
+
 Below you will find an example of JSON being used in the browser to encode a dictionary:
 
 \begin{lstlisting}[language=Java]
-const myData = {"1": 2, 3: 4.0}
+const myData = {"1": 2, 3: 4.0};
 console.log(JSON.stringify(myData));
 \end{lstlisting}
 
@@ -59,14 +66,17 @@ print(json.dumps(my_data))
 Python is an interpreted, high-level, general-purpose programming language.
 I chose to use Python because I wanted to use the same language for the client and server.
 When I serialised data in the client I could use the same
-deserialisation function on the server.
+deserialisation library on the server.
 
-Python is also a very simple language and is interpreted,
+Python is also a very simple language and can be run without complication,
 this allowed me to quickly test code, without having to compile it every time.
 
 Python comes with a package manager called \texttt{pip},
 which is accessible on all operating systems,
 this allows me to easily install dependencies required by the server.
+
+Python is less verbose than languages like Java,
+allowing you to get a lot done with a small amount of code.
 
 \section{GPT-3.5}
 In recent months, the popularity of large language models has exploded,
@@ -77,19 +87,19 @@ This model has been trained on a large corpus of text from the internet
 and can make predictions based on inputs to the model.
 
 Currently, this technology represents the state of the art in
-artificial intelligence and OpenAI's API make it freely available to anyone.
+artificial intelligence and OpenAI's API makes it freely available to anyone.
 
 To promote the platform, I have created a promotional page on
-my GitHub pages and added a bot (CaladiumBot) that can answer questions about it.
+GitHub pages and added a bot (CaladiumBot) that can answer questions about it.
 I fetch the latest version of the \texttt{README.md} file for
 this project, feed it into the OpenAI model as an initial prompt,
-and then use it to answer users' questions about the platform.
+and then used it to answer users' questions about the platform.
 
 OpenAI provides a module for Python,
 below you will find a minimal example of how I'm using it.
-The full implementation can be found in \texttt{/bot/\_\_main\_\_}.
+The full implementation can be found in \texttt{bot/\_\_main\_\_}.
 
-\begin{lstlisting}[language=Python]
+\begin{lstlisting}
 import openai # Set OpenAI API key as environmental variable
 openai.api_key = os.environ.get("OPENAI_API_KEY", None)
 
@@ -110,35 +120,48 @@ print(openai.ChatCompletion.create(model="gpt-3.5-turbo", \
 
 \section{Technology in the Client Side}
 As stated in the objectives, there will be a native GUI application,
-this will be a Windows application and will not run in the browser,
-the language was chosen to create the client in Python,
-so I am using Python-specific libraries to achieve this.
+this will be a Windows application so it will not run in the browser,
+the application will be written in Python,
+so I am using Python-specific libraries alongside it.
 
 \subsection{PyInstaller}
 A common reason why more people don't opt to use Python over a
-native language such as C/C++ is the fact you require Python,
-to run the code, some users that would like to use the software might 
-want to be able to install your software without having to install Python.
+native language such as C/C++ is the fact you require Python
+to run the code.
+Some users of a particular software might
+want to be able to run the software without having to install Python first.
 
-Pyinstaller is a module for Python that allows you to bundle your
-Python code with a Python interpreter, allowing it to be run on any
-a computer that doesn't have Python installed.
+PyInstaller is a module for Python that allows you to bundle your
+Python code with a Python interpreter, allowing it to be run on any computer
+that doesn't have Python installed.
 This allows your software to be self-contained and portable,
 users don't have to install Python on their computer to install your software.
+
+As shown in the documentation you can easily
+convert a Python project into a bundle. \cite{pyinstaller}
+
+Pass the main file location of the Python project into PyInstaller: \\
+\texttt{pyinstaller \_\_main\_\_.py}
 
 \subsection{Tkinter}
 Tkinter is the standard GUI library for Python,
 It is also cross-platform, allowing the client to run on Windows, Linux and macOS.
 It is stable and mature, with a plethora of documentation to be found on the internet.
 
-Tkinter makes it very easy to create a GUI, allowing developers to quickly prototype code
-I will give an example below,
-of creating a simple GUI window.
+Tkinter makes it very easy to create a GUI with a small amount of code,
+allowing developers to quickly build prototype code.
 
-\begin{lstlisting}[language=Python]
+The library features many GUI components including buttons, labels and input boxes,
+these are important for creating a native GUI application experience for Windows.
+
+I will give an example below, of creating a simple GUI window.
+
+\begin{lstlisting}
 import tkinter
 
+# Creating the main window object
 main_window = tkinter.Tk()
+# Main loop of execution, polling for updates
 main_window.mainloop()
 \end{lstlisting}
 
@@ -157,22 +180,61 @@ invoked by the callback can cause the GUI to freeze,
 causing the program to become unresponsive.
 
 While a naive solution might involve threading,
-this approach demands thread synchronization and can lead to race conditions
-and ghost threads, leading to even more problems that it fixes.
+this approach requires thread synchronization and can lead to race conditions
+and phantom threads, leading to even more problems that it fixes.
 
 Instead, tkthread provides a more elegant solution.
+tkthread is a third-party module for Python,
+that is non-affiliated with the developers of Tkinter.
+
+In the example below, I'm showing how you can use tkthread to patch
+Tkinter to allow async operations,
+when the button is pressed it will spawn a thread,
+that will give the UI a certain amount of time to draw itself.
+
+\begin{lstlisting}
+import tkthread
+# Patch tkinter to allow async operations
+tkthread.patch()
+
+import tkinter
+
+main_window = tkinter.Tk()
+
+def button_callback():
+  # Spawn new thread
+  @tkthread.main(main_window)
+  def my_thread():
+    while True:
+      print("This won't block the GUI")
+      
+      main_window.update() # Allow UI to update
+      main_window.after(1000)
+
+# Create new button, that will call function above
+my_button = tkinter.Button(main_window,
+    text="Test Button", command=button_callback)
+my_button.pack()
+
+main_window.mainloop()
+\end{lstlisting}
 
 \subsection{JavaScript}
 JavaScript was used in the dashboard to add dynamicity,
 it is used to fetch data from the server using the RESTful API endpoints
-and display it to the screen.
+and display it on the screen.
 
 I wanted to take full advantage of all the new JavaScript features that were brought in
-recent years these include the ability to have classes and the new fetch function as an alternative to setting up the XMLHttpRequest object.
+recent years, these include the ability to have classes and
+the new \texttt{fetch} function as an alternative to setting up the XMLHttpRequest object.
 
 The 6th edition of the ECMAScript standard \cite{ES6} (JavaScript standard) 
-introduced the class keyword for creating classes,
+introduced the \texttt{class} keyword for creating classes,
 before this developers had to create classes through prototypes.
+
+Classes are important in the dashboard because the list page classes
+all inherit from a common superclass allowing them to share code.
+
 \begin{lstlisting}[language=Java]
 class Page {
     int x;
@@ -208,13 +270,15 @@ Page.prototype.setX = function(newX) {
 }
 \end{lstlisting}
 
-Another addition of the ECMAScript 2015 is the \texttt{fetch} function,
+Another addition of the ECMAScript 2015 standard is the \texttt{fetch} function,
 prior to this, you'd have to use the \texttt{XMLHttpRequest} object,
 this is important in Caladium because it allows the dashboard to
 request data from the server through the RESTful APIs.
 
-I'm using the \texttt{fetch} function to request data from the server,
-It is much simpler than using the legacy XMLHttpRequest API.
+Below you can find an example of \texttt{fetch} being used in the dashboard,
+\texttt{fetch} accepts a number of parameters including the resource path,
+the HTTP headers, in this case, the \textbf{Authorisation}
+token and a body containing the data being sent to the server.
 
 \begin{lstlisting}[language=Java]
 const caladiumFetchParameters = {
@@ -230,7 +294,7 @@ The server is the main component of the platform,
 bridging communication between the client and the sandbox instances, 
 and providing RESTful APIs for the client to interact with it.
 
-The server needs to be able to persist data from administrators, 
+The server needs to be able to persist data for the administrators, 
 which is stored in CouchDB. Since the server is written in Python,
 it requires the pymongodb library to communicate with the DB instance.
 
@@ -245,12 +309,12 @@ I decided to use Flask to create the HTTP endpoints.
 
 Flask is a micro web framework written in Python.
 It is classified as a micro-framework because it does
-not require particular tools or libraries.
+not require any extra tools or libraries.
 This allowed me to create the HTTP endpoints for the RESTful API without
 having to worry about the underlying HTTP server.
 
 Below you will find some example code to create a Flask server,
-with a GET endpoint that returns "\texttt{Index Page}" on request.
+with a GET endpoint that returns the text "\texttt{Index Page}" on request.
 
 \begin{lstlisting}[language=Python]
 import flask
@@ -264,35 +328,81 @@ app.run()
 \end{lstlisting}
 
 \subsection{Representational State Transfer}
+I am using REST to model the HTTP endpoints for the server,
+REST was first described in Roy Thomas Fielding's dissertation \cite{REST}
+as a way of architecting APIs in a stateless manner to
+access resources over a network connection.
+
+REST is a set of best practices for how systems should interact with one another.
+It promotes scalability and allows for caching of resources.
+
+HTTP methods can be used to perform actions on a resource.
+For example, the \textbf{GET} method can be used to fetch data,
+which can also be cached.
+The \textbf{DELETE} method can be used to delete a record by its ID. \\
+
+For example, if there existed a set of endpoints that
+performed actions on a database of tasks.
+
+\textbf{GET} \texttt{/api/tasks} \\
+Would return a JSON array, containing all the tasks.
+
+\textbf{POST} \texttt{/api/tasks} \\
+Would be used to create a new task,
+and you'd pass in the new task through the HTTP body.
+
+\textbf{DELETE} \texttt{/api/tasks/0001} \\
+Would be used to delete a task by its ID,
+in this case, it would be the task with ID \texttt{0001}.
 
 \subsection{CouchDB}
 CouchDB is a document-oriented NoSQL database.
-An important feature of any platform for many users is the
-ability to be able to persist data.
+An important feature of any platform is the ability to persist data.
 
-In my case, I was using CouchDB to store the records for the
+In my case, I am using CouchDB to store the records for the
 \textbf{clients}, \textbf{patterns}, \textbf{tasks} and \textbf{workers} tables.
 
 I find NoSQL quite convenient compared to SQL databases,
 because I don't have to write out the queries,
 and NoSQL allows you to easily append JSON objects to the tables.
 
-I went with CouchDB because the simplistic nature of a document database is appealing,
+I went with CouchDB because of the simplistic nature of
+a document database is appealing,
 allowing me to spend more time on more complex features.
+CouchDB is also scalable, allowing many instances of it,
+allowing it to increase with more users.
 
 CouchDB provides an HTTP/JSON API, allowing any programming language
 with an HTTP library to interface with the DB instance.
 
 \subsection{pycouchdb}
 Python alone isn't able to communicate with the CouchDB instance,
-and requires a library in this case it's \textbf{pycouchdb}.
+and requires a library, in this case it's \textbf{pycouchdb}.
+
+pycouchdb provides an API for developers to easily interface with
+CouchDB without having to write the HTTP requests to do so.
+
+The example below shows how to use pycouchdb,
+to create a table called "tasks" and add a record.
+
+\begin{lstlisting}
+import pycouchdb
+
+# Connect to the DB using the connection str in the env variable
+couchdb_server = pycouchdb.Server(os.environ["COUCHDB_CONNECTION_STR"])
+
+# Create the table, and create a new record with the dictionary
+tasks_table = couchdb_server.create("tasks")
+tasks_table.save({"name": "task"})
+\end{lstlisting}
+
 
 \subsection{Docker}
 Docker is a tool used by developers to create reproducible environments.
 Meaning you can run your software on different computers,
 and it would have the exact same stuff installed.
 
-Most open-source projects come with a \texttt{Dockerfile} this provides
+Most open-source projects come with a \texttt{Dockerfile} it provides
 users interested in setting up the project on their own computer,
 with the same environment, the developers used.
 
@@ -302,7 +412,8 @@ You must then build containers using this file,
 you can have multiple containers on one machine,
 this is equivalent to having different computers with different Linux distributions.
 
-You must then run these containers, and this will execute the code of the project.
+You must then run these containers to
+execute the code of the project.
 These containers are isolated from the main system, and cannot edit files on the host system.
 I am using Docker to make it easy to test my project on different machines,
 allowing me to delete them easily,
@@ -316,7 +427,7 @@ to install the Linux Debian bullseye version.
 Then refresh the apt-get package manager,
 and install Python and the Python pip package manager.
 Installs the required Python modules,
-and copy the server files into the \texttt{/caladium} directory.
+and copies the server files into the \texttt{/caladium} directory.
 
 Then when you execute the container,
 it runs the \texttt{\_\_main\_\_.py} on port 8080.
@@ -336,8 +447,6 @@ COPY src/ /caladium
 ENTRYPOINT ["python3"]
 CMD ["__main__.py", "8080"]
 \end{lstlisting}
-
-\section{CouchDB}
 
 \section{Technology in the Analysis Side}
 In this section, I will be discussing the technology that
@@ -360,7 +469,7 @@ if the process is currently running under Sandboxie,
 it will fake a response, making the application think it was successful,
 allowing us to observe its behaviour to its full extent.
 
-The main purpose of using Sandboxie is to provide any
+The main purpose of using Sandboxie is to provide an
 easy to use isolation software for users, to run software
 without worrying about it harming the system.
 
@@ -384,10 +493,14 @@ it produces a log, of all the actions performed and the name of the process that
 I needed a way of finding out what the malware is doing,
 so I decided to use Process Monitor to log system calls.
 I originally was thinking of using a driver to log system calls,
-but I decided to use Process Monitor instead to avoid reinventing the wheel.
+but I decided to use Process Monitor instead, to avoid reinventing the wheel.
+
+As described by my research in the methodology chapter,
+Process Monitor features command-line parameters
+allowing it to be programmatically controlled by your code.
 
 \subsection{Racket}
-Racket is a functional programming language.
+Racket is a functional programming language. \cite{racket}
 I decided to program the main part of the analysis in Racket
 because I've used a lot of Python in other components and
 wanted to use a different programming language.
@@ -397,20 +510,43 @@ this means once variables are set a value, then they can't be updated.
 If you want to update a variable then you must create a new one with
 the changes.
 
+Racket is based on Lisp, which means List Processor,
+nearly everything in Racket is a list,
+Lisp stems from lambda calculus which is an area
+of mathematics for expressing computational models.
+
+Below you can find a function written in Racket that adds two numbers,
+the list begins with "define", the seconds parameter is the function name and arguments,
+and finally then the body of the function.
+
+\begin{lstlisting}
+(define (add x y)
+    (+ x y))
+\end{lstlisting}
+
 Racket comes with a plethora of documentation which can be found on its website.
 
 \subsection{ClamAV}
 ClamAV is an open-source anti-malware solution that
-supports Windows, macOS and Linux.
+supports Windows, macOS and Linux. \cite{clamav}
 This is the software I'm using to perform my static analysis.
 
 Most anti-malware software are paid and/or closed source,
 but ClamAV is the exception, on its website you can find a rich set of documentation,
 
-My case was concerned with the \textbf{clamscan} command, and its parameters.
+It comes with a number of command-line utilities.
+In my case I was concerned with the \textbf{clamscan} command, and its parameters.
 Most anti-malware solutions don't provide low-level access to their software
 requiring you to use their menuing because that's who their target audience is.
 
 ClamAV is targeted at power users,
 giving them the ability to modify the source code,
-and adding their own malware definitions.
+and being able to add their own malware definitions.
+
+I had some difficulties with setting up ClamAV on Windows,
+ClamAV is mostly targeted towards Linux users,
+but I found a modified distribution of ClamAV optimised for Windows
+called ClamWin.
+
+ClamWin periodically downloaded the latest malware definitions from its website,
+this all happens automatically.

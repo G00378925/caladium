@@ -8,24 +8,25 @@
 This chapter will be discussing the methodology,
 That I used whilst developing my project
 along with the research that helped guide it.
-The primary objective of my research was to help identify components,
+The primary objective of my research was to identify components,
 that would allow my platform to detect malware based on its behaviour.
 These components include Sandboxie and Process Monitor.
 
 Git played an important role during the development of the project.
-It is also used to store my promotional page,
-using GitHub Pages to automatically deploy it.
-I also used GitHub Actions to run a suite of tests to test the API endpoints.
-To manage tasks and time efficiently, I used a Kanban board on GitHub
+It is also used to host my promotional page,
+and it uses GitHub Pages to automatically deploy it.
+I also used GitHub Actions to run a suite of tests on the
+API endpoints when code was pushed to the repository.
+To manage tasks and time effectively, I used a Kanban board on GitHub
 and adopted an agile-style methodology to ensure
 progress with changing requirements.
 And I used Docker to create a reproducible environment,
-to avoid having to install and set up dependencies for different machines,
-And finally, the server will be hosted on the Microsoft Azure Cloud.
+to avoid having to install and set up dependencies for different machines.
+The server will be hosted on the Microsoft Azure Cloud.
 
 \section{Research}
-When I figured out what I wanted to do for my project
-on (that being malware detection),
+When I figured out what I wanted to do for my project on
+(that being malware detection),
 I conducted research on the various technologies that I could use.
 My initial focus was on tools that would enable me
 to log the system calls on Windows.
@@ -34,10 +35,10 @@ I quickly realised that this would be too time-consuming,
 and would take up too much of my time,
 preventing me from creating a comprehensive platform.
 
-My research led me to discover "Process Monitor" \cite{procmon}
-software by Microsoft that can be used to log system calls.
+My research led me to discover "Process Monitor" \cite{procmon},
+a software by Microsoft that can be used to log system calls.
 I also explored open-source software that
-I could leverage to do static analysis.
+I could use to do static analysis.
 I was originally going to do only dynamic analysis
 but there is always the potential of it not detecting malware,
 and there are already definitions of known malware on the internet.
@@ -65,14 +66,14 @@ While most people use Process Monitor's user interface
 to click buttons and navigate using its interface,
 I needed a method of using it automatically
 without manually directing it each time.
-Thankfully, I discovered that Process Monitor supports command line
-options which can be accessed by typing "\textbf{procmon.exe /?}".
+Thankfully, I discovered that Process Monitor supports some command-line
+options which can be viewed by typing "\textbf{procmon.exe /?}".
 This allowed me to start and stop Process Monitor as needed.
 
-Through experimentation, I was able to successfully call
-Process Monitor from my Racket program. After starting it,
+Through experimentation, I found a way to start
+Process Monitor from my Racket program.
 I would then spawn the program I was observing and record its behaviour.
-Once finished, I would shut down Process Monitor
+Once it was finished, I would shut down Process Monitor
 and convert the data it collected into a usable CSV format.
 To start Process Monitor with a minimized window,
 I used the command
@@ -82,38 +83,39 @@ I passed the
 \textbf{/Terminate} parameter to Process Monitor to stop monitoring.
 
 I struggled to find much documentation on the PML format,
-I then found that Process Monitor has a parameter to convert it to CSV format.
+I then found that Process Monitor had a parameter to convert it to CSV format.
 By using "\textbf{/OpenLog output-location.pml /SaveAs csv-location.csv}",
 This will output a plain-text file with each system call on a new line.
 One final problem was that Process Monitor didn't have the ability
-to filter out the process in question,
-so I made a Python script that filters out the process and its children.
+to filter out processes I wasn't interested in,
+so I made a Python script that filters out everything that
+isn't the process and its children.
 
 \subsection{Client Installer}
 For users to be able to install the client on their computers,
 I researched tools that could generate a Windows installer.
-I came across a tool called iexpress.exe,
+I came across a tool called \textbf{iexpress.exe},
 which is conveniently included in Windows.
 
-iexpress.exe is primarily used through its GUI,
-I discovered that it can accept a parameter
-- a SED file (\textbf{client/caladium.sed})
+\textbf{iexpress.exe} is primarily used through its GUI,
+I discovered that it can accept a parameter through the command-line,
+a SED file (\textbf{client/caladium.sed})
 containing instructions for iexpress to build an installer.
 
 Before creating the installer,
 I archived all the files generated by PyInstaller into a tarball (tar.gz)
 and included a script with the installer that
-extracts the archive into the Program Files directory on Windows.
+extracts the archive into the \texttt{Program Files} directory on Windows.
 I also have it so it creates a shortcut in the startup directory,
 so it starts on system boot.
 
 \section{Development}
 For version control, I used Git and hosted the repository on GitHub.
-I added a \textbf{.gitignore} to prevent temporary files
-and build outputs from being added to the GitHub repository.
+I added a \texttt{.gitignore} to prevent temporary files
+and build outputs from being pushed to the GitHub repository.
 Initially, I divided the project into
 three parts: the client, server, and sandbox,
-to maintain organization. I then created a \textbf{src} subdirectory
+to maintain organisation. I then created a \textbf{src} subdirectory
 for each sub-project, containing only the core code for that project.
 For instance, the server subproject has a \textbf{tests} directory
 containing test code that is not part of the core code.
@@ -136,11 +138,12 @@ Finding time to work on the project was challenging,
 as I had other modules besides the dissertation.
 I mostly worked on the project during weekends, and whenever
 I thought of a new feature, I would then add to the Kanban board.
-During development, I spent considerable time thinking
+During development, I spent a considerable amount of time thinking
 about possible solutions to problems. For example,
 to avoid embedding ugly HTML in my dashboard single application's JavaScript,
-I created a library called pantothenic.js that can convert 
-Lisp expressions into dynamic HTML.
+I created a library called \textbf{pantothenic.js} that can convert 
+string-based lisp expressions into DOM objects
+(you'll see more about this in the design chapter).
 
 \subsection{Weekly Progress Reports}
 Every week during the 2 semesters, I exchanged my progress report,
@@ -153,7 +156,7 @@ this would sometimes be research and/or development.
 I worked on the \texttt{DirChangeListener} class for the client,
 which is used to listen for changes in directories.
 
-This will be used to detect new files added to the download directory.
+This will be used to detect new files added to the downloads directory.
 I researched methods of implementing the sandbox analysis,
 and have a basic prototype of it working.
 
@@ -227,7 +230,7 @@ fixed the bar chart rendering bug in the dashboard.
 
 \textbf{26th of February - 4th of March} \\
 I implemented the uninstall functionality in the preferences menu in the client.
-I added the code to do the static analysis with ClamVM.
+I added the code to do the static analysis with ClamAV.
 I created a promotional page in the \texttt{/docs} directory
 that will automatically be deployed to GitHub Pages,
 upon pushing to the repository.
@@ -252,7 +255,7 @@ finished the README and created a screencast.
 Added a GPT 3.5 chatbot to the promotional page,
 the chatbot allows new users to ask questions about the platform.
 
-Fixed the piechart rendering for the clean-malware ratio in the dashboard.
+Fixed the pie chart rendering for the clean-malware ratio in the dashboard.
 Found an XSS security vulnerability that has now been fixed.
 And set a timeout for infinitely running scans,
 to be killed after a minute in the dynamic analysis.
@@ -284,18 +287,17 @@ The Kanban board had three columns: "Todo", "In Progress", and "Done".
 When I thought of a task that needed to be done, I placed it in the "Todo" column.
 When a task was in progress, I moved it to the "In Progress" column.
 Once I finished working on a task, I then moved it to the "Done" column.
-Appendix A \ref{sec:kanban_table} contains a list of
+Appendix B \ref{sec:kanban_table} contains a list of
 all the tasks I had on my Kanban board,
 every one of them are now in the "Done" column.
 
 \section{Software Testing}
 % What about validation and testing?
-I used test-driven approach (TDD) to develop the server endpoints.
+I used a test-driven approach (TDD) to develop the server endpoints.
 I used the "unittest" Python library to write unit tests for the server endpoints.
 
 I used the tests as a specification for the server endpoints.
 If the tests failed I wasn't implementing the endpoints correctly.
-
 I could run the tests and it would verify if I had broken any of the endpoints.
 
 The test files are prefixed with \textbf{test\_},
@@ -313,7 +315,7 @@ I wanted to automate the process of running a suite of tests.
 
 Therefore, I created a GitHub action that can be found at \\
 \texttt{.github/workflows/run\_tests.yml}.
-The YAML file instructs GitHub to spawn an instance of the server on their servers,
+The YAML file instructs GitHub to spawn an instance of the server, on their servers,
 sleep for 3 seconds, and then run the tests found
 under the \texttt{server/tests} directory.
 
