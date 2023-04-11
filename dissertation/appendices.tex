@@ -1,12 +1,12 @@
 % 21:09 04/04/2023
 \begin{appendices}
-\renewcommand{\chaptername}{Appendix}
+\renewcommand{\chaptername}{Appendix A}
 \renewcommand{\thechapter}{A}
 \chapter{}
 The GitHub repository for the project can be found at the URL: \\
 \href{https://github.com/G00378925/caladium}{https://github.com/G00378925/caladium}
 
-\renewcommand{\chaptername}{Appendix}
+\renewcommand{\chaptername}{Appendix B}
 \renewcommand{\thechapter}{B}
 \chapter{}
 \label{sec:kanban_table}
@@ -59,4 +59,111 @@ The GitHub repository for the project can be found at the URL: \\
     20 & Fix the auto-provisioning bug where it doesn't
     provision after inputting the profile JSON. \\
 \end{tabular}
+
+\renewcommand{\chaptername}{Appendix C}
+\renewcommand{\thechapter}{C}
+\chapter{}
+
+The following are instructions to build each component of Caladium:
+First, retrieve the latest build of Caladium, you can do that with this command:
+\texttt{git clone https://github.com/G00378925/caladium.git}
+
+Python is a requirement for all projects, you can
+\href{https://www.python.org/downloads/}{download and install, the latest version for your system here}
+
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+% <!-- --><!-- --><!-- Client --><!-- --><!-- -->
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+\section{Client}
+You must make sure you are on Microsoft Windows
+for this part as \textbf{iexpress.exe} is required.
+Run the following commands in \textbf{Command Prompt},
+making sure you are in the Caladium root directory.
+
+\begin{lstlisting}
+cd client
+python -m pip install -r requirements.txt
+
+rem You will be prompted to enter the IP address of the Caladium server
+
+build.cmd
+\end{lstlisting}
+
+This will result in a \texttt{caladium-setup.exe} in the \texttt{dist} directory,
+this is the installer that will be given to users.
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+% <!-- --><!-- --><!-- Server --><!-- --><!-- -->
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+% <!-- --><!-- --><!--        --><!-- --><!-- -->
+\section{Server}
+To build and run the server, enter the following commands into your terminal,
+these should work on Linux, macOS and Windows.
+
+You need the address of your CouchDB instance this needs
+to be put in the environmental variable \texttt{COUCHDB\_CONNECTION\_STR}.
+If on Windows use
+\texttt{set COUCHDB\_CONNECTION\_STR=admin:root@0.0.0.0:5984},
+if on Linux or macOS use
+\texttt{export COUCHDB\_CONNECTION\_STR=admin:root@0.0.0.0:5984}.
+With \texttt{admin:root@0.0.0.0:5984} being the CouchDB connection string.
+
+Make sure to swap out `python3` with `python` if executing on Windows.
+\begin{lstlisting}
+cd server/src
+
+python3 -m pip install flask requests
+python3 __main__.py
+\end{lstlisting}
+The address of the instance will be printed on the terminal.
+
+\subsubsection{Using Docker}
+Instead of having to set up an environment manually,
+you can use the supplied Dockerfile
+to set up a reproducible environment,
+replace the \texttt{0.0.0.0:5984} in the commands below like above.
+
+Make sure you have Docker installed on your system,
+and type the following into your terminal.
+
+\begin{lstlisting}
+cd server
+sudo docker build --tag caladium .
+sudo docker run -e COUCHDB_CONNECTION_STR=^
+    "http://admin:root@0.0.0.0:5984" -p 80:8080 caladium
+\end{lstlisting}
+% <!-- --><!-- --><!--                  --><!-- --><!-- -->
+% <!-- --><!-- --><!--                  --><!-- --><!-- -->
+% <!-- --><!-- --><!-- Sandbox Analysis --><!-- --><!-- -->
+% <!-- --><!-- --><!--                  --><!-- --><!-- -->
+% <!-- --><!-- --><!--                  --><!-- --><!-- -->
+\section{Sandbox Analysis}
+To set up the analysis service on a computer, you must first
+\href{https://download.racket-lang.org/}{install Racket} and
+\href{https://sandboxie-plus.com/}{Sandboxie}.
+Create a \texttt{SysinternalsSuite} directory at the root of your drive, this is usually \texttt{C:\\SysinternalsSuite}.
+Place \texttt{Procmon64.exe} in there, you can
+\href{https://learn.microsoft.com/en-us/sysinternals/downloads/procmon}{download it here}.
+
+Alternatively, you can use these commands to download Procmon to that location.
+\begin{lstlisting}
+mkdir /l %SystemDrive%\SysinternalsSuite 2>null
+curl https://live.sysinternals.com/Procmon64.exe ^
+    --output %SystemDrive%\SysinternalsSuite\Procmon64.exe
+\end{lstlisting}
+
+ClamAV is required for the static analysis,
+I am using a distribution of ClamAV called ClamWin,
+\href{https://clamwin.com/content/view/18/46/}{which can be downloaded here},
+ClamWin will automatically download the latest malware definitions.
+
+Run a new Command Prompt as administrator, and run \texttt{cd sandbox \\
+\&\& start\_sandbox.cmd}.
+The analysis service will now poll for tasks, in the case of it crashing it will automatically restart.
+Note the IP address and port of the service,
+in the format \texttt{0.0.0.0:8080}
+and add it to the administrator dashboard.
+
 \end{appendices}
