@@ -19,7 +19,7 @@ and they have begun to use new techniques to avoid detection
 from traditional anti-malware solutions.
 
 For the Applied Project and Minor Dissertation module,
-I was tasked with creating a significant software project.
+I've been tasked with creating a significant software project.
 I decided to create a platform that can detect malware based on its behaviour,
 using dynamic heuristic analysis, which involves executing files
 in a sandboxed environment and observing what the file does during its execution,
@@ -31,15 +31,29 @@ A sandbox is a way of isolating potentially harmful processes on your computer,
 limiting the resources it can access,
 sensitive files are an example of something you don't want malware accessing.
 
-It's easy to bypass traditional anti-malware scanning techniques,
-such as static analysis (this is looking for known patterns of strings or bytes in a file),
-Avoiding detection from the static analysis can be done using tools such as UPX.
-UPX has the ability to compress executable files, \cite{upx}
-hiding artefacts that would be used to identify malware.
-Disguising behaviour during execution is a lot harder
-than simply hiding artefacts in a file.
-That's why this method is much more effective at detecting malware.
+\section{Literature}
+Traditional anti-malware scanning techniques, such as static analysis
+(which involves looking for known patterns of strings or bytes in a file),
+can be easily bypassed. Malware authors often use techniques such as obfuscation
+\cite{4413008} to purposely hide data in the file from analysers.
 
+Packing is used to compress file contents, and have them decompress on execution,
+and sometimes malware is even encrypted to further hinder analysis,
+allowing the malware to have completely different
+static signatures while exhibiting the same behaviour.
+An example of a tool that can do this is UPX, this will be explained below.
+
+There is a lot of information about a program that isn't
+readily available just by analysing its static form.
+Once in execution, malicious software will carry out its malicious behaviour,
+which cannot be easily hidden \cite{10.1145/3329786}.
+This is why dynamic analysis is a much better strategy for detecting malware.
+
+Avoiding detection from static analysis can also be done using tools such as UPX.
+UPX has the ability to compress executable files \cite{upx},
+hiding artefacts that would be used to identify malware.
+
+\section{Project Overview}
 This project will be targeting Microsoft Windows 10/11,
 it will feature a GUI application that can be installed,
 allowing users to automatically scan downloaded files in a sandboxed environment.
@@ -65,13 +79,12 @@ upload it to the platform for analysis.
 The user will see a real-time analysis of the file.
 If the file is deemed malicious, the user will be prompted to quarantine it.
 
-\section{Project Overview}
 There will be three main sub-projects included in the platform,
 these being the client, server and sandbox.
 The dashboard is closely integrated with the server,
 and although it is found in the server project,
 it is actually running on the client side during execution.
-The client is a native graphical user interface (GUI) application,
+The client is a native GUI application,
 designed for Microsoft Windows 10/11.
 To utilise the platform, users must install the client on their computer(s),
 once installed, it will automatically launch upon system boot.
@@ -87,14 +100,14 @@ this is used to safeguard malicious files in a secure location,
 and includes an option for users to restore files to their original location.
 
 The server project is responsible for establishing communication
-between the client and the sandbox,
+between the client and the sandbox analysis worker,
 while also offering an administrator dashboard
 for carrying out administrative tasks.
 The administrator will be able to view statistics by looking at charts
 and see the ratio of malicious to clean scans using the pie chart.
 They can also remove workers, provision new clients and add malicious patterns.
 
-The sandbox is responsible for running malware in a secure environment,
+The sandbox analysis workers are responsible for running malware in a secure environment,
 and recording system call(s) for further analysis.
 It will also use static analysis as a fallback,
 the static analysis differs from my approach,
@@ -110,7 +123,7 @@ and compares them to a list of definitions it periodically downloads.
 The objectives of this project are to:
 \begin{itemize}
 \item Develop a robust and reliable software platform capable of detecting
-      malicious software based on its behaviour and quarantining if malicious.
+      malicious software based on its behaviour and quarantining it if malicious.
 \item Ensure the platform's stability and maintainability by producing clean,
       readable and maintainable code.
 \item Create a native GUI application for Microsoft Windows 10/11
@@ -135,7 +148,7 @@ and using a threading library called "tkthread",
 to allow the application to do other tasks,
 without locking up the application's GUI.
 
-The client application comprises three sections:
+The client application comprises of three sections:
 "Main Page" (Caladium), "Quarantine" and "Preferences".
 The "Main Page" features a text label displaying
 the current directory being scanned,
@@ -209,7 +222,7 @@ The promotional page can be found here:
 There is also a chatbot called CaladiumBot, source code can be found in the
 \texttt{bot} directory, it makes use of OpenAI's GPT 3.5 model. \cite{openai}
 The bot can answer questions about the platform,
-before talking to you it has been given a copy of the \texttt{README.md},
+before talking to you, it has been given a copy of the \texttt{README.md},
 and using that, it can then answer your questions.
 To chat with this bot, navigate to the promotional page and press the
 "Chat with CaladiumBot" button.
@@ -237,11 +250,9 @@ The GitHub repository for the project can be found at the URL
 (You can also find it in Appendix A):\\
 \href{https://github.com/G00378925/caladium}{https://github.com/G00378925/caladium}
 
-Upon visiting this link,
-you will be presented with the README,
+Upon visiting this link, you will be presented with the README,
 giving a description of the project.
 
-At the bottom of the README,
+At the bottom of the README, and in Appendix \ref{appendix:c},
 you will find instructions for building each component.
-In each of the directories,
-you will find each sub-project that was listed above.
+In each of the directories, you will find each sub-project that was listed above.

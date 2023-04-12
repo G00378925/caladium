@@ -9,7 +9,7 @@ The GitHub repository for the project can be found at the URL: \\
 \renewcommand{\chaptername}{Appendix B}
 \renewcommand{\thechapter}{B}
 \chapter{}
-\label{sec:kanban_table}
+\label{table:kanban_table}
 
 \begin{tabular}{|c|p{14cm}|}
     Card No. & Task \\
@@ -63,6 +63,7 @@ The GitHub repository for the project can be found at the URL: \\
 \renewcommand{\chaptername}{Appendix C}
 \renewcommand{\thechapter}{C}
 \chapter{}
+\label{appendix:c}
 
 The following are instructions to build each component of Caladium:
 First, retrieve the latest build of Caladium, you can do that with this command:
@@ -107,7 +108,7 @@ to be put in the environmental variable \texttt{COUCHDB\_CONNECTION\_STR}.
 If on Windows use
 \texttt{set COUCHDB\_CONNECTION\_STR=admin:root@0.0.0.0:5984},
 if on Linux or macOS use
-\texttt{export COUCHDB\_CONNECTION\_STR=admin:root@0.0.0.0:5984}.
+\texttt{export COUCHDB\_CONNECTION\_STR=admin:root@0.0.0.0:5984}. \\
 With \texttt{admin:root@0.0.0.0:5984} being the CouchDB connection string.
 
 Make sure to swap out `python3` with `python` if executing on Windows.

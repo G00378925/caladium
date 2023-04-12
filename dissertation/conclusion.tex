@@ -43,5 +43,33 @@ but I found my dashboard wasn't sanitising the inputs,
 so a malicious user could input raw HTML and my dashboard would
 display raw HTML which is referred to as XSS.
 
+\subsection{Network Reliability}
+When designing software that utilizes networking technology,
+it is important to avoid making naive assumptions based
+on the comfort of developing on a local machine.
+
+The reality is that developing for networks can be challenging, 
+as there are numerous factors to consider,
+including latency, potential delays before data reaches its destination,
+and unexpected network interruptions that may be beyond one's control.
+
+During the development of Caladium,
+I had to strike a balance between reliability and functionality.
+I made sure that it was working at a minimum between my
+Azure instance and my local computer,
+and decided to put the rest of my time into working on the rest of the functionality.
+
 \section{Conclusion}
 Overall the project has been a success all objectives have been achieved.
+
+The platform provides a user-friendly experience to users,
+they can download and install the client to their computer.
+
+It will automatically start on boot like any typical anti-malware solution,
+and begin scanning for newly downloaded files,
+when a new file is detected they are prompted to scan the file.
+
+When I began the project I wanted to learn more about functional programming hense
+me using Racket to create the main for the sandbox analysis.
+From what I've learned about functional programming I will now apply to
+other programming languages like Python to create much cleaner code.

@@ -1,3 +1,4 @@
+% 00:36 12/04/2023
 \chapter{System Evaluation}
 % Evaluate your project against the objectives set out in the introduction.
 % This chapter should present results if applicable
@@ -7,8 +8,6 @@
 
 In this chapter, the project will be evaluated against the
 objectives set out in the introduction.
-There will also be a discussion on the good areas and places
-that don't work as well as they should.
 
 \section{Detecting Malware}
 \subsection{Dynamic Analysis}
@@ -16,19 +15,19 @@ The main goal of this project is to detect malicious software.
 To achieve this, administrators can add malicious patterns through the dashboard.
 These patterns are then passed to the workers when a scan task is created.
 The software is executed, and its system calls are collected
-and compared against malicious patterns.
+and compared against the malicious patterns.
 If any of the system calls contain one of the patterns,
 then they can be deemed malicious.
 
-To test the dynamic analysis compile the C program found below
-(use a compiler such as GCC or Clang).
+To test the dynamic analysis, compile the C program provided below
+(using a compiler such as GCC or Clang).
+The program creates a file called "very\_malicious.txt" when executed,
+and this file name is added to the malicious patterns
+before scanning the executable.
 
-It creates a file called "very\_malicious.txt" when executed,
-and this file name to the malicious patterns before scanning the executable.
-
-Have the client application scan this file,
-use the manual scan on the main page.
-When scanned, the system successfully detected the file as malicious.
+Have the client application scan this file using
+the manual scan option on the main page.
+\textbf{Caladium successfully detected the file as being malicious.}
 
 \begin{lstlisting}[language=C]
 #include <windows.h>
@@ -45,28 +44,49 @@ int main(int argc, char *argv[]) {
 \end{lstlisting}
 
 \subsection{Static Analysis}
-The main goal of the project was to develop a platform capable
-of detecting malicious software based on its behaviour.
-This was done by executing the software in a sandboxed
-environment and logging the system calls.
-And then comparing the system calls to a list of malicious patterns.
-When I searched for databases on the internet of known malicious patterns,
-I didn't find many results, so I opted to include static analysis as well as a fallback.
+The primary method of malware detection is dynamic analysis,
+it uses static analysis as a fallback,
+and uses ClamAV to facilitate this.
 
-As static analysis is a tried and true method of detecting malware,
-there is a plethora of definitions for malicious patterns.
+To test this, I am using the "EICAR Test File" \cite{EICAR},
+which is a standardized file that is universally
+detected as malware by all anti-malware solutions.
+
+\textbf{Caladium successfully detects the file as malware.}
 
 \section{User Experience}
-A rich interface is provided to users and administrators through the
-client and the dashboard.
+A user-friendly interface is provided to both users and
+administrators through the client and the dashboard.
 
-Users have the ability to modify the current scanning directory.
+\subsection{Windows GUI Application}
+Users simply need to run an installer,
+which will automatically install and provision the software,
+and start it on system boot.
+It will immediately begin scanning the downloads directory,
+and users can easily remove the software through the preferences menu.
+
+The quarantine frame makes it easy for users to understand which
+files are quarantined and allows them to easily quarantine new files.
+Users also have the ability to modify the current scanning directory.
+
+\subsection{Dashboard}
+Administrators are prompted to log in to the dashboard and are
+given the option to change their password in the
+preferences menu once logged in.
+
+Administrators can disable dynamic analysis in case it breaks,
+and the system will fall back to static analysis.
+
+The dashboard is a single-page application, with seamless switching
+between pages without loading times.
+The list pages allow administrators to easily add and remove clients or workers.
 
 \section{Stability}
-Weird behaviour
+The platform functionality works very well, but I have noticed that there are unexpected problems when running over a network connection, I've tried to mitigate this by adding code to detect when a connection takes too long to run, or to detect exceptions, due to the unreliable nature of networks.
+
+When designing a platform that makes use of different languages and computers, getting everything to work seamlessly is quite the challenge.
 
 \section{Code Quality}
-
 \subsection{Cyclomatic Complexity}
 Cyclomatic complexity is a metric that measures how complex code is.
 This can indicate that there may be too much code inside a class or method.
@@ -88,11 +108,25 @@ it does not necessarily indicate good code readability.
 Readability can be improved by using good variable names.
 
 \subsection{Readability}
+Throughout the development process,
+I have made efforts to assign meaningful names to variables that reflect their purpose.
+When applicable, I have also created functions to break up functionality,
+which helps to keep the cyclomatic complexity low, as explained above.
+
+In the GUI application, I have organized each frame into its own class,
+such as the \texttt{QuarantineFrame}, which contains GUI-specific functionality.
+The actual code for handling quarantine logic is placed in a separate \texttt{Quarantine} class.
+
+I believe that implementing these measures has improved
+the overall readability of the application.
 
 \section{Scaling}
 The server is capable of handling multiple clients,
-but there is only one instance of the server running.
-This means in the event of the server crashing, clients will not be able to scan files.
+the platform was designed to make use of only one server,
+but it is possible to have multiple instances of the server,
+and have them all use the same CouchDB instance.
+
+In the case of one server crashing one of the clients would still have able to scan files, it they are using the other servers
 
 The platform can handle multiple scans at the same time, as multiple workers are supported.
 
@@ -119,13 +153,25 @@ def analysis_worker(syscall_queue, malicious_patterns):
 
 As you can see above, if the malicious\_patterns list grows
 significantly this would quickly become a bottleneck,
-so the solution I found is doing the check-ing parallel,
+so the solution I found is doing the checking in parallel,
 each of the system calls would be added to a queue,
 and a worker would fetch a syscall and then run it against all the patterns.
 
 \section{RESTful APIs}
-Clients are able to communicate with the server through RESTful APIs,
+Clients communicate with the server using RESTful APIs.
+Each of the endpoints is designed to be stateless,
+meaning that the server does not need to maintain context.
+HTTP methods such as \texttt{GET} and \texttt{POST} is used
+to specify the type of action to be performed.
 
+In the tasks endpoint, I am using the HTTP \texttt{DELETE}
+method to delete records by their ID.
+
+I have developed a suite of tests to test
+the endpoints when the code is pushed to the repository.
+Currently, all tests are passing. And I have also confirmed their functionality
+as the GUI application is able to successfully scan files,
+which relies on the APIs functioning correctly.
 
 \section{Security}
 As stated in the introductory chapter, the platform needs to be secure,
@@ -143,9 +189,8 @@ All RESTful API calls require the session token to be sent with the request.
 In the \texttt{\_\_main\_\_.py}, you can find a function
 called \texttt{before\_request},
 this gets called before every request, it checks the path being requested
-and if the requestee as the correct token to access the resource.
+and if the requester has the correct token to access the resource.
 
-% https://owasp.org/www-community/attacks/xss/
 \subsection{Cross Site Scripting (XSS)}
 Cross-site scripting is a type of attack \cite{XSS},
 where attacks can inject code into other users' browser sessions,
@@ -157,5 +202,8 @@ after finding this security bug, to convert HTML to entity tags.
 I set out an objective to have the code in my project
 adhere to good design principles
 
-Throughout the development I tried to go by the DRY
+Throughout the development, I tried to go by the DRY
 (Do not Repeat Yourself) principle as much as possible.
+
+This is evident in the Page hierarchy found in the dashboard,
+where 
