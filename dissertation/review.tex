@@ -211,7 +211,7 @@ def button_callback():
       main_window.update() # Allow UI to update
       main_window.after(1000)
 
-# Create new button, that will call function above
+# Create new button, that will call the function above
 my_button = tkinter.Button(main_window,
     text="Test Button", command=button_callback)
 my_button.pack()
@@ -377,7 +377,7 @@ with an HTTP library to interface with the DB instance.
 
 \subsection{pycouchdb}
 Python alone isn't able to communicate with the CouchDB instance,
-and requires a library, in this case it's \textbf{pycouchdb}.
+and requires a library, in this case, it's \textbf{pycouchdb}.
 
 pycouchdb provides an API for developers to easily interface with
 CouchDB without having to write the HTTP requests to do so.
@@ -532,10 +532,10 @@ supports Windows, macOS and Linux. \cite{clamav}
 This is the software I'm using to perform my static analysis.
 
 Most anti-malware software are paid and/or closed source,
-but ClamAV is the exception, on its website you can find a rich set of documentation,
+but ClamAV is the exception, on its website, you can find a rich set of documentation,
 
 It comes with a number of command-line utilities.
-In my case I was concerned with the \textbf{clamscan} command, and its parameters.
+In my case, I was concerned with the \textbf{clamscan} command, and its parameters.
 Most anti-malware solutions don't provide low-level access to their software
 requiring you to use their menuing because that's who their target audience is.
 

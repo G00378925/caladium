@@ -54,39 +54,18 @@ detected as malware by all anti-malware solutions.
 
 \textbf{Caladium successfully detects the file as malware.}
 
-\section{User Experience}
-A user-friendly interface is provided to both users and
-administrators through the client and the dashboard.
+\subsection{Quarantine}
+When the sandbox analysis worker detects the file being malware,
+it will send a message back to the client indicating "malware\_detected".
 
-\subsection{Windows GUI Application}
-Users simply need to run an installer,
-which will automatically install and provision the software,
-and start it on system boot.
-It will immediately begin scanning the downloads directory,
-and users can easily remove the software through the preferences menu.
-
-The quarantine frame makes it easy for users to understand which
-files are quarantined and allows them to easily quarantine new files.
-Users also have the ability to modify the current scanning directory.
-
-\subsection{Dashboard}
-Administrators are prompted to log in to the dashboard and are
-given the option to change their password in the
-preferences menu once logged in.
-
-Administrators can disable dynamic analysis in case it breaks,
-and the system will fall back to static analysis.
-
-The dashboard is a single-page application, with seamless switching
-between pages without loading times.
-The list pages allow administrators to easily add and remove clients or workers.
-
-\section{Stability}
-The platform functionality works very well, but I have noticed that there are unexpected problems when running over a network connection, I've tried to mitigate this by adding code to detect when a connection takes too long to run, or to detect exceptions, due to the unreliable nature of networks.
-
-When designing a platform that makes use of different languages and computers, getting everything to work seamlessly is quite the challenge.
+The user in the client will then be prompted to quarantine the malware,
+and the scan will finish.
+The quarantined file can be found in the quarantine frame,
+concluding that the quarantining feature works correctly.
 
 \section{Code Quality}
+I'm accessing the code quality on its cyclomatic complexity and how readable it is.
+
 \subsection{Cyclomatic Complexity}
 Cyclomatic complexity is a metric that measures how complex code is.
 This can indicate that there may be too much code inside a class or method.
@@ -120,42 +99,32 @@ The actual code for handling quarantine logic is placed in a separate \texttt{Qu
 I believe that implementing these measures has improved
 the overall readability of the application.
 
-\section{Scaling}
-The server is capable of handling multiple clients,
-the platform was designed to make use of only one server,
-but it is possible to have multiple instances of the server,
-and have them all use the same CouchDB instance.
+\section{User Experience}
+A user-friendly interface is provided to both users and
+administrators through the client and the dashboard.
 
-In the case of one server crashing one of the clients would still have able to scan files, it they are using the other servers
+\subsection{Windows GUI Application}
+Users simply need to run an installer,
+which will automatically install and provision the software,
+and start it on system boot.
+It will immediately begin scanning the downloads directory,
+and users can easily remove the software through the preferences menu.
 
-The platform can handle multiple scans at the same time, as multiple workers are supported.
+The quarantine frame makes it easy for users to understand which
+files are quarantined and allows them to easily quarantine new files.
+Users also have the ability to modify the current scanning directory.
 
-\section{Time Complexity}
-When a file is executed by the worker it produces a log of all the
-system calls it produces, a list of patterns is passed to
-the worker in order to be checked against the system calls
-if there is a match then the file can be deemed malicious.
+\subsection{Dashboard}
+Administrators are prompted to log in to the dashboard and are
+given the option to change their password in the
+preferences menu once logged in.
 
-This is a sample of the code from \texttt{sandbox/src/syscall\_analysis.py}
-it has a O($n$ * $m$) time complexity, $n$ being the size of the syscalls
-and $m$ being the size of the patterns\_list.
-\begin{lstlisting}
-def analysis_worker(syscall_queue, malicious_patterns):
-  while True:
-    # Fetch a syscall from the queue
-    try: syscall = syscall_queue.get(timeout=1)
-    except: break
-    for pattern in malicious_patterns:
-      # Check for a pattern match
-      if pattern in syscall:
-        # Detection . . .
-\end{lstlisting}
+Administrators can disable dynamic analysis in case it breaks,
+and the system will fall back to static analysis.
 
-As you can see above, if the malicious\_patterns list grows
-significantly this would quickly become a bottleneck,
-so the solution I found is doing the checking in parallel,
-each of the system calls would be added to a queue,
-and a worker would fetch a syscall and then run it against all the patterns.
+The dashboard is a single-page application, with seamless switching
+between pages without loading times.
+The list pages allow administrators to easily add and remove clients or workers.
 
 \section{RESTful APIs}
 Clients communicate with the server using RESTful APIs.
@@ -172,6 +141,8 @@ the endpoints when the code is pushed to the repository.
 Currently, all tests are passing. And I have also confirmed their functionality
 as the GUI application is able to successfully scan files,
 which relies on the APIs functioning correctly.
+
+GitHub shows a green check mark when all the tests are passing.
 
 \section{Security}
 As stated in the introductory chapter, the platform needs to be secure,
@@ -207,3 +178,45 @@ Throughout the development, I tried to go by the DRY
 
 This is evident in the Page hierarchy found in the dashboard,
 where 
+
+\section{Stability}
+The platform functionality works very well, but I have noticed that there are unexpected problems when running over a network connection, I've tried to mitigate this by adding code to detect when a connection takes too long to run, or to detect exceptions, due to the unreliable nature of networks.
+
+When designing a platform that makes use of different languages and computers, getting everything to work seamlessly is quite the challenge.
+
+\section{Scaling}
+The server is capable of handling multiple clients,
+the platform was designed to make use of only one server,
+but it is possible to have multiple instances of the server,
+and have them all use the same CouchDB instance.
+
+In the case of one server crashing one of the clients would still have the ability to scan files if they are using the other servers
+
+The platform can handle multiple scans at the same time, as multiple workers are supported.
+
+\section{Time Complexity}
+When a file is executed by the worker it produces a log of all the
+system calls it produces, a list of patterns is passed to
+the worker in order to be checked against the system calls
+if there is a match then the file can be deemed malicious.
+
+This is a sample of the code from \texttt{sandbox/src/syscall\_analysis.py}
+it has a O($n$ * $m$) time complexity, $n$ being the size of the syscalls
+and $m$ being the size of the patterns\_list.
+\begin{lstlisting}
+def analysis_worker(syscall_queue, malicious_patterns):
+  while True:
+    # Fetch a syscall from the queue
+    try: syscall = syscall_queue.get(timeout=1)
+    except: break
+    for pattern in malicious_patterns:
+      # Check for a pattern match
+      if pattern in syscall:
+        # Detection . . .
+\end{lstlisting}
+
+As you can see above, if the malicious\_patterns list grows
+significantly this would quickly become a bottleneck,
+so the solution I found is doing the checking in parallel,
+each of the system calls would be added to a queue,
+and a worker would fetch a syscall and then run it against all the patterns.

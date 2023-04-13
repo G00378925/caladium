@@ -5,71 +5,178 @@
 % Highlight your findings from the System Evaluation chapter.
 
 \section{Brief Summary}
-The goal of this project was to develop a software platform capable of
-detecting malicious software based on its behaviour.
-To do this files needed to be executed, these files are potentially malicious
-so they need to be isolated from the system they are running on.
-This was done with Sandboxie, and the actions/system calls would need to be logged,
-this was done with Process Monitor.
+The goal of this project was to develop a platform capable
+of detecting malicious software based on its behaviour.
 
-Users will be able to download and install a client to their computer,
-the client will be a GUI Windows Application
-when the user downloads a new file it will see it and prompt the user to scan it.
-It will send the file to the server, the client will display the real-time progress of the scan,
-if found malicious the user will be prompted the quarantine the file.
+For this to be achieved, files needed to be executed,
+these files were potentially malicious,
+so they needed to be isolated from the host system.
+Sandboxie was used for isolation,
+and Process Monitor was used to log
+the actions/system calls of the software being run.
 
-The client software communicates with the server using a
-RESTful API, which the dashboard also uses
+Users can download and install a GUI Windows application client on their computer.
+When a user downloads a new file, the client will detect it and prompt the user to scan it.
+The file will be sent to the server and then will be passed to a sandbox analysis worker,
+and the client will display the real-time feedback of the scan.
+If the file is found to be malicious, the user will then be prompted to quarantine it.
 
-In the objectives, I stated I wanted to create a secure platform, as shown in the evaluation chapter, I showed that the administrator's password is hashed, and in the event of the dashboard being compromised, the plain text password would not be known.
+The clients communicate with the server through a RESTful API,
+the dashboard also uses this.
+The dashboard was designed to be user-friendly,
+allowing administrators to easily perform administrative tasks
+such as adding and removing workers.
+
+In the objectives, it was stated that security would be given top priority.
+In the evaluation chapter, I showed that the administrator's password is hashed,
+and in the event of the dashboard being compromised,
+the plain text password would never be known.
+When auditing the code I did find some security vulnerabilities,
+this was the XSS which allowed unsanitised HTML to be injected.
+I then fixed this by substituting the HTML < and >
+characters with their entity equivalents.
+
+I aimed to create clean and readable code and use good practices,
+such as the DRY (Don't Repeat Yourself) principle whilst developing the software.
+
+Using an agile methodology,
+I broke down features into tasks and added them to the Kanban board
+(can be found in Appendix \ref{table:kanbanBoard}).
+I created tests for the endpoints which can be found in \texttt{server/tests} directory,
+and these are automatically executed when the code is pushed to the repository.
+Every couple of weeks in the 2nd semester, I made releases of the client,
+which can be found in the releases section in the GitHub repository.
+I am currently on my 6th release.
 
 \section{Findings}
+\subsection{Outcomes}
+\begin{itemize}
+    \item Can detect malware using dynamic and static
+    analysis and quarantine if deemed malicious.
+    \item Created a comprehensive platform,
+    that is well-organised and has clean and readable code.
+    \item Created a native GUI application for Windows
+    that allows users to scan their files and shows the scan progress.
+    \item The dashboard allows administrators to perform administrative
+    actions on the platform such as removing and adding workers.
+    \item Clients can communicate with the server using the
+    RESTful API, and has been tested using the test suite found in \texttt{server/tests}.
+    \item The password for the administrator user is hashed to prevent
+    unauthorised access in the case of compromise,
+    and the XSS vulnerability that was found, has been patched.
+\end{itemize}
+
 \subsection{Format Agnosticity}
-One of the more interesting applications of the dynamic scanning
-feature is its format-agnostic capability.
-This means that it can scan any file, regardless of whether it is an executable file.
+One of the more interesting applications of the
+dynamic scanning feature is its format-agnostic capability.
+This means that it can scan any file,
+regardless of whether it is an executable file or not.
 
-For instance, you can scan an image file to
-see how it affects the Image Viewer in Windows.
-It is possible to exploit any security vulnerability in the process.
+For example, you can scan an image file to see how
+it affects the image viewer in Windows.
+Even though the image isn't an executable file,
+it could be crafted in such a way as to exploit
+a vulnerability in the image viewer resulting in code execution.
 
-Moreover, the dynamic scanning feature can scan other programming languages.
-For instance, if Java is installed, you can scan a Java JAR
+The dynamic scanning feature can be used to scan
+the files of other programming languages.
+For example, if Java is installed, you can scan a Java JAR
 and observe the syscalls that Java would perform.
 
 \subsection{Cross Site Scripting (XSS)}
-Administrators can input data into various fields patterns for example,
-but I found my dashboard wasn't sanitising the inputs,
-so a malicious user could input raw HTML and my dashboard would
-display raw HTML which is referred to as XSS.
+Administrators can input data into various fields on the dashboard,
+such as adding new malicious patterns.
+
+I discovered that my dashboard was not sanitising the inputs,
+which could allow a malicious user to input raw HTML
+that would be displayed as it is on the dashboard,
+resulting in a vulnerability known as the XSS.
+
+This is a common oversight made by many developers,
+as it requires in-depth knowledge of how browsers display content,
+which may be lacking, especially for developers who come
+from a server development background with less exposure to the web.
 
 \subsection{Network Reliability}
-When designing software that utilizes networking technology,
+When designing software that utilises networking technology,
 it is important to avoid making naive assumptions based
 on the comfort of developing on a local machine.
 
-The reality is that developing for networks can be challenging, 
+The reality is that developing for networks is challenging,
 as there are numerous factors to consider,
 including latency, potential delays before data reaches its destination,
 and unexpected network interruptions that may be beyond one's control.
 
 During the development of Caladium,
 I had to strike a balance between reliability and functionality.
-I made sure that it was working at a minimum between my
-Azure instance and my local computer,
-and decided to put the rest of my time into working on the rest of the functionality.
+I made sure that it was working at a minimum between
+my Azure instance and my local computer and decided to
+put the rest of my time into working on the remaining functionality.
+
+This serves as a lesson to me to avoid jumping to the
+first thing that comes to my head, and to research technologies
+that are trusted in the industry that facilitate communication
+between distributed systems, like my platform.
+
+\subsection{Opportunities Identified for Future Investigation}
+To determine if a file is malicious,
+I use heuristics that involve checking if the system calls
+contain any of the known malicious pattern strings.
+
+Regular expressions may have been more appropriate for this purpose,
+but I decided against using them due to them being computationally
+expensive and potentially slowing down the scanning process.
+
+Another possible approach is to assign weights to certain patterns,
+and if the total malicious score exceeds a certain threshold,
+then the file can be considered malicious.
+
+In my system, I use an absolute approach, 
+if a syscall contains any of the known patterns,
+it is considered malicious.
+This could be a potential application of fuzzy logic,
+where there is an aspect of uncertainty.
+
+Models like GPT could have been used,
+it could take in a sample of the system calls and
+determine if they are malicious based on that,
+I also decided against this as it's quite expensive at this time.
 
 \section{Conclusion}
-Overall the project has been a success all objectives have been achieved.
+Overall, the project has been a massive success,
+because I achieve all my objectives set out in the introduction.
 
-The platform provides a user-friendly experience to users,
-they can download and install the client to their computer.
+The platform provides a user-friendly experience to
+users who can download and install the client on their computer.
 
-It will automatically start on boot like any typical anti-malware solution,
-and begin scanning for newly downloaded files,
-when a new file is detected they are prompted to scan the file.
+It will automatically start on boot, similar to typical anti-malware solutions,
+and begin scanning for newly downloaded files.
+When a new file is detected, users are prompted to scan the file.
 
-When I began the project I wanted to learn more about functional programming hense
-me using Racket to create the main for the sandbox analysis.
-From what I've learned about functional programming I will now apply to
-other programming languages like Python to create much cleaner code.
+Upon scanning, the file will be run on a sandbox analysis worker,
+providing in-depth feedback back to the client,
+and will then use ClamAV as a fallback for static analysis.
+
+The most challenging part of the project was implementing the dynamic analysis,
+as I did not have any libraries that could do this for me.
+I had to research and combine different components to achieve this.
+I used a variety of languages and libraries to make Caladium possible.
+
+Due to this being a significant project with multiple components,
+I learned about good software practices and applied methodologies such as agile.
+I also created tests for the endpoints that were tested upon pushing to the repository.
+
+I gained knowledge about the malware side
+of cybersecurity by researching malware detection
+and dynamic analysis. \cite{10.1145/3329786}
+Developing software requires knowledge not only in software development but also in neighbouring fields.
+
+I found an opportunity to use GPT-3.5 in my project,
+it was used in the CaladiumBot, which answers questions about the platform.
+The model is given the \texttt{README.md} as an initial prompt,
+this is how it's able to answer questions about Caladium.
+
+When I started the project, I wanted to learn more about functional programming,
+which is why I used Racket to write the main part of the sandbox analysis.
+Functional programming can help promote cleaner code,
+and this can be applied to other programming languages such as Python.

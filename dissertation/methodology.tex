@@ -24,21 +24,38 @@ And I used Docker to create a reproducible environment,
 to avoid having to install and set up dependencies for different machines.
 The server will be hosted on the Microsoft Azure Cloud.
 
+\section{Determining Requirements}
+I recognised that most anti-malware solutions targeting consumers
+come with a GUI application for performing scans.
+I wanted to do the same, which is why there is a GUI application.
+
+There would be a server component and a database to persist data for the server.
+After some thought, I decided against performing scanning on the server.
+Instead, I opted to have the scanning done on separate analysis workers.
+This would isolate any potential malware from compromising the server and
+allows for scanning to be done in parallel.
+
+For communication between the client and server, I chose to use RESTful APIs.
+I chose this because it is now the de facto standard for web applications and is quite simple.
+
+I also included a dashboard to provide a user-friendly interface for administrators,
+enabling them to perform actions on the platform as a whole without
+having to do it through a tedious command-line interface.
+
 \section{Research}
-When I figured out what I wanted to do for my project on
+When I figured out what I wanted to do my project on
 (that being malware detection),
 I conducted research on the various technologies that I could use.
 My initial focus was on tools that would enable me
 to log the system calls on Windows.
 Although I initially considered creating the logging software myself,
 I quickly realised that this would be too time-consuming,
-and would take up too much of my time,
-preventing me from creating a comprehensive platform.
+preventing me from creating a full-featured platform in the time given.
 
 My research led me to discover "Process Monitor" \cite{procmon},
 a software by Microsoft that can be used to log system calls.
 I also explored open-source software that
-I could use to do static analysis.
+I could use it to do static analysis.
 I was originally going to do only dynamic analysis
 but there is always the potential of it not detecting malware,
 and there are already definitions of known malware on the internet.
@@ -79,20 +96,19 @@ To start Process Monitor with a minimized window,
 I used the command
 "\textbf{procmon.exe /Minimized /BackingFile output-location.pml}",
 which produces a PML file. After the monitored process had finished,
-I passed the
-\textbf{/Terminate} parameter to Process Monitor to stop monitoring.
+I passed the \textbf{/Terminate} parameter to Process Monitor to stop monitoring.
 
 I struggled to find much documentation on the PML format,
 I then found that Process Monitor had a parameter to convert it to CSV format.
 By using "\textbf{/OpenLog output-location.pml /SaveAs csv-location.csv}",
-This will output a plain-text file with each system call on a new line.
+I could output a plain-text file with each system call on a new line.
 One final problem was that Process Monitor didn't have the ability
 to filter out processes I wasn't interested in,
 so I made a Python script that filters out everything that
-isn't the process and its children.
+isn't the process and it's children.
 
 \subsection{Client Installer}
-For users to be able to install the client on their computers,
+For users to be able to install the client on their computer(s),
 I researched tools that could generate a Windows installer.
 I came across a tool called \textbf{iexpress.exe},
 which is conveniently included in Windows.
@@ -119,7 +135,7 @@ to maintain organisation. I then created a \textbf{src} subdirectory
 for each sub-project, containing only the core code for that project.
 For instance, the server subproject has a \textbf{tests} directory
 containing test code that is not part of the core code.
-Similarly, I moved the core code of the client to the
+Like the server, I moved the core code of the client to the
 \textbf{src} subdirectory, leaving
 the installer code in its original directory.
 
@@ -129,7 +145,7 @@ a stale version, I regularly committed changes to the
 GitHub repository and pulled the latest version of the
 repository to the current workstation. For text editing,
 I used Visual Studio Code, which provides text suggestions,
-and occasionally used VIM to edit smaller scripts and files,
+and I occasionally used VIM to edit smaller scripts and files,
 especially when working on Racket code.
 I used Overleaf to write the dissertation and pushed the changes to the
 \texttt{dissertation} directory in the GitHub repository.
@@ -137,12 +153,12 @@ I used Overleaf to write the dissertation and pushed the changes to the
 Finding time to work on the project was challenging,
 as I had other modules besides the dissertation.
 I mostly worked on the project during weekends, and whenever
-I thought of a new feature, I would then add to the Kanban board.
+I thought of a new feature, and I would add it to the Kanban board.
 During development, I spent a considerable amount of time thinking
 about possible solutions to problems. For example,
 to avoid embedding ugly HTML in my dashboard single application's JavaScript,
 I created a library called \textbf{pantothenic.js} that can convert 
-string-based lisp expressions into DOM objects
+string-based Lisp expressions into DOM objects
 (you'll see more about this in the design chapter).
 
 \subsection{Weekly Progress Reports}
@@ -229,11 +245,10 @@ Added a button to unprovision the client, I also added an icon to the executable
 fixed the bar chart rendering bug in the dashboard.
 
 \textbf{26th of February - 4th of March} \\
-I implemented the uninstall functionality in the preferences menu in the client.
+I implemented the uninstall functionality in the preferences menu, in the client.
 I added the code to do the static analysis with ClamAV.
 I created a promotional page in the \texttt{/docs} directory
-that will automatically be deployed to GitHub Pages,
-upon pushing to the repository.
+that will automatically be deployed to GitHub Pages, upon pushing to the repository.
 Removing all threading code from the client, making it all asynchronous.
 
 \textbf{5th - 11th of March} \\
@@ -259,6 +274,8 @@ Fixed the pie chart rendering for the clean-malware ratio in the dashboard.
 Found an XSS security vulnerability that has now been fixed.
 And set a timeout for infinitely running scans,
 to be killed after a minute in the dynamic analysis.
+
+Added a 6th \textbf{v0.1.2} release of the client to GitHub.
 
 \section{Agile Methodology}
 I decided on an agile-style methodology because
@@ -287,17 +304,25 @@ The Kanban board had three columns: "Todo", "In Progress", and "Done".
 When I thought of a task that needed to be done, I placed it in the "Todo" column.
 When a task was in progress, I moved it to the "In Progress" column.
 Once I finished working on a task, I then moved it to the "Done" column.
-Appendix B \ref{sec:kanban_table} contains a list of
+Appendix \ref{table:kanbanBoard} contains a list of
 all the tasks I had on my Kanban board,
 every one of them are now in the "Done" column.
 
-\section{Software Testing}
+Every couple of weeks in the 2nd semester,
+I created GitHub releases for the client.
+These releases included the installer.
+I followed the principles of semantic versioning,
+where the version numbers are formatted as major.minor.patch.
+By the end of the development,
+I had reached version \texttt{v0.1.2}, which was the 6th release.
+
 % What about validation and testing?
+\section{Software Testing}
 I used a test-driven approach (TDD) to develop the server endpoints.
 I used the "unittest" Python library to write unit tests for the server endpoints.
 
 I used the tests as a specification for the server endpoints.
-If the tests failed I wasn't implementing the endpoints correctly.
+If the tests failed, it indicated I wasn't implementing the endpoints correctly.
 I could run the tests and it would verify if I had broken any of the endpoints.
 
 The test files are prefixed with \textbf{test\_},
@@ -313,7 +338,7 @@ So the only difference is the endpoint location.
 After pushing the code to the GitHub repository,
 I wanted to automate the process of running a suite of tests.
 
-Therefore, I created a GitHub action that can be found at \\
+So, I created a GitHub action that can be found at \\
 \texttt{.github/workflows/run\_tests.yml}.
 The YAML file instructs GitHub to spawn an instance of the server, on their servers,
 sleep for 3 seconds, and then run the tests found
