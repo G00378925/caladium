@@ -6,9 +6,9 @@
 % and algorithms to illustrate your design.
 
 This chapter features a discussion on how the project was designed
-and on the design principles used throughout.
+and on the design decisions used throughout.
 Diagrams and screenshots of the various components will be provided
-and implementation snippets of code will be included.
+and so will implementation snippets of code.
 
 \begin{figure}[h!]
     \centering
@@ -27,30 +27,33 @@ On the left side, there is the client software,
 which includes the GUI application and the dashboard
 that runs in the administrator's browser.
 In the middle, there is the server. On the right side,
-there are the instances of sandbox analysis workers.
+there are instances of the sandbox analysis workers.
 Multiple instances of these workers can be created.
 
 \section{Windows GUI Application}
-The GUI application runs on a user's computer it runs on the client side
+The GUI application runs on a user's computer
+and it runs on the client side
 
 Python files with the \texttt{frame.py} suffix contain Tkinter frame classes,
-and each of these files contains only one class that inherits the Tkinter frame class.
+and each of these files contains only one class that inherits the Tkinter \texttt{Frame} class.
 
-This allows for the encapsulation of all code related to that frame,
+This allows all code related to that frame, to be fully encapsulated,
 for instance in the \texttt{PreferencesFrame}, the buttons for changing the settings
 are kept inside the class and not accessible to other classes.
 
-The main code of application can be found in the \texttt{client/src/\_\_main\_\_.py} file,
+The main code of the application can be found in the
+\texttt{client/src/\_\_main\_\_.py} file,
 the purpose of this file is to setup up the Tkinter window and run the main loop of execution.
 
-In order for the application to do anything with the server, it first needs to be provisioned.
+In order for the application to do anything with the server,
+it first needs to be provisioned.
 The requirement of provisioning prevents unauthorised
-
 clients from executing tasks on the workers.
+
 Administrators can optionally enable auto-provisioning on the server,
 allowing clients to provision without manual intervention,
 manual intervention requires administrators to issue users with a token,
-and users will input this token into their client upon first load.
+and users will input this token into their application on the first load.
 
 \subsection{User Interface}
 The client post-provisioning features a Tkinter \texttt{Notebook},
@@ -64,12 +67,14 @@ The Main Page in the frame features a button to manually scan a file,
 and a label indicating the current scanning directory.
 
 \subsubsection{Quarantine Page}
-The code for the quarantine page can be found in \texttt{client/src/quarantineframe.py}.
+The code for the quarantine page can be found in
+\texttt{client/src/quarantineframe.py}.
 
-The quarantine displays all the files currently in quarantine,
+The quarantine frame displays all the files currently in quarantine,
 it shows the original location of each file,
-with the ability the restore each file,
-by clicking on the entry in the list box and then pressing the "Restore file" button.
+with the ability to restore each file,
+by clicking on the entry in the list box
+and then pressing the "Restore file" button.
 
 A screenshot of the quarantine page can be seen below,
 you can also see the menu bar at the top,
@@ -90,7 +95,8 @@ I'm using \texttt{tkinter.filedialog.askopenfile("rb")},
 which returns a handle to a file when picked.
 
 \subsubsection{Preferences Page}
-The preferences page contains buttons, allowing users to adjust settings.
+The preferences page contains buttons,
+allowing users to adjust settings.
 
 The "Uninstall Caladium" button will uninstall Caladium from your computer,
 it does this by dropping a script into your \texttt{\%TEMP\%} directory,
@@ -99,13 +105,13 @@ It will then delete the Caladium directory from the \texttt{Program Files} direc
 and cleans up the shortcuts on the desktop and the startup directory.
 
 Pressing the "Change Scanning Directory" button will open a directory picker,
-similar to the file picker shown above in the quarantine.
+similar to the file picker shown above in the quarantine frame.
 Once the user has selected the new directory,
 it will change the current scanning directory to the one selected,
 and update the label on the main page to reflect this.
 
 "Unprovision Caladium" will reverse the provisioning,
-and will close the application, when the user reopens
+and will close the application. When the user reopens
 the application, they will be prompted to re-provision.
 
 \subsubsection{Scanning Frame}
@@ -130,7 +136,8 @@ In the screenshot above, you can see the log messages coming back from the serve
 each message is prefixed with an error level indicator, \texttt{[+]} meaning success
 and \texttt{[-]} meaning failure.
 
-At the bottom you can see the current progress stage, in this case its \texttt{50\%}.
+At the bottom, you can see the current progress stage,
+in this case, its \texttt{50\%}.
 
 \subsection{Quarantine}
 When files are added to the quarantine,
@@ -166,7 +173,7 @@ that will be called when a new file appears in the directory.
 A \textbf{tkthread} thread is spawned which loops
 and checks for new files on every iteration.
 The current directory state is obtained using
-\texttt{os.listdir(dir\_name)} and compared to the last state.
+\texttt{os.listdir(dir\_name)} and compared with the last state.
 To prevent the application from locking up,
 the Tkinter GUI is given some time to render on each iteration.
 This is explained in detail in the technology review chapter.
@@ -199,18 +206,28 @@ Clicking on any of the titles on the index page will bring you to its list page.
 \end{figure}
 
 \subsection{Single-Page Application}
+A single-page application can update its contents
+without having to refresh the page,
+using JavaScript to dynamically fetch content from an API.
+\cite{jadhav2015single}
+For example, in my dashboard, when a user clicks on a button,
+content such as a list of workers
+will be fetched from an API and then displayed on the screen.
+
 Upon loading a new page, the contents of the page are
 dynamically generated using DOM Lisp expressions.
 The URL of the page is then updated using the History API.
 
 In the \textbf{server/static/js/index.js} I have a dictionary called
-\textbf{routes} containing a list of all the routes and their corresponding
-page classes and their URL.
-When the page is loaded, the URL is checked against the dictionary
-and the corresponding page class is loaded.
+\textbf{routes} containing a list of all
+the routes and their corresponding
+page classes and their page titles.
+When a page is loaded,
+the routes dictionary is queried using the current URL in the browser,
+and the corresponding page class is then loaded.
 
-Below you can find a code snippet of the routes found in the \texttt{index.js},
-for example, the "/" route, will open the \texttt{IndexPage} class,
+Below you can find a code snippet of the routes found in \texttt{index.js},
+for example, the "/" route, will load the \texttt{IndexPage} class,
 and sets the title to "Dashboard".
 \begin{lstlisting}
 // These are all the defined pages
@@ -228,14 +245,16 @@ const routes = {
 \end{lstlisting}
 
 \subsection {Page Class Hierarchy}
-The dashboard is object-oriented, all of the main code can be found in
+The dashboard is object-oriented,
+all of the main code can be found in
 the \textbf{server/static/js/index.js} file.
 This contains code for communicating with
-the server endpoints and classes for each page.
+the server endpoints and the classes for each page.
 
 Below you can find a diagram showing the hierarchy of the classes,
 all classes inherit from the \texttt{Page} class,
-as they share common functionality, this also upholds the DRY principle.
+as they share common functionality,
+this also upholds the DRY principle.
 
 \begin{figure}[h!]
     \includegraphics[width=0.9\textwidth]{images/diagrams/dashboard_hierarchy.drawio}
@@ -245,20 +264,22 @@ as they share common functionality, this also upholds the DRY principle.
 
 Each page class must implement the \textbf{loadPage} method,
 which is called when the page is loaded.
-This can be used for fetching data from the server.
+This function pulls data from the server,
+that is specific to that page.
 
 \subsection{DOM Lisp Expressions}
 In a single-page application (SPA), all page content
 is dynamically generated without
 needing to pull HTML from a server when navigating between pages.
 
-Initially, I considered embedding raw HTML within JavaScript code,
+Initially, I considered embedding raw HTML within the JavaScript code,
 but found it to be inelegant.
 As a solution, I created a domain-specific language (DSL)
 to represent the Document Object Model (DOM) as Lisp expressions.
 
 My approach involved storing these Lisp expressions as strings within each page class,
-they can include parameters which could be replaced with their actual values during page loading.
+they can include parameters which could be replaced
+with their actual values during page loading.
 This approach allowed me to encapsulate the expressions within each page class.
 
 This approach simplifies the creation of the visual components of each class.
@@ -266,7 +287,7 @@ I developed a library, that can be found at \textbf{server/src/static/js/pantoth
 which has a \textbf{generateDOM} function that takes a
 DOM Lisp expression and its parameters, and returns a DOM object.
 
-The DOM is a tree of nested elements that represents a web pages HTML.
+The DOM is a tree of nested elements that represents a web page's HTML.
 By using Lisp expressions as a DSL to represent DOMs,
 I have created a more elegant solution for generating dynamic
 content without embedding ugly HTML.
@@ -274,11 +295,19 @@ content without embedding ugly HTML.
 Below you will find an example of a DOM Lisp expression.
 This is taken from the \textbf{Preferences} class in the
 \textbf{server/src/static/js/index.js} file.
-It is a list of components for the HTML page,
-including an input box for a new password for the admin user
+It describes the HTML components for that page,
+it includes an input box for a new password for the admin user
 and a button that toggles the auto-provisioning of new users.
 When the user clicks the button, it calls the
 \textbf{toggleAutoProvision} method within the class.
+
+The navigation bar is also represented as a DOM expression,
+this can be found in the main \texttt{Page} class,
+that all pages inherit.
+This avoids repeating myself, allowing easy maintenance.
+
+The \texttt{navigationBar} parameter found below,
+is replaced with the actual navigation bar when loaded.
 
 \begin{lstlisting}
 this.body = ` (div (hash "children"
@@ -301,7 +330,8 @@ this.body = ` (div (hash "children"
     \label{image:loginPageScreenshot}
 \end{figure}
 
-Before you are able to perform any actions, you must log in to the dashboard,
+Before you are able to perform any actions,
+you must log in to the dashboard,
 using the Login page as shown above,
 the default username and password are "root" and "root".
 
@@ -365,7 +395,8 @@ def get_records_route():
 
 Each of the endpoints is RESTful the HTTP method name signifies
 the type of operation to be performed on that resource,
-the table below will show each method and a description of what it does.
+the table below will show each method used in the server
+and a description of its purpose.
 
 \begin{table}
     \centering
@@ -379,8 +410,6 @@ the table below will show each method and a description of what it does.
         \hline
         POST & Creates new data on the server. \\
         \hline
-        PUT & Update existing data on the server. \\
-        \hline
         DELETE & Delete a record by ID. \\
         \hline
     \end{tabular}
@@ -393,15 +422,20 @@ Data was persisted using CouchDB,
 and the server communicates with it using the pycouchdb module.
 
 Having to write out the pycouchdb queries became cumbersome,
-and I decided to abstract the records of the database away using a class called
+so I decided to abstract the records of the database away using a class called
 \texttt{DatabaseRecord}, this can be found in \texttt{server/src/database.py}.
 
-Now If I want to fetch a record of a table I would do this:
+Now If I wanted to fetch a record from a table I would do this:
 \begin{lstlisting}
-task_record database.get(TaskRecord, task_id)
+task_record = database.get(TaskRecord, task_id)
 \end{lstlisting}
 
-To get/set attributes of the record use the instances methods of \texttt{DatabaseRecord}.
+To get/set attributes of the record,
+I would use the instance methods of \texttt{DatabaseRecord}.
+
+In the case of the setting operations,
+the \textt{DatabaseRecord} class would push the modified attribute
+of the record to the CouchDB instance.
 
 \begin{lstlisting}
 print("This is worker ID:", task_record.get("worker_id"))
@@ -417,22 +451,46 @@ as seen in the \texttt{\_\_main\_\_.py} file.
 It checks the token contained in the request and
 verifies if the caller has the required permissions to execute the request.
 
+\subsection{Cloud Hosting}
+I'm using Microsoft Azure to host a Linux server in the cloud.
+During development, to test the latest version,
+I would git pull the latest version of the repository and
+then build and run the Docker image using the \texttt{Dockerfile}.
+
+I am also using Azure to host the CaladiumBot server part.
+To expose ports other than 80,
+which is the default for HTTP web traffic,
+I had to manually add the ports in the Azure dashboard.
+
+My promotional page, which is hosted on GitHub Pages,
+communicates with this CaladiumBot server.
+But could only do this if the server had a valid HTTPS certificate.
+To get an HTTPS certificate you need your server to
+be linked with a domain name.
+So I purchased a domain name, and generated an HTTPS certificate,
+then I succeeded in getting it working.
+
 \section{Analysis Side}
-The main file of the analysis side can be found in \texttt{sandbox/src/main.rkt},
-it is written in the Racket language, when it begins it will open a TCP port ready to accept incoming requests
+The main file of the analysis side can be found in
+\texttt{sandbox/src/main.rkt},
+it is written in the Racket language,
+when it begins it will open a TCP port,
+ready to accept incoming requests
 
 \subsection{Communication with Server Side}
-When a client asks the server to analyze a file,
+When a client asks the server to analyse a file,
 the server needs to assign the job to one of its worker instances.
 To keep track of what the workers are doing,
 the server needs a way to communicate with them in real time.
 I chose to use TCP for this purpose,
 a communication method that allows data to be sent and received between devices.
 
-The main program for analyzing the file is written in Racket,
-which has built-in support for TCP. The server is written entirely in Python,
+The main program for analysing the file is written in Racket,
+which has built-in support for TCP.
+
+The server is written entirely in Python,
 which also supports TCP using the sockets library.
-However, I encountered a problem when trying to receive information from the workers.
+But, I encountered a problem when trying to receive information from the workers.
 The server had no way of knowing how much data was being sent,
 so I looked for a solution and found a
 helpful answer on Stack Overflow \cite{chqrlie:2022}
@@ -440,10 +498,25 @@ The solution was to include the length of the incoming
 data at the beginning of the packet
 so that the server would know how much data to expect.
 
+This code can be found in \texttt{sandbox/src/caladium\_resp.py}.
+It initially sends the size of the data,
+it uses the struct module to convert the Python integer,
+into bytes form, and the > denotes that it will be in big-endian.
+(most significant byte on the left).
+Then sends the actual data,
+the other computer listens for the initial size,
+then knows how much to read.
+
+\begin{lstlisting}
+output_func(struct.pack(">I", len(json_obj_bytes)))
+output_func(json_obj_bytes)
+\end{lstlisting}
+
 \subsection{Scanning Process}
 When a file is passed to the analysis worker from the server,
 the scanning process begins as seen in diagram \ref{image:scanningProcess}.
-Malicious patterns are also passed to the worker.
+Malicious patterns are also passed to the worker
+alongside the file to be scanned.
 
 \begin{figure}[h!]
     \centering
@@ -453,32 +526,38 @@ Malicious patterns are also passed to the worker.
 \end{figure}
 
 The first part of the process is dynamic analysis.
-It begins by spawning a Process Monitor,
+It begins by spawning Process Monitor,
 then the target file is executed in Sandboxie.
 While this is happening,
 Process Monitor is logging the system calls performed by the target file.
 Once the process is finished or a certain amount of time elapses (timeout),
-the process monitor is killed. This will return a list of system calls in CSV format.
+Process Monitor is killed. This will return a list of system calls in CSV format.
 
-We must iterate through all these system calls to see if we
-get a match with one of the patterns that were passed to the worker.
-If there isn't a match, we will continue to the next stage of the process,
+Then it must iterate through all these system calls,
+to see if there is a match with one of the patterns
+that was passed to the worker.
+If there isn't a match, it will continue to the next stage of the process,
 the static analysis.
 
-This is done with ClamAV, which will be passed to the
+This is done with ClamAV,
+which passes the location of the file to
 \texttt{clamscan.exe} as a parameter.
-We will check the output of this to see if it's malicious. If none detect anything,
+It will check the output of this to see if it's malicious.
+If both strategies detect nothing,
 the scan will end and the file can be deemed clean.
 Each state of the process gives updates back to the server along with
 text messages that will be presented to the client.
 
 \section{Promotional Page}
-In addition to the projects above the platform features a promotional page hosted on GitHub Pages.
+In addition to the sub-projects above, the platform
+features a promotional page hosted on GitHub Pages.
 
-It contains two buttons on the top of the page, the first downloads the latest build of the Caladium client from the GitHub releases.
+It contains two buttons on the top of the page,
+the first downloads the latest build of the
+Caladium client from the GitHub releases.
 
-The second button is "Chat with CaladiumBot",
-this is a chatbot that is powered by GPT-3.5.
+The second button "Chat with CaladiumBot",
+launches a chatbot that is powered by GPT-3.5.
 
 \subsection{Fetching Latest Release}
 To find out the latest GitHub release for the client,
@@ -487,7 +566,7 @@ the page must query the GitHub API to get the latest release tag.
 It will query \texttt{https://api.github.com/repos/g00378925/caladium/tags}, \\
 and this will return a JSON object that contains the latest tag.
 Setting the window location to this URL and
-replacing the tag will download the file.
+setting the tag will download the file.
 
 \begin{lstlisting}
 window.location = `https://github.com/G00378925/caladium/
@@ -496,14 +575,15 @@ window.location = `https://github.com/G00378925/caladium/
 
 \subsection{CaladiumBot}
 In order to use the OpenAI API to access GPT-3.5,
-I needed to use an API key, which was supposed to be private and
+I needed to use an API key,
+which was supposed to be private and
 couldn't be kept on the public promotional page.
 
 To fix this, I created a shim API Flask server located at 
 \texttt{bot/\_\_main\_\_.py}, similar to the main server above.
 This shim API provided a single API endpoint \texttt{/api/ask\_question}.
 
-When the call is made from the promotional page,
+When a user asks a question on the promotional page,
 it provides the question in the HTTP body.
 Upon receiving the question,
 the server sends a copy of the \texttt{README.md} 

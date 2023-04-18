@@ -6,7 +6,7 @@
 [![Racket badge](https://img.shields.io/badge/language-racket-red)](https://github.com/G00378925/caladium/search?l=racket)
 
 Caladium is my [fourth-year applied software project](https://www.gmit.ie/applied-project-and-minor-dissertation),
-the title of my dissertation is "**Malware detection using dynamic heuristic analysis**".
+the title of my dissertation is "**Malware Detection using Dynamic Heuristic Analysis**".
 [It can be found here](dissertation/dissertation.pdf)
 
 The project aims to detect malicious files by identifying patterns in them.
@@ -19,7 +19,7 @@ which is achieved through the use of [Sandboxie](https://sandboxie-plus.com/).
 
 [Procmon](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon)
 is used to log the syscalls performed during the process execution.
-Whereas [ClamAV](https://www.clamav.net/), is used to perform static analysis,
+I am then using [ClamAV](https://www.clamav.net/) to perform static analysis,
 it is a free and open-source anti-virus engine that checks a database of known malicious patterns of strings and bytes.
 
 The platform includes a dashboard single-page application for administrators in an enterprise to perform administrative tasks.
@@ -34,9 +34,9 @@ Technicians can set up analysis computers and add them to the platform using the
 
 If you are looking to set up the platform yourself, instructions can be found under the **Building** header below.
 Don't forget to check my [promotional page which can be found here](https://g00378925.github.io/caladium/).
-**_Make sure to ask CaladiumBot some questions about the platform, it is powered by GPT 3.5!_**
+**_Make sure to ask CaladiumBot some questions about the platform, it is powered by GPT-3.5!_**
 
-## Screencast Demonstration
+## Main Screencast Demonstration
 
 <div align="center">
     <a href="https://www.youtube.com/watch?v=aYbQChGvz88">
@@ -44,17 +44,24 @@ Don't forget to check my [promotional page which can be found here](https://g003
     </a>
 </div>
 
-**_Click on the video to open it in YouTube._**
+**_Click on the video to open it on YouTube._**
+
+## Promotional Page & CaladiumBot Screencast
+<div align="center">
+    <a href="https://www.youtube.com/watch?v=hMskBzCt6kU">
+        <img src="https://img.youtube.com/vi/hMskBzCt6kU/0.jpg" alt="Screencast">
+    </a>
+</div>
 
 ## Features of the Platform
-- Client
-    + An installer file is created as part of the client's build process,
-    which can be downloaded and installed by users. They can also choose to uninstall it from the preferences menu.
-    + Upon starting, the client is listening for changes in the `Downloads` directory,
+- GUI Application
+    + An installer file is created as part of the applications build process,
+    which can be downloaded and installed by users. They can also choose to uninstall it, using the preferences menu.
+    + Upon starting, the application is listening for changes in the `Downloads` directory,
     it will detect new files downloaded by the user and prompt them to scan them.
     + During the scan process, the server will randomly assign a worker to handle the analysis.
     Users will receive real-time feedback with a progress bar and text.
-    If the file is identified as malicious, the user will be prompted to quarantine it.
+    If the file is identified as being malicious, the user will be prompted to quarantine it.
     + The quarantine is a secure storage space for potentially malicious files,
     which can be accessed in the **Quarantine** section.
     Users can view a list of files present in the quarantine and choose to add or restore files.
@@ -63,10 +70,10 @@ Don't forget to check my [promotional page which can be found here](https://g003
     Users also have the option to unprovision from the platform, which will require them to re-authenticate with the server.
 
 - Dashboard
-    + To access the dashboard, the administrator needs to enter a valid username and password, which by default is set as `root`.
+    + To access the dashboard, the administrator needs to enter a valid username and password, which is by default, set as `root`.
     Once logged in, the administrator can navigate to the **Preferences** page to change the default password.
     + The dashboard allows administrators to perform administrative tasks related to **Clients**, **Patterns**, **Tasks** and **Workers**.
-    Each of these pages is linked to from the index page and includes a plot that shows relevant data,
+    Each of these pages is linked to from the index page and the index page includes charts that show relevant data,
     such as the ratio of clean to malicious files for analysis.
     + On the **Clients** page, administrators can provision new clients by generating an authentication token for them.
     + The **Tasks** page lists all past and present tasks and shows their current state, such as `Malware Detected`, `Executing` or `Clean`.
@@ -90,7 +97,7 @@ Don't forget to check my [promotional page which can be found here](https://g003
     + An instance of Procmon is launched, and the file is executed within a Sandboxie instance.
     The analysis service waits for the file to finish executing, and if it takes too long to close, it is automatically terminated.
     The syscalls made by the process are collected, and the analysis service checks them in parallel against the provided patterns.
-    + During the scanning process, the analysis service sends log messages back to the client,
+    + During the scanning process, the analysis service sends log messages back to the application,
     along with a percentage of completion and a status string that indicates the current state.
     Possible states include `executing` and `malware_detected`.
     + After the scan is completed, the analysis service automatically cleans up any files that were created
@@ -125,8 +132,8 @@ Python is a requirement for all projects, you can
 <!-- --><!-- --><!-- Client --><!-- --><!-- -->
 <!-- --><!-- --><!--        --><!-- --><!-- -->
 <!-- --><!-- --><!--        --><!-- --><!-- -->
-### Client
-You must make sure you are on Microsoft Windows for this part as `iexpress.exe` is required.
+### GUI Application
+You must make sure you are on Microsoft Windows for this part, as `iexpress.exe` is required.
 Run the following commands in `Command Prompt`, making sure you are in the Caladium root directory.
 ```batch
 cd client

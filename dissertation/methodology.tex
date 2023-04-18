@@ -33,9 +33,9 @@ There would be a server component and a database to persist data for the server.
 After some thought, I decided against performing scanning on the server.
 Instead, I opted to have the scanning done on separate analysis workers.
 This would isolate any potential malware from compromising the server and
-allows for scanning to be done in parallel.
+allows for multiple scans at the same time.
 
-For communication between the client and server, I chose to use RESTful APIs.
+For communication between the clients and the server, I chose to use RESTful APIs.
 I chose this because it is now the de facto standard for web applications and is quite simple.
 
 I also included a dashboard to provide a user-friendly interface for administrators,
@@ -50,16 +50,16 @@ My initial focus was on tools that would enable me
 to log the system calls on Windows.
 Although I initially considered creating the logging software myself,
 I quickly realised that this would be too time-consuming,
-preventing me from creating a full-featured platform in the time given.
+preventing me from creating a fully-featured platform in the time given.
 
 My research led me to discover "Process Monitor" \cite{procmon},
 a software by Microsoft that can be used to log system calls.
 I also explored open-source software that
-I could use it to do static analysis.
+I could use to do static analysis.
 I was originally going to do only dynamic analysis
 but there is always the potential of it not detecting malware,
 and there are already definitions of known malware on the internet.
-I discovered ClamAV and opted for its Windows-optimized version, ClamWin.
+I discovered ClamAV and opted for its Windows-optimised version, ClamWin.
 This software periodically downloads definition signatures
 of known malware in the wild.
 
@@ -71,7 +71,7 @@ After exploring the potential options,
 I settled for Sandboxie. \cite{sandboxie}
 I initially considered running the software on a virtual machine,
 Sandboxie proved to be a more efficient option.
-This software works by hooking the operating-system system calls.
+This software works by hooking the operating-system, system calls.
 Sandboxie keeps track of what resources a running
 process has permission to access.
 It also has the ability to hide files from the running process.
@@ -90,7 +90,7 @@ This allowed me to start and stop Process Monitor as needed.
 Through experimentation, I found a way to start
 Process Monitor from my Racket program.
 I would then spawn the program I was observing and record its behaviour.
-Once it was finished, I would shut down Process Monitor
+Once it was finished, I would then shut down Process Monitor
 and convert the data it collected into a usable CSV format.
 To start Process Monitor with a minimized window,
 I used the command
@@ -128,7 +128,7 @@ so it starts on system boot.
 \section{Development}
 For version control, I used Git and hosted the repository on GitHub.
 I added a \texttt{.gitignore} to prevent temporary files
-and build outputs from being pushed to the GitHub repository.
+and build outputs from being pushed to the repository.
 Initially, I divided the project into
 three parts: the client, server, and sandbox,
 to maintain organisation. I then created a \textbf{src} subdirectory
@@ -153,7 +153,7 @@ I used Overleaf to write the dissertation and pushed the changes to the
 Finding time to work on the project was challenging,
 as I had other modules besides the dissertation.
 I mostly worked on the project during weekends, and whenever
-I thought of a new feature, and I would add it to the Kanban board.
+I thought of a new feature, I would then add it to the Kanban board.
 During development, I spent a considerable amount of time thinking
 about possible solutions to problems. For example,
 to avoid embedding ugly HTML in my dashboard single application's JavaScript,
@@ -233,7 +233,7 @@ Clients can now auto-provision without requiring an admin to do it for them.
 
 \textbf{12th - 18th of February} \\
 This week, I successfully found a way to bundle the client code using PyInstaller.
-I also created an installer using \texttt{iexpress.exe} tool found in Windows
+I also created an installer using the \texttt{iexpress.exe} tool found in Windows
 that creates a shortcut on installation.
 Added commentary to some of the code,
 I've restructured some of the code in the client to make it more smooth.
@@ -267,7 +267,7 @@ Added a new button on the admin dashboard to disable dynamic scanning.
 I fixed the remaining bugs in the scanning process,
 finished the README and created a screencast.
 
-Added a GPT 3.5 chatbot to the promotional page,
+Added a GPT-3.5 chatbot to the promotional page,
 the chatbot allows new users to ask questions about the platform.
 
 Fixed the pie chart rendering for the clean-malware ratio in the dashboard.
@@ -276,6 +276,9 @@ And set a timeout for infinitely running scans,
 to be killed after a minute in the dynamic analysis.
 
 Added a 6th \textbf{v0.1.2} release of the client to GitHub.
+
+\textbf{26th March - 15th April}
+% 
 
 \section{Agile Methodology}
 I decided on an agile-style methodology because
@@ -301,12 +304,21 @@ Throughout the development process,
 I continuously identified the tasks that needed to be completed.
 
 The Kanban board had three columns: "Todo", "In Progress", and "Done".
-When I thought of a task that needed to be done, I placed it in the "Todo" column.
+When I thought of a task that needed to be done,
+I placed it in the "Todo" column.
 When a task was in progress, I moved it to the "In Progress" column.
 Once I finished working on a task, I then moved it to the "Done" column.
 Appendix \ref{table:kanbanBoard} contains a list of
 all the tasks I had on my Kanban board,
 every one of them are now in the "Done" column.
+
+Below you can find a screenshot of the Kanban board I used.
+\begin{figure}[h!]
+    \centering
+    \label{image:kanbanBoardScreenshot}
+    \includegraphics[width=0.95\textwidth]{images/screenshots/kanban_board}
+    \caption{Kanban Board Screenshot}
+\end{figure}
 
 Every couple of weeks in the 2nd semester,
 I created GitHub releases for the client.
@@ -350,9 +362,10 @@ Since I have this instance on my Azure server and not on GitHub, I added the \\
 environmental variable through the GitHub UI.
 This variable is securely passed to the server,
 as having it leaked through logs would cause havoc to my database.
-This allowed me to test if any new code that was introduced or modified broke the application.
+This allowed me to test if any new code that
+was introduced or modified, broke the application.
 
-I set up a server on the cloud to host the server,
+I set up a server on the cloud, to host the server,
 I did this by creating a Linux virtual cloud computer on
 Microsoft Azure Cloud and installed Docker on it.
 To test the server on the cloud, I simply \textbf{git pull}'d

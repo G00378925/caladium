@@ -64,9 +64,9 @@ print(json.dumps(my_data))
 
 \section{Python}
 Python is an interpreted, high-level, general-purpose programming language.
-I chose to use Python because I wanted to use the same language for the client and server.
-When I serialised data in the client I could use the same
-deserialisation library on the server.
+I chose to use Python because I wanted to use the same language for the client and the server.
+When I serialised data on the client side, I could use the same
+ library, to deserialise it on the server.
 
 Python is also a very simple language and can be run without complication,
 this allowed me to quickly test code, without having to compile it every time.
@@ -82,18 +82,21 @@ allowing you to get a lot done with a small amount of code.
 In recent months, the popularity of large language models has exploded,
 primarily due to the advent of ChatGPT.
 
-OpenAI, the creator of GPT, provides an API to their GPT-3.5 model.
+OpenAI, the creator of GPT, provides an
+API to their GPT-3.5 model \cite{openai}.
 This model has been trained on a large corpus of text from the internet
 and can make predictions based on inputs to the model.
 
 Currently, this technology represents the state of the art in
-artificial intelligence and OpenAI's API makes it freely available to anyone.
+artificial intelligence and
+OpenAI's API makes it freely available to anyone.
 
 To promote the platform, I have created a promotional page on
-GitHub pages and added a bot (CaladiumBot) that can answer questions about it.
+GitHub pages and added a bot (CaladiumBot),
+that can answer questions about it.
 I fetch the latest version of the \texttt{README.md} file for
 this project, feed it into the OpenAI model as an initial prompt,
-and then used it to answer users' questions about the platform.
+and then used it to answer user's questions about the platform.
 
 OpenAI provides a module for Python,
 below you will find a minimal example of how I'm using it.
@@ -122,7 +125,7 @@ print(openai.ChatCompletion.create(model="gpt-3.5-turbo", \
 As stated in the objectives, there will be a native GUI application,
 this will be a Windows application so it will not run in the browser,
 the application will be written in Python,
-so I am using Python-specific libraries alongside it.
+so I am using Python-specific libraries to develop it.
 
 \subsection{PyInstaller}
 A common reason why more people don't opt to use Python over a
@@ -149,7 +152,7 @@ It is also cross-platform, allowing the client to run on Windows, Linux and macO
 It is stable and mature, with a plethora of documentation to be found on the internet.
 
 Tkinter makes it very easy to create a GUI with a small amount of code,
-allowing developers to quickly build prototype code.
+which allowed me to quickly build a prototype of the GUI application.
 
 The library features many GUI components including buttons, labels and input boxes,
 these are important for creating a native GUI application experience for Windows.
@@ -175,13 +178,12 @@ it triggers an event that calls the corresponding callback function
 that was specified during the button's creation.
 
 As this call blocks the \textbf{mainloop}'s execution,
-a function that takes a long time to complete,
-invoked by the callback can cause the GUI to freeze,
+a function that takes a long time to complete can cause the GUI to freeze,
 causing the program to become unresponsive.
 
 While a naive solution might involve threading,
 this approach requires thread synchronization and can lead to race conditions
-and phantom threads, leading to even more problems that it fixes.
+and phantom threads, leading to even more problems than it fixes.
 
 Instead, tkthread provides a more elegant solution.
 tkthread is a third-party module for Python,
@@ -190,7 +192,12 @@ that is non-affiliated with the developers of Tkinter.
 In the example below, I'm showing how you can use tkthread to patch
 Tkinter to allow async operations,
 when the button is pressed it will spawn a thread,
-that will give the UI a certain amount of time to draw itself.
+and every so often it will give the
+UI a certain amount of time to draw itself.
+
+This results in much cleaner code,
+and avoid complexities like using threading,
+instead running callback functions asynchronously.
 
 \begin{lstlisting}
 import tkthread
@@ -275,7 +282,8 @@ prior to this, you'd have to use the \texttt{XMLHttpRequest} object,
 this is important in Caladium because it allows the dashboard to
 request data from the server through the RESTful APIs.
 
-Below you can find an example of \texttt{fetch} being used in the dashboard,
+Below you can find an example of the \texttt{fetch}
+being used in the dashboard,
 \texttt{fetch} accepts a number of parameters including the resource path,
 the HTTP headers, in this case, the \textbf{Authorisation}
 token and a body containing the data being sent to the server.
@@ -291,14 +299,14 @@ return await resp.json();
 
 \section{Technology in the Server}
 The server is the main component of the platform,
-bridging communication between the client and the sandbox instances, 
-and providing RESTful APIs for the client to interact with it.
+bridging communication between the clients and the sandbox instances, 
+and providing RESTful APIs for the clients to interact with it.
 
 The server needs to be able to persist data for the administrators, 
 which is stored in CouchDB. Since the server is written in Python,
 it requires the pymongodb library to communicate with the DB instance.
 
-Additionally, I have created a \texttt{Dockerfile} for Docker
+I have also created a \texttt{Dockerfile} for Docker
 that enables people to easily replicate the required
 environment for running the server.
 
@@ -407,14 +415,16 @@ users interested in setting up the project on their own computer,
 with the same environment, the developers used.
 
 The \texttt{Dockerfile} contains instructions for the Docker daemon,
-this is a program that must be installed on a computer you wish to use Docker on.
+this is a program that must be installed
+on a computer you want to use Docker on.
 You must then build containers using this file,
 you can have multiple containers on one machine,
 this is equivalent to having different computers with different Linux distributions.
 
 You must then run these containers to
 execute the code of the project.
-These containers are isolated from the main system, and cannot edit files on the host system.
+These containers are isolated from the main system,
+and cannot edit files on the host system.
 I am using Docker to make it easy to test my project on different machines,
 allowing me to delete them easily,
 and not have to actually install the dependencies on my main host system.
@@ -448,6 +458,22 @@ ENTRYPOINT ["python3"]
 CMD ["__main__.py", "8080"]
 \end{lstlisting}
 
+\subsection{unittest}
+\textbf{unittest} is a module that comes bundled with Python
+that allows you to create test cases for your code. \cite{unittest}
+It takes inspiration from JUnit, which is a popular Java testing framework.
+
+To create a test case you must create a class that inherits the
+\texttt{unittest.TestCase} class.
+Each of the test methods then in your test case class must be prefixed
+with \texttt{text\_}.
+Then in each of the methods, you call \texttt{self.assertEquals}.
+And check if the output of the function in question returns
+the intended output.
+
+This allowed me to create tests for the endpoints,
+and check if they returned their intended outputs.
+
 \section{Technology in the Analysis Side}
 In this section, I will be discussing the technology that
 facilitates the scanning of files and the Racket programming language
@@ -467,15 +493,15 @@ Sandboxie works by intercepting the system calls made by these applications
 it then identifies the application that made the request,
 if the process is currently running under Sandboxie,
 it will fake a response, making the application think it was successful,
-allowing us to observe its behaviour to its full extent.
+allowing us to observe its behaviour.
 
 The main purpose of using Sandboxie is to provide an
 easy to use isolation software for users, to run software
 without worrying about it harming the system.
 
-Sandboxie provides plenty of documentation on how to use the software on its website,
+Sandboxie provides plenty of documentation on how to use the software, on its website,
 and the utilities that come with the software come with command-line parameters,
-allowing to interface with it programmatically.
+allowing programmers to interface with it programmatically.
 
 Below you will find an example command of how to run the Windows
 \textbf{notepad} in a sandbox:
@@ -486,7 +512,7 @@ Below you will find an example command of how to run the Windows
 
 \subsection{Process Monitor}
 Process Monitor is a system monitoring program that allows you to log system calls.
-It was created by Microsoft to serve as an advanced monitoring tool giving power users
+It was created by Microsoft to serve as a monitoring tool giving power users
 the ability to see what exactly every process on their machine is doing,
 it produces a log, of all the actions performed and the name of the process that did it.
 
@@ -548,5 +574,6 @@ ClamAV is mostly targeted towards Linux users,
 but I found a modified distribution of ClamAV optimised for Windows
 called ClamWin.
 
-ClamWin periodically downloaded the latest malware definitions from its website,
+ClamWin periodically downloads the latest malware
+definitions from its website,
 this all happens automatically.
