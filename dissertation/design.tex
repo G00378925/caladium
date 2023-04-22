@@ -32,7 +32,7 @@ Multiple instances of these workers can be created.
 
 \section{Windows GUI Application}
 The GUI application runs on a user's computer
-and it runs on the client side
+and it runs on the client side.
 
 Python files with the \texttt{frame.py} suffix contain Tkinter frame classes,
 and each of these files contains only one class that inherits the Tkinter \texttt{Frame} class.
@@ -83,7 +83,7 @@ showing how you can switch between each frame.
 \begin{figure}[h!]
     \centering
     \label{image:quarantinePageScreenshot}
-    \includegraphics[width=0.75\textwidth]{../docs/client.png}
+    \includegraphics[width=0.8\textwidth]{../docs/client.png}
     \caption{Quarantine Page Screenshot}
 \end{figure}
 
@@ -116,7 +116,8 @@ the application, they will be prompted to re-provision.
 
 \subsubsection{Scanning Frame}
 The code that implements the scanning frame can
-be found in \texttt{client/src/scanningframe.py}.
+be found in \\
+\texttt{client/src/scanningframe.py}.
 
 When the scanning process begins, this window will open,
 it will have a text box containing real-time feedback from the server,
@@ -128,14 +129,13 @@ the state of the bar is updated using its \texttt{value} attribute.
 \begin{figure}[h!]
     \centering
     \label{image:scanningFrameScreenshot}
-    \includegraphics[width=0.75\textwidth]{images/screenshots/scanning_frame}
+    \includegraphics[width=1\textwidth]{images/screenshots/scanning_frame}
     \caption{Scanning Frame Screenshot}
 \end{figure}
 
 In the screenshot above, you can see the log messages coming back from the server,
 each message is prefixed with an error level indicator, \texttt{[+]} meaning success
 and \texttt{[-]} meaning failure.
-
 At the bottom, you can see the current progress stage,
 in this case, its \texttt{50\%}.
 
@@ -182,8 +182,8 @@ This is explained in detail in the technology review chapter.
 The dashboard is a single-page web application (SPA)
 and is fully written in JavaScript.
 This means when you navigate to another page in the dashboard
-it doesn't have to pull it from the server,
-just fetch the data specific to that page,
+it doesn't have to pull the entire page from the server,
+it will only fetch the data specific to that page,
 then renders it dynamically using JavaScript.
 
 Below you will find a screenshot of the dashboard's index page,
@@ -218,7 +218,7 @@ Upon loading a new page, the contents of the page are
 dynamically generated using DOM Lisp expressions.
 The URL of the page is then updated using the History API.
 
-In the \textbf{server/static/js/index.js} I have a dictionary called
+In the \textbf{server/src/static/js/index.js}, I have a dictionary called
 \textbf{routes} containing a list of all
 the routes and their corresponding
 page classes and their page titles.
@@ -228,7 +228,7 @@ and the corresponding page class is then loaded.
 
 Below you can find a code snippet of the routes found in \texttt{index.js},
 for example, the "/" route, will load the \texttt{IndexPage} class,
-and sets the title to "Dashboard".
+and sets the title to "Dashboard". \\
 \begin{lstlisting}
 // These are all the defined pages
 const routes = {
@@ -247,7 +247,7 @@ const routes = {
 \subsection {Page Class Hierarchy}
 The dashboard is object-oriented,
 all of the main code can be found in
-the \textbf{server/static/js/index.js} file.
+the \textbf{server/src/static/js/index.js} file.
 This contains code for communicating with
 the server endpoints and the classes for each page.
 
@@ -278,7 +278,7 @@ As a solution, I created a domain-specific language (DSL)
 to represent the Document Object Model (DOM) as Lisp expressions.
 
 My approach involved storing these Lisp expressions as strings within each page class,
-they can include parameters which could be replaced
+they can include parameters which can be replaced
 with their actual values during page loading.
 This approach allowed me to encapsulate the expressions within each page class.
 
@@ -305,7 +305,6 @@ The navigation bar is also represented as a DOM expression,
 this can be found in the main \texttt{Page} class,
 that all pages inherit.
 This avoids repeating myself, allowing easy maintenance.
-
 The \texttt{navigationBar} parameter found below,
 is replaced with the actual navigation bar when loaded.
 
@@ -323,16 +322,9 @@ this.body = ` (div (hash "children"
 \end{lstlisting}
 
 \subsection{Login Page}
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.75\textwidth]{images/screenshots/login_page}
-    \caption{Login Page Screenshot}
-    \label{image:loginPageScreenshot}
-\end{figure}
-
 Before you are able to perform any actions,
 you must log in to the dashboard,
-using the Login page as shown above,
+using the Login page as shown below,
 the default username and password are "root" and "root".
 
 These can be changed on the preferences page once logged in,
@@ -340,7 +332,14 @@ the password is hashed with SHA-256, so its
 the plain-text version cannot be retrieved in the event of a compromise.
 
 Input these details into the username and password fields
-and press "Login" as seen in the screenshot above.
+and press "Login" as seen in the screenshot below.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{images/screenshots/login_page}
+    \caption{Login Page Screenshot}
+    \label{image:loginPageScreenshot}
+\end{figure}
 
 \subsection{List Page}
 Below you can find an example screenshot of one of the list pages,
@@ -352,7 +351,7 @@ these are specified by the class that inherits the list page class.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/screenshots/list_page}
+    \includegraphics[width=1\textwidth]{images/screenshots/list_page}
     \caption{List Page Screenshot}
     \label{image:listPageScreenshot}
 \end{figure}
@@ -393,11 +392,6 @@ def get_records_route():
 ...
 \end{lstlisting}
 
-Each of the endpoints is RESTful the HTTP method name signifies
-the type of operation to be performed on that resource,
-the table below will show each method used in the server
-and a description of its purpose.
-
 \begin{table}
     \centering
     \begin{tabular}{|p{2cm}|p{6cm}|}
@@ -417,6 +411,11 @@ and a description of its purpose.
     \label{table:httpMethods}
 \end{table}
 
+Each of the endpoints is RESTful, the HTTP method name signifies
+the type of operation to be performed on that resource,
+the table above will show each method used in the server
+and a description of its purpose.
+
 \subsection{Database}
 Data was persisted using CouchDB,
 and the server communicates with it using the pycouchdb module.
@@ -431,10 +430,11 @@ task_record = database.get(TaskRecord, task_id)
 \end{lstlisting}
 
 To get/set attributes of the record,
-I would use the instance methods of \texttt{DatabaseRecord}.
+I would use the instance methods of \\
+\texttt{DatabaseRecord}.
 
 In the case of the setting operations,
-the \textt{DatabaseRecord} class would push the modified attribute
+the \texttt{DatabaseRecord} class would push the modified attribute
 of the record to the CouchDB instance.
 
 \begin{lstlisting}
@@ -454,7 +454,7 @@ verifies if the caller has the required permissions to execute the request.
 \subsection{Cloud Hosting}
 I'm using Microsoft Azure to host a Linux server in the cloud.
 During development, to test the latest version,
-I would git pull the latest version of the repository and
+I would pull in the latest version of the repository using Git and
 then build and run the Docker image using the \texttt{Dockerfile}.
 
 I am also using Azure to host the CaladiumBot server part.
@@ -473,15 +473,15 @@ then I succeeded in getting it working.
 \section{Analysis Side}
 The main file of the analysis side can be found in
 \texttt{sandbox/src/main.rkt},
-it is written in the Racket language,
-when it begins it will open a TCP port,
+it is written in the Racket language.
+When it begins it will open a TCP port,
 ready to accept incoming requests
 
 \subsection{Communication with Server Side}
 When a client asks the server to analyse a file,
 the server needs to assign the job to one of its worker instances.
-To keep track of what the workers are doing,
-the server needs a way to communicate with them in real time.
+To keep track of what the workers were doing,
+the server needed a way to communicate with them in real-time.
 I chose to use TCP for this purpose,
 a communication method that allows data to be sent and received between devices.
 
@@ -489,14 +489,14 @@ The main program for analysing the file is written in Racket,
 which has built-in support for TCP.
 
 The server is written entirely in Python,
-which also supports TCP using the sockets library.
+which also supports TCP using the \texttt{sockets} library.
 But, I encountered a problem when trying to receive information from the workers.
 The server had no way of knowing how much data was being sent,
 so I looked for a solution and found a
-helpful answer on Stack Overflow \cite{chqrlie:2022}
+helpful answer on Stack Overflow. \cite{chqrlie:2022}
 The solution was to include the length of the incoming
-data at the beginning of the packet
-so that the server would know how much data to expect.
+data at the beginning of the packet,
+so the server would know how much data to expect.
 
 This code can be found in \texttt{sandbox/src/caladium\_resp.py}.
 It initially sends the size of the data,
@@ -506,6 +506,7 @@ into bytes form, and the > denotes that it will be in big-endian.
 Then sends the actual data,
 the other computer listens for the initial size,
 then knows how much to read.
+I've included the code snippet that does this, below.
 
 \begin{lstlisting}
 output_func(struct.pack(">I", len(json_obj_bytes)))
@@ -514,13 +515,13 @@ output_func(json_obj_bytes)
 
 \subsection{Scanning Process}
 When a file is passed to the analysis worker from the server,
-the scanning process begins as seen in diagram \ref{image:scanningProcess}.
+the scanning process executes as seen in the diagram below.
 Malicious patterns are also passed to the worker
 alongside the file to be scanned.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{images/diagrams/scan_process}
+    \includegraphics[width=0.6\textwidth]{images/diagrams/scan_process}
     \caption{Scanning Process Diagram}
     \label{image:scanningProcess}
 \end{figure}
@@ -544,9 +545,10 @@ which passes the location of the file to
 \texttt{clamscan.exe} as a parameter.
 It will check the output of this to see if it's malicious.
 If both strategies detect nothing,
-the scan will end and the file can be deemed clean.
+the scan will end, and the file can be deemed clean.
 Each state of the process gives updates back to the server along with
-text messages that will be presented to the client.
+text messages that will be presented
+in the GUI application's log box.
 
 \section{Promotional Page}
 In addition to the sub-projects above, the platform
@@ -555,7 +557,6 @@ features a promotional page hosted on GitHub Pages.
 It contains two buttons on the top of the page,
 the first downloads the latest build of the
 Caladium client from the GitHub releases.
-
 The second button "Chat with CaladiumBot",
 launches a chatbot that is powered by GPT-3.5.
 
@@ -584,22 +585,24 @@ To fix this, I created a shim API Flask server located at
 This shim API provided a single API endpoint \texttt{/api/ask\_question}.
 
 When a user asks a question on the promotional page,
-it provides the question in the HTTP body.
+it inserts the question into the HTTP body,
+when sending the request to the API.
 Upon receiving the question,
 the server sends a copy of the \texttt{README.md} 
 as an initial prompt to the model.
 The model then responds with its text prediction,
 which the shim API sends back to the promotional page.
 The promotional page then dynamically adds
-this text to the page using JavaScript character by character,
+this text, character by character, to the page using JavaScript,
 creating the effect of generating the text.
 
-Below is an excerpt of the code that creates this effect.
+An excerpt of the code that creates this effect can be found below.
 
 \begin{lstlisting}
 // Add text to the output box
 function addTextToOutput(outputText) {
-    document.getElementById("caladiumBotOutput").innerHTML += outputText;
+    document.getElementById("caladiumBotOutput")
+      .innerHTML += outputText;
 }
 
 ...
@@ -607,7 +610,8 @@ function addTextToOutput(outputText) {
 function addCaladiumBotMessageEffect(caladiumBotMsg) {
     ...
 
-    // This adds a single character, and pauses for a random amount of time
+    // This adds a single character,
+    // and pauses for a random amount of time
     addTextToOutput(caladiumBotMsg[0]);
     setTimeout(addCaladiumBotMessageEffect,
         Math.random() * 100, caladiumBotMsg.substr(1));

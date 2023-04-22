@@ -15,7 +15,7 @@ Sandboxie was used for isolation,
 and Process Monitor was used to log
 the actions/system calls of the software being run.
 
-Users can download and install a GUI Windows application client on their computer.
+Users can download and install a GUI Windows application to their computer.
 When a user downloads a new file, the client will detect it and prompt the user to scan it.
 The file will be sent to the server and then will be passed to a sandbox analysis worker,
 and the client will display the real-time feedback of the scan.
@@ -43,7 +43,7 @@ principle whilst developing the software.
 Using an agile methodology,
 I broke down features into tasks and added them to the Kanban board
 (can be found in Appendix \ref{table:kanbanBoard}).
-I created tests for the endpoints which can be found in \texttt{server/tests} directory,
+I created tests for the endpoints which can be found in the \texttt{server/tests} directory,
 and these are automatically executed when the code is pushed to the repository.
 Every couple of weeks in the 2nd semester, I made releases of the client,
 which can be found in the releases section in the GitHub repository.
@@ -89,8 +89,8 @@ Administrators can input data into various fields on the dashboard,
 such as adding new malicious patterns.
 
 I discovered that my dashboard was not sanitising the inputs,
-which could allow a malicious user to input raw HTML
-that would be displayed as it is on the dashboard,
+which could allow a malicious user to input raw HTML,
+that would be displayed in its raw form
 resulting in a vulnerability known as the XSS.
 
 This is a common oversight made by many developers,
@@ -114,18 +114,18 @@ I made sure that it was working at a minimum between
 my Azure instance and my local computer and decided to
 put the rest of my time into working on the remaining functionality.
 
-This serves as a lesson to me to avoid jumping to the
-first thing that comes to my head, and to research technologies
-that are trusted in the industry that facilitate communication
-between distributed systems, like my platform.
+This serves as a lesson, to avoid making naive assumptions,
+by putting more time into researching technologies
+that are trusted in the industry, that facilitate communication
+between distributed systems, like this project.
 
 \subsection{Opportunities Identified for Future Investigation}
 To determine if a file is malicious,
-I use heuristics that involve checking if the system calls
+I use a heuristic that involves checking if the system calls
 contain any of the known malicious pattern strings.
 
 Regular expressions may have been more appropriate for this purpose,
-but I decided against using them due to them being computationally
+but I decided against using them, due to them being computationally
 expensive and potentially slowing down the scanning process.
 
 Another possible approach is to assign weights to certain patterns,
@@ -142,7 +142,7 @@ Large language models like GPT-4 could also have been used,
 it could take in a sample of the system calls and
 be instructed to return a string of text
 indicating if they are malicious or not.
-I also decided against this as it's quite expensive at this time.
+I also decided against this, as it's quite expensive at this time.
 
 \section{Conclusion}
 Overall, the project has been a massive success,
@@ -166,7 +166,7 @@ I used a variety of languages and libraries to make Caladium possible.
 
 Due to this being a significant project with multiple components,
 I learned about good software practices and applied methodologies such as agile.
-I also created tests for the endpoints that were tested upon pushing to the repository.
+I also created tests for the endpoints, that were tested upon pushing to the repository.
 
 I gained knowledge about the malware side
 of cybersecurity by researching malware detection

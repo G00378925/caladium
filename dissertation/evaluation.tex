@@ -20,13 +20,13 @@ and compared against the malicious patterns.
 If any of the system calls contain any of the patterns,
 then they can be deemed malicious.
 
-To test the dynamic analysis, compile the C program provided below
+I tested the dynamic analysis, by compiling the C program provided below
 (using a compiler such as GCC or Clang).
 The program creates a file called "very\_malicious.txt" when executed,
-and this file name should be added to the malicious patterns
+and I added this file name to the malicious patterns
 before scanning the executable.
 
-Have the client application scan this file using
+And I got the GUI application to scan this file using
 the manual scan option on the main page.
 \textbf{Caladium successfully detected the file as being malicious.}
 
@@ -53,7 +53,7 @@ To test this, I am using the "EICAR Test File" \cite{EICAR},
 which is a standardised file that is universally
 detected as malware by all anti-malware solutions.
 
-\textbf{Caladium successfully detects the file as malware.}
+\textbf{Caladium successfully detected the file as malware.}
 
 \subsection{Quarantine}
 When the sandbox analysis worker detects the file as malware,
@@ -61,8 +61,8 @@ it will send a message back to the client indicating "malware\_detected".
 
 The user in the client will then be prompted to quarantine the malware,
 and the scan will finish.
-The quarantined file can be found in the quarantine frame,
-concluding that the quarantining feature works correctly.
+\textbf{The quarantined file can be found in the quarantine frame,
+concluding that the quarantining feature works correctly.}
 
 \section{Code Quality}
 I am evaluating the code quality based on its
@@ -107,19 +107,19 @@ which contains GUI-specific functionality.
 The actual code for handling quarantine logic
 is placed in a separate \texttt{Quarantine} class.
 
-I believe that implementing these measures has improved
-the overall readability of the application.
+\textbf{I believe that following these measures has improved
+the overall code readability of the application.}
 
 \section{User Experience}
 A user-friendly interface is provided to both users and
 administrators through the GUI application and the dashboard.
 
 \subsection{Windows GUI Application}
-Users simply need to run an installer,
+To install the software, users just need to execute the installer,
 which will automatically install and provision the software,
 and start it on system boot.
 It will immediately begin scanning the downloads directory,
-and users can easily remove the software through the preferences menu.
+and users can easily remove the software through the preferences frame.
 
 The quarantine frame makes it easy for users to understand which
 files are quarantined and allows them to easily quarantine new files.
@@ -129,7 +129,7 @@ When users scan a file, they are given real-time feedback on the scan process,
 and a progress bar showing the percentage level of completion,
 users can easily stop the scan process by closing the scan window.
 
-I believe these features, create a rich and friendly experience for users.
+\textbf{I believe these features, create a rich and friendly experience for users.}
 
 \subsection{Dashboard}
 Administrators are prompted to log in to the dashboard and are
@@ -140,7 +140,7 @@ Administrators can disable dynamic analysis in case it breaks,
 and the system will then solely rely on static analysis.
 
 The dashboard is a single-page application,
-with seamless switching between pages without loading times.
+which allows seamless switching between pages without loading times.
 The list pages allow administrators to easily
 add and remove clients or workers.
 
@@ -175,6 +175,18 @@ The password is hashed using the SHA-256 algorithm.
 If the server is compromised,
 the admin's password won't be readable in its original form.
 
+The diagram below illustrates how data can be easily
+hashed, but is difficult to reverse the process.
+Passwords can be securely stored after being hashed,
+this makes it infeasible to retrieve the original password from the hash.
+
+\begin{figure}[h!]
+    \centering
+    \label{image:hashingDiagram}
+    \includegraphics[width=0.75\textwidth]{images/diagrams/hashing}
+    \caption{Hashing Algorithm Diagram}
+\end{figure}
+
 When you log in you are given a session token,
 which is stored in the browser's local storage.
 All RESTful API calls require a valid session token to be sent with the request.
@@ -185,11 +197,23 @@ this gets called before every request, it checks the path being requested
 and if the requester has the correct token to access the resource.
 
 \subsection{Cross Site Scripting (XSS)}
-Cross-site scripting is a type of attack \cite{XSS},
-where attackers can inject code into other users' browser sessions.
+Cross-site scripting is a type of attack,
+where attackers can inject code into other users' browser sessions. \cite{XSS}
 A field may display data on the screen,
 and attack input data may contain HTML
-that is not sanitised.
+that is not sanitised. \\
+
+In the screenshot below, you can see how the \\
+"\texttt{hello <script>alert(1)</script>world}" string can cause a problem.
+The script tags are being processed literally,
+executing the JavaScript and showing the alert box.
+
+\begin{figure}[h!]
+    \centering
+    \label{image:xssScreenshot}
+    \includegraphics[width=0.85\textwidth]{images/screenshots/xss}
+    \caption{Dashboard XSS Screenshot}
+\end{figure}
 
 In my project, I modified my code in the dashboard
 after discovering this security bug,
@@ -262,10 +286,10 @@ as multiple workers are supported.
 \section{Time Complexity}
 When a file is executed by the worker it produces a log of all the
 system calls it produces, a list of patterns is passed to
-the worker in order to be checked against the system calls
+the worker in order to be checked against the system calls,
 if there is a match then the file can be deemed malicious.
 
-This is a sample of the code from \texttt{sandbox/src/syscall\_analysis.py}
+This is a sample of the code from \texttt{sandbox/src/syscall\_analysis.py},
 before optimisation it had a O($n$ * $m$) time complexity,
 $n$ is the size of the syscalls
 and $m$ being the size of the malicious\_patterns.

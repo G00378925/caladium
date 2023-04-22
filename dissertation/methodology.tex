@@ -6,7 +6,7 @@
 % methodology and your research methodology.
 
 This chapter will be discussing the methodology,
-That I used whilst developing my project
+that I used whilst developing my project
 along with the research that helped guide it.
 The primary objective of my research was to identify components,
 that would allow my platform to detect malware based on its behaviour.
@@ -59,7 +59,7 @@ I could use to do static analysis.
 I was originally going to do only dynamic analysis
 but there is always the potential of it not detecting malware,
 and there are already definitions of known malware on the internet.
-I discovered ClamAV and opted for its Windows-optimised version, ClamWin.
+I discovered ClamAV \cite{clamav} and opted for its Windows-optimised version, ClamWin.
 This software periodically downloads definition signatures
 of known malware in the wild.
 
@@ -77,7 +77,7 @@ process has permission to access.
 It also has the ability to hide files from the running process.
 
 \subsection{Collecting System Calls}
-After choosing Process Monitor as my tool to collect system calls,
+After choosing Process Monitor \cite{procmon} as my tool to collect system calls,
 I needed to find a way to integrate it into my project.
 While most people use Process Monitor's user interface
 to click buttons and navigate using its interface,
@@ -159,14 +159,14 @@ about possible solutions to problems. For example,
 to avoid embedding ugly HTML in my dashboard single application's JavaScript,
 I created a library called \textbf{pantothenic.js} that can convert 
 string-based Lisp expressions into DOM objects
-(you'll see more about this in the design chapter).
+(you'll see more about this in the system design chapter).
 
 \subsection{Weekly Progress Reports}
 Every week during the 2 semesters, I exchanged my progress report,
 with my supervisor during our weekly meeting over Microsoft Teams.
 
 Below you will find each week's report and a description of what I did,
-this would sometimes be research and/or development.
+this would sometimes be research and/or development. \\
 
 \textbf{16th - 22th of October} \\
 I worked on the \texttt{DirChangeListener} class for the client,
@@ -174,35 +174,35 @@ which is used to listen for changes in directories.
 
 This will be used to detect new files added to the downloads directory.
 I researched methods of implementing the sandbox analysis,
-and have a basic prototype of it working.
+and have a basic prototype of it working. \\
 
 \textbf{23rd - 29th of October} \\
 I found out that the system call logger was collecting too many system calls.
 So I needed to filter out the ones I'm not interested in.
 I made a filtering program in Python to do this.
 
-I also refactored the analysis code to make it cleaner.
+I also refactored the analysis code to make it cleaner. \\
 
 \textbf{30th of October - 12th of November} \\
 I started using the Kanban board on GitHub to keep track of tasks.
 I added code to the sandbox analysis service, so you can now connect to it over TCP,
-and pass in a JSON message object containing the instructions you want it to execute.
+and pass in a JSON message object containing the instructions you want it to execute. \\
 
 \textbf{13th - 19th of November} \\
 This week I was working on the dashboard, and I added a stylesheet called Milligram,
-I enabled CORS, so I could now fetch data from the server without getting an error message.
+I enabled CORS, so I could now fetch data from the server without getting an error message. \\
 
 \textbf{20th - 26th of November} \\
 I worked on setting up Docker and a server on Azure.
-Now I can run the server in a container, and it downloads all the dependencies I require.
+Now I can run the server in a container, and it downloads all the dependencies I require. \\
 
 \textbf{27th of November - 3rd of December} \\
 I worked on setting up a page for adding workers in the dashboard application.
-I also added backend logic for logging in users.
+I also added backend logic for logging in users. \\
 
 \textbf{4th - 10th of December} \\
 I added code that can begin a scanning task on the server,
-and added RESTful APIs for performing actions on this code.
+and added RESTful APIs for performing actions on this code. \\
 
 \textbf{11th of December - 28th of January} \\
 During these four weeks, I have:
@@ -222,34 +222,34 @@ All requests from the client to the server, 
 are now authenticated, and you can't do anything without being first provisioned.
 Files dropped into the downloads directory, now trigger a notification,
 asking the user if they want the files to be scanned.
-And I fixed some broken endpoints for deleting records, which the tests caught.
+And I fixed some broken endpoints for deleting records, which the tests caught. \\
 
 \textbf{5th - 11th of February} \\
 During this week, I added a GitHub Action to automatically run the test suite,
 when new code is pushed to the repository.
 Fixed some problems in the client and server,
 and fixed the problem in the client that was causing the scan to fail.
-Clients can now auto-provision without requiring an admin to do it for them.
+Clients can now auto-provision without requiring an admin to do it for them. \\
 
 \textbf{12th - 18th of February} \\
 This week, I successfully found a way to bundle the client code using PyInstaller.
 I also created an installer using the \texttt{iexpress.exe} tool found in Windows
 that creates a shortcut on installation.
 Added commentary to some of the code,
-I've restructured some of the code in the client to make it more smooth.
+I've restructured some of the code in the client to make it more smooth. \\
 
 \textbf{19th - 25th of February} \\
 I added a new preferences page to the client,
 so users could update the current scanning directory.
 Added a button to unprovision the client, I also added an icon to the executable,
-fixed the bar chart rendering bug in the dashboard.
+fixed the bar chart rendering bug in the dashboard. \\
 
 \textbf{26th of February - 4th of March} \\
 I implemented the uninstall functionality in the preferences menu, in the client.
 I added the code to do the static analysis with ClamAV.
 I created a promotional page in the \texttt{/docs} directory
 that will automatically be deployed to GitHub Pages, upon pushing to the repository.
-Removing all threading code from the client, making it all asynchronous.
+Removing all threading code from the client, making it all asynchronous. \\
 
 \textbf{5th - 11th of March} \\
 I worked on the promotional page, adding a download button to
@@ -257,11 +257,11 @@ download the latest version of Caladium.
 When malware is detected the user is now
 prompted to quarantine the malicious files.
 I have now made a \textbf{v0.1} release of the software on GitHub
-along with a new feature, showing the current scanning directory on the main page.
+along with a new feature, showing the current scanning directory on the main page. \\
 
 \textbf{12th - 18th of March} \\
 I made the scanning less likely to fail, by adding code to detect exceptions.
-Added a new button on the admin dashboard to disable dynamic scanning.
+Added a new button on the admin dashboard to disable dynamic scanning. \\
 
 \textbf{19th - 25th of March} \\
 I fixed the remaining bugs in the scanning process,
@@ -275,10 +275,14 @@ Found an XSS security vulnerability that has now been fixed.
 And set a timeout for infinitely running scans,
 to be killed after a minute in the dynamic analysis.
 
-Added a 6th \textbf{v0.1.2} release of the client to GitHub.
+Added a 6th \textbf{v0.1.2} release of the client to GitHub. \\ \\
 
-\textbf{26th March - 15th April}
-% 
+\textbf{26th March - 15th April} \\
+I finished writing a draft of the dissertation.
+I added a sound to the dashboard that plays when moving between pages,
+it can be disabled using a toggle in the preferences page.
+I recorded a screencast of the promotional page,
+which shows CaladiumBot answering questions about Caladium.
 
 \section{Agile Methodology}
 I decided on an agile-style methodology because
@@ -297,13 +301,21 @@ it can be deployed to production if it passes all of them.
 
 In order to manage the tasks required for the project,
 I decided to break them down and create a Kanban board.
-Initially, I was considering using Jira, but I later found out that
+I did consider using Jira, but I later found out that
 GitHub supported the Kanban board,
 which was much more convenient because it was integrated with GitHub.
 Throughout the development process,
 I continuously identified the tasks that needed to be completed.
 
-The Kanban board had three columns: "Todo", "In Progress", and "Done".
+Below you can find a screenshot of the Kanban board I used.
+\begin{figure}[h!]
+    \centering
+    \label{image:kanbanBoardScreenshot}
+    \includegraphics[width=1\textwidth]{images/screenshots/kanban_board}
+    \caption{Kanban Board Screenshot}
+\end{figure}
+
+The Kanban board had three columns: "Todo", "In Progress" and "Done".
 When I thought of a task that needed to be done,
 I placed it in the "Todo" column.
 When a task was in progress, I moved it to the "In Progress" column.
@@ -311,14 +323,6 @@ Once I finished working on a task, I then moved it to the "Done" column.
 Appendix \ref{table:kanbanBoard} contains a list of
 all the tasks I had on my Kanban board,
 every one of them are now in the "Done" column.
-
-Below you can find a screenshot of the Kanban board I used.
-\begin{figure}[h!]
-    \centering
-    \label{image:kanbanBoardScreenshot}
-    \includegraphics[width=0.95\textwidth]{images/screenshots/kanban_board}
-    \caption{Kanban Board Screenshot}
-\end{figure}
 
 Every couple of weeks in the 2nd semester,
 I created GitHub releases for the client.
@@ -364,6 +368,15 @@ This variable is securely passed to the server,
 as having it leaked through logs would cause havoc to my database.
 This allowed me to test if any new code that
 was introduced or modified, broke the application.
+
+Below, you can find a screenshot of the result of the GitHub action.
+The green checkmark indicates that all the tests ran correctly.
+\begin{figure}[h!]
+    \centering
+    \label{image:githubGreenCheckmark}
+    \includegraphics[width=0.95\textwidth]{images/screenshots/green_check}
+    \caption{GitHub Green Checkmark Screenshot}
+\end{figure}
 
 I set up a server on the cloud, to host the server,
 I did this by creating a Linux virtual cloud computer on
