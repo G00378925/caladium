@@ -74,10 +74,13 @@
 
 (define (run-in-sandbox executable-location out)
     (begin
+        ; Generate temp file locations, and delete if they already exist
         (define procmon-pml-file-location
             (path->string (make-temporary-file "caladium_~a.pml")))
+        (delete-file (string->path procmon-pml-file-location))
         (define procmon-csv-file-location
             (path->string (make-temporary-file "caladium_~a.csv")))
+        (delete-file (string->path procmon-csv-file-location))
 
         (send-update "[*] Starting Process Monitor" 10 out)
         (define procmon-subprocess (subprocess-and-close-ports procmon-location

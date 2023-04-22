@@ -47,6 +47,10 @@ class Page {
     }
 
     loadPage(updatePage=false) {
+        // Play pageChangeSound
+        if (localStorage["pageChangeSound"] == "true")
+            pageChangeSound.play();
+
         // Make sure the page has no HTML elements before appending the new ones
         while (document.body.childNodes[0]) {
             document.body.childNodes[0].remove();
@@ -184,7 +188,9 @@ class PreferencesPage extends Page {
                           (hr)
                           (button (hash "onclick" toggleAutoProvision "innerHTML" autoProvisionButtonText))
                           (span (hash "innerHTML" "&nbsp;&nbsp;&nbsp;&nbsp;"))
-                          (button (hash "onclick" toggleDynamicAnalysis "innerHTML" dynamicAnalysisButtonText)))))`;
+                          (button (hash "onclick" toggleDynamicAnalysis "innerHTML" dynamicAnalysisButtonText))
+                          (hr)
+                          (button (hash "onclick" togglePageChangeSound "innerHTML" pageChangeSoundButtonText)))))`;
     }
 
     loadPage(updatePage=false) {
@@ -193,6 +199,7 @@ class PreferencesPage extends Page {
             this.preferences = resp;
             this.autoProvisionButtonText = (resp["auto_provision"] ? "Disable" : "Enable") + " Auto Provision";
             this.dynamicAnalysisButtonText = (resp["dynamic_analysis"] ? "Disable" : "Enable") + " Dynamic Analysis";
+            this.pageChangeSoundButtonText = (localStorage["pageChangeSound"] == "true" ? "Disable" : "Enable") + " Page Change Sound";
             super.loadPage();
         });
     }
@@ -216,6 +223,12 @@ class PreferencesPage extends Page {
         // Toggle the dynamic analysis preference
         currentPage.caladiumFetch("PUT", currentPage.endpoint, {"dynamic_analysis": !currentPage.preferences["dynamic_analysis"]})
         .then(resp => {currentPage.loadPage(true);});
+    }
+
+    togglePageChangeSound() {
+        // Will flip the status of the pageChangeSound
+        localStorage["pageChangeSound"] = localStorage["pageChangeSound"] == "true" ? false : true;
+        currentPage.loadPage(true);
     }
 }
 
@@ -290,6 +303,7 @@ class ClientsPage extends ListPage {
         });
     }
 
+    // Display the token to the user
     getProvisionTokenFunc(provisionToken) {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(provisionToken);
@@ -336,6 +350,7 @@ class PatternsPage extends ListPage {
                                   "onclick" patternDeleteFunc "innerHTML" "Delete"))))))))`;
     }
 
+    // Will add a new pattern
     addPatternOnClick() {
         const patternString = document.getElementById("patternString").value;
         if (patternString) {

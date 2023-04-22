@@ -1,9 +1,8 @@
 #
 # This script is used to analyse the syscalls of a process.
-# python3 syscall_analysis.py <syscall_file> <malicious_pattern_file>
 #
 
-import multiprocessing, sys
+import multiprocessing, sys, time
 
 import caladium_resp as caladium
 
@@ -34,11 +33,16 @@ def main(argv):
     # Put all syscalls into the queue
     for syscall in syscalls: syscall_queue.put(syscall)
 
+    scan_begin_time = time.time() # Time when scan began
+
     pool = multiprocessing.Pool(processes=worker_count)
     # Spawn worker processes to process the syscalls
     for _ in range(worker_count):
         pool.apply_async(analysis_worker, (syscall_queue, malicious_patterns))
 
+    caladium.send_message(f"[+] Scan took {time.time() - scan_begin_time} seconds(s)")
+
+    # Wait for the threads to finish
     pool.close()
     pool.join()
 

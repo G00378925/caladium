@@ -74,8 +74,14 @@ function generateDOM(expressionStr, parameters) {
         // Hashes will be used as parameters to attributes
         case "hash": {
             let newHash = {};
-            for (let j = 0; j < Math.floor((expressionList.length - 1) / 2); j++)
-                newHash[expressionList[(j * 2) + 1]] = expressionList[(j * 2) + 2];
+            for (let j = 0; j < Math.floor((expressionList.length - 1) / 2); j++) {
+                const attrKey = expressionList[(j * 2) + 1];
+                newHash[attrKey] = expressionList[(j * 2) + 2];
+            }
+
+            if (newHash["innerHTML"]) // Disable XSS
+                newHash["innerHTML"] = newHash["innerHTML"].replace('<', "&lt;").replace('>', "&gt;");
+
             return newHash;
         }
         // Lists will be used to list children
